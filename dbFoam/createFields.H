@@ -9,6 +9,9 @@ autoPtr<psiThermo> pThermo
 psiThermo& thermo = pThermo();
 
 volScalarField& e = thermo.he();
+volScalarField& p = thermo.p();
+volScalarField& T = thermo.T();
+const volScalarField& psi = thermo.psi();
 
 Info<< "Reading field U\n" << endl;
 volVectorField U
@@ -63,40 +66,10 @@ volScalarField rhoE
     rho*(e + 0.5*magSqr(U))
 );
 
-surfaceScalarField pos
+convectiveFlux dbFlux
 (
-    IOobject
-    (
-        "pos",
-        runTime.timeName(),
-        mesh
-    ),
-    mesh,
-    dimensionedScalar("pos", dimless, 1.0)
-);
-
-surfaceScalarField neg
-(
-    IOobject
-    (
-        "neg",
-        runTime.timeName(),
-        mesh
-    ),
-    mesh,
-    dimensionedScalar("neg", dimless, -1.0)
-);
-
-surfaceScalarField phi("phi", fvc::flux(rhoU));
-
-Info<< "Creating turbulence model\n" << endl;
-autoPtr<compressible::turbulenceModel> turbulence
-(
-    compressible::turbulenceModel::New
-    (
-        rho,
-        U,
-        phi,
-        thermo
-    )
+    p,
+    U,
+    T,
+    thermo
 );

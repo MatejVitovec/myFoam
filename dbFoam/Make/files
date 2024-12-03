@@ -1,3 +1,7 @@
+convectiveFlux/convectiveFlux.C
+convectiveFlux/riemannSolver/riemannSolver.C
+convectiveFlux/riemannSolver/hllc/hllc.C
+BC/subsonicInletTotal/subsonicInletTotalFvPatchVectorField.C
 dbFoam.C
 
 EXE = $(FOAM_USER_APPBIN)/dbFoam

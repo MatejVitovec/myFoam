@@ -19,25 +19,24 @@ thermoType
     type            hePsiThermo;
     mixture         pureMixture;
     transport       const;
-    thermo          hConst;
+    thermo          eConst;
     equationOfState perfectGas;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
 
-// Note: these are the properties for a "normalised" inviscid gas
-//       for which the speed of sound is 1 m/s at a temperature of 1K
-//       and gamma = 7/5
 mixture
 {
     specie
     {
-        molWeight       11640.3;
+        molWeight       28.96;
     }
     thermodynamics
     {
-        Cp              2.5;
+        Cp              1004.5;
+	Cv		718.0;
         Hf              0;
+	Tref        	0;
     }
     transport
     {

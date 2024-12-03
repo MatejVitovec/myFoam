@@ -24,7 +24,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Global
-    centralCourantNo
+    courantNo
 
 Description
     Calculates the mean and maximum wave speed based Courant Numbers.

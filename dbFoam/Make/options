@@ -1,5 +1,4 @@
 EXE_INC = \
-    -IBCs/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
@@ -7,7 +6,12 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
-    -I$(LIB_SRC)/dynamicFvMesh/lnInclude
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -IconvectiveFlux \
+    -IconvectiveFlux/lnInclude \
+    -IconvectiveFlux/riemannSolver \
+    -IconvectiveFlux/riemannSolver/hllc \
+    -IBC/subsonicInletTotal
 
 EXE_LIBS = \
     -lfiniteVolume \
@@ -16,7 +20,6 @@ EXE_LIBS = \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
     -lspecie \
-    -lrhoCentralFoam \
     -lturbulenceModels \
     -lcompressibleTurbulenceModels \
     -lthermoTools \
