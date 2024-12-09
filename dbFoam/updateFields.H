@@ -2,7 +2,7 @@
 
 const volScalarField gamma = thermo.Cp()/thermo.Cv();
 
-//rho.boundaryFieldRef() = thermo.rho()().boundaryField();
+rho.boundaryFieldRef() = thermo.rho()().boundaryField();
 
 U = rhoU/rho;
 U.correctBoundaryConditions();
@@ -13,7 +13,6 @@ e.correctBoundaryConditions();
 p = (gamma - 1.0)*rho*e;
 p.correctBoundaryConditions();
 
-//T.correctBoundaryConditions();
 
 thermo.correct();
 

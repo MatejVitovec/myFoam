@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|  \\    /   O peration     | Version:  1.7.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,9 +10,15 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system";
     object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//libs (
+//  "libfluidThermophysicalModels.so"
+//  "libmyFoam.so"
+//);
 
 startFrom       startTime;
 
@@ -20,13 +26,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.012;
+endTime         20000;
 
 deltaT          1e-06;
 
-writeControl    adjustable;
+writeControl    timeStep;
 
-writeInterval   0.001;
+writeInterval   1000;
 
 purgeWrite      0;
 
@@ -40,13 +46,13 @@ timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable true;
+runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo           0.2;
+maxCo 0.4;
 
-maxDeltaT       1;
+rDeltaTSmoothingCoeff 0.1;
 
 
 // ************************************************************************* //

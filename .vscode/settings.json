@@ -67,7 +67,18 @@
         "typeinfo": "cpp",
         "*.txx": "cpp",
         "phaseModel.C": "cpp",
-        "subsonicInletTotalFvPatchVectorField.C": "cpp"
+        "subsonicInletTotalFvPatchVectorField.C": "cpp",
+        "messageStream.C": "cpp",
+        "gradientEnergyFvPatchScalarField.C": "cpp",
+        "fvPatchField.C": "cpp",
+        "mixedEnergyFvPatchScalarField.C": "cpp",
+        "mixedFvPatchField.C": "cpp",
+        "fvcDiv.C": "cpp",
+        "fvcSurfaceIntegrate.C": "cpp",
+        "fvMeshGeometry.C": "cpp",
+        "typeindex": "cpp",
+        "ausmPlusUp.C": "cpp",
+        "slau2.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

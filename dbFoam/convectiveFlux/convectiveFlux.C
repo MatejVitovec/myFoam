@@ -28,6 +28,8 @@ License
 #include "directionInterpolate.H"
 
 #include "hllc.H"
+#include "ausmPlusUp.H"
+#include "slau2.H"
 #include <iostream>
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -45,7 +47,7 @@ Foam::convectiveFlux::convectiveFlux
     //    p.mesh(), 
     //    p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
     //),
-    fluxSolver_(new Foam::hllc()),
+    fluxSolver_(new Foam::slau2()),
     mesh_(p.mesh()),
     p_(p),
     U_(U),
@@ -228,7 +230,7 @@ void Foam::convectiveFlux::computeFlux()
             forAll (pp, facei)
             {
                 // Calculate fluxes
-                fluxSolver_ -> calculateFlux
+                fluxSolver_->calculateFlux
                 (
                     pRhoFlux[facei],
                     pRhoUFlux[facei],

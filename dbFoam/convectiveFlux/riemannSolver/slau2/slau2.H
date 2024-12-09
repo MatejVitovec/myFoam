@@ -22,25 +22,22 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    hllc
+    slau2
 
 Description
-    HLLC flux class, computes numerical fluxes based on HLLC scheme. Uses
-    primitive variables as input and gives back conservative numerical fluxes.
-
-    Toro, E.I. and Spruce, M. and Spears, W.: Restoration of the Contact
-    Surface in the HLL-Riemann Solver, Shock Waves, 4:25-34, 1996
+    AUSM+up flux class, computes numerical fluxes based on AUSM+ scheme. Uses primitive 
+    variables as input and gives back conservative numerical fluxes.
 
 Author
     Matej Vitovec
 
 SourceFiles
-    hllc.H
+    slau2.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef hllc_H
-#define hllc_H
+#ifndef slau2_H
+#define slau2_H
 
 #include "riemannSolver.H" 
 
@@ -50,26 +47,26 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class hllc Declaration
+                           Class slau2 Declaration
 \*---------------------------------------------------------------------------*/
 
-class hllc
+class slau2
 :
     public riemannSolver
 {
 
 public:
-    //TypeName("hllc");
+    //TypeName("slau2");
 
     // Constructors
 
         //- Constructor null
-        hllc(const fvMesh&, const dictionary&) {};
-        hllc() {};
+        slau2(const fvMesh&, const dictionary&);
+        slau2();
 
 
     // Destructor - default
-    virtual ~hllc() {};
+    virtual ~slau2() {};
 
 
     // Member Functions
@@ -93,6 +90,14 @@ public:
             const vector& Sf,
             const scalar& magSf
         ) const;
+
+private:
+
+    scalar beta_;
+    scalar MaInf_;
+    scalar Kp_;
+    scalar Ku_;
+    scalar sigma_;
 };
 
 

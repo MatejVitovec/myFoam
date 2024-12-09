@@ -128,6 +128,8 @@ void Foam::hllc::calculateFlux
 
     const scalar SStar = (pRight - pLeft + rhoLeft*qLeft*(SLeft - qLeft) - rhoRight*qRight*(SRight - qRight))
         /stabilise(rhoLeft*(SLeft - qLeft) - rhoRight*(SRight - qRight), VSMALL);
+    //const scalar SStar = (pRight - pLeft + rhoLeft*qLeft*(SLeft - qLeft) - rhoRight*qRight*(SRight - qRight))
+    //    /rhoLeft*(SLeft - qLeft) - rhoRight*(SRight - qRight);
         
 
     // Compute pressure in star region from the right side
@@ -166,6 +168,7 @@ void Foam::hllc::calculateFlux
     else if (pos(SStar))
     {
         scalar omegaLeft = scalar(1.0)/stabilise((SLeft - SStar), VSMALL);
+        //scalar omegaLeft = scalar(1.0)/(SLeft - SStar);
         pStar = pStarLeft;
 
         // Compute left star region
@@ -184,6 +187,7 @@ void Foam::hllc::calculateFlux
     else if (pos(SRight))
     {
         scalar omegaRight = scalar(1.0)/stabilise((SRight - SStar), VSMALL);
+        //scalar omegaRight = scalar(1.0)/(SRight - SStar);
         pStar = pStarRight;
 
         // compute right star region
@@ -214,7 +218,7 @@ void Foam::hllc::calculateFlux
 
     rhoFlux  = (convectionSpeed*rhoState)*magSf;
     rhoUFlux = (convectionSpeed*rhoUState + pState*normalVector)*magSf;
-    rhoEFlux = (convectionSpeed*(rhoEState + pState) + pState)*magSf;
+    rhoEFlux = (convectionSpeed*(rhoEState + pState))*magSf;
 }
 
 

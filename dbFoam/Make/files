@@ -1,6 +1,8 @@
 convectiveFlux/convectiveFlux.C
 convectiveFlux/riemannSolver/riemannSolver.C
 convectiveFlux/riemannSolver/hllc/hllc.C
+convectiveFlux/riemannSolver/ausmPlusUp/ausmPlusUp.C
+convectiveFlux/riemannSolver/slau2/slau2.C
 BC/subsonicInletTotal/subsonicInletTotalFvPatchVectorField.C
 dbFoam.C
 

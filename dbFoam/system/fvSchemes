@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2406                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,54 +10,57 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
+    location    "system";
     object      fvSchemes;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
 ddtSchemes
 {
-    default         Euler;
+ default         Euler;
 }
 
 gradSchemes
 {
     default         Gauss linear;
-    venkatakrishnan cellLimited<Venkatakrishnan> Gauss linear 1;
+    limitedGauss    cellLimited Gauss linear 1;
+    venkatakrishnan cellLimited<Venkatakrishnan> edgeCellsLeastSquares 1;
+    grad(U) Gauss linear;
+    grad(h) Gauss linear;
 }
 
 divSchemes
 {
     default         none;
-
 }
 
 laplacianSchemes
 {
-    default         Gauss linear corrected;
+   default         Gauss linear corrected;
 }
 
 interpolationSchemes
 {
-    default         linear;
-
-    //reconstruct(rho) vanLeer;
-    //reconstruct(U)  vanLeerV;
-    //reconstruct(T)  vanLeer;
-    //reconstruct(p) linearUpwind  limitedGauss; //upwind;
-    //reconstruct(U) linearUpwindV limitedGauss; //upwind;
-    //reconstruct(T) linearUpwind  limitedGauss; //upwind;
-    reconstruct(p)  Minmod 1;
-    reconstruct(U)  Minmod 1;
-    reconstruct(T)  Minmod 1;
-    //reconstruct(p) linearUpwind  venkatakrishnan; 
-    //reconstruct(U) linearUpwindV venkatakrishnan; 
-    //reconstruct(T) linearUpwind  venkatakrishnan;
+    default        linear;
+    //reconstruct(p) Minmod;
+    //reconstruct(U) Minmod;
+    //reconstruct(T) Minmod;
+    //reconstruct(p) upwind;
+    //reconstruct(U) upwind;
+    //reconstruct(T) upwind;
+    reconstruct(p) linearUpwind venkatakrishnan;
+    reconstruct(U) linearUpwindV venkatakrishnan;
+    reconstruct(T) linearUpwind venkatakrishnan;
 }
 
 snGradSchemes
 {
     default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
 }
 
 
