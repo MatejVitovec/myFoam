@@ -47,7 +47,7 @@ Foam::convectiveFlux::convectiveFlux
     //    p.mesh(), 
     //    p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
     //),
-    fluxSolver_(new Foam::slau2()),
+    fluxSolver_(new Foam::hllc()),
     mesh_(p.mesh()),
     p_(p),
     U_(U),

@@ -23,7 +23,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    riemannSolver
+    advectionSplitting
 
 Description
     Basic class for of inviscid numerical fluxes.
@@ -32,15 +32,15 @@ Author
     Matej Vitovec
 
 SourceFiles
-    riemannSolver.H
+    advectionSplitting.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef riemannSolver_H
-#define riemannSolver_H
+#ifndef advectionSplitting_H
+#define advectionSplitting_H
 
 #include "fvCFD.H"
-#include "gasProperties.H"
+#include "riemannSolver.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,49 +48,77 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class riemannSolver Declaration
+                           Class advectionSplitting Declaration
 \*---------------------------------------------------------------------------*/
 
-class riemannSolver
+class advectionSplitting : public riemannSolver
 {
 
 private:
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    riemannSolver(const riemannSolver&);
+    advectionSplitting(const advectionSplitting&);
 
     //- Disallow default bitwise assignment
-    void operator=(const riemannSolver&);
+    void operator=(const advectionSplitting&);
+
+    virtual scalar massFlux
+    (
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& pLeft,
+        const scalar& pRight,
+        const scalar& aLeft,
+        const scalar& aRight,
+        const vector& normalVector
+    ) const = 0;
+
+    virtual scalar pressureFlux
+    (
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& pLeft,
+        const scalar& pRight,
+        const scalar& eLeft,
+        const scalar& aLeft,
+        const scalar& aRight,
+        const vector& normalVector
+    ) const = 0;
 
 
 public:
 
-    TypeName("riemannSolver");
+    TypeName("advectionSplitting");
 
     declareRunTimeSelectionTable
     (
         autoPtr,
-        riemannSolver,
+        advectionSplitting,
         dictionary,
         (const fvMesh& mesh, const dictionary& dict),
         (mesh, dict)
     );
 
     // Constructors
-    riemannSolver() {};
+    advectionSplitting() {};
 
-    //- Return a reference to the selected riemannSolver
-    static autoPtr<riemannSolver> New(
+    //- Return a reference to the selected advectionSplitting
+    static autoPtr<advectionSplitting> New(
         const fvMesh& mesh, 
         const dictionary& dict,
-	    const word key="riemannSolver"
+	    const word key="advectionSplitting"
     );
 
     // Destructor - default
-    virtual ~riemannSolver() {};
+    virtual ~advectionSplitting() {};
 
     // Member Functions
+
 
         // Update fluxes based on current left and right states
         void calculateFlux
@@ -107,7 +135,7 @@ public:
             const vector& Sf,
             const scalar& magSf,
             const gasProperties& gas
-        ) const = 0;
+        ) const;
 
         void calculateFlux
         (
@@ -127,7 +155,7 @@ public:
             const scalar& magSf,
             const gasProperties& gas1,
             const gasProperties& gas2
-        ) const = 0;
+        ) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

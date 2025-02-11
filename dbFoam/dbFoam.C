@@ -40,7 +40,8 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
-#include "convectiveFlux.H"
+#include "twoFluidConvectiveFlux.H"
+#include "twoFluid.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -89,17 +90,20 @@ int main(int argc, char *argv[])
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-
+       
         dbFlux.computeFlux();
 
         // --- Solve density
-        solve(fvm::ddt(rho) + fvc::div(dbFlux.rhoFlux()));
+        solve(fvm::ddt(alphaRho1) + twoFluid::fvc::div(dbFlux.alphaRhoFlux1_pos(), dbFlux.alphaRhoFlux1_neg()));
+        solve(fvm::ddt(alphaRho2) + twoFluid::fvc::div(dbFlux.alphaRhoFlux2_pos(), dbFlux.alphaRhoFlux2_neg()));
 
         // --- Solve momentum
-        solve(fvm::ddt(rhoU) + fvc::div(dbFlux.rhoUFlux()));
+        solve(fvm::ddt(alphaRhoU1) + twoFluid::fvc::div(dbFlux.alphaRhoUFlux1_pos(), dbFlux.alphaRhoUFlux1_neg()));
+        solve(fvm::ddt(alphaRhoU2) + twoFluid::fvc::div(dbFlux.alphaRhoUFlux2_pos(), dbFlux.alphaRhoUFlux2_neg()));
 
         // --- Solve energy
-        solve(fvm::ddt(rhoE) + fvc::div(dbFlux.rhoEFlux()));
+        solve(fvm::ddt(alphaRhoE1) + twoFluid::fvc::div(dbFlux.alphaRhoEFlux1_pos(), dbFlux.alphaRhoEFlux1_neg()));
+        solve(fvm::ddt(alphaRhoE2) + twoFluid::fvc::div(dbFlux.alphaRhoEFlux2_pos(), dbFlux.alphaRhoEFlux2_neg()));
 
 
         #include "updateFields.H"

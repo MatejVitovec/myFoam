@@ -25,7 +25,7 @@ Application
     slau2
 
 Description
-    AUSM+up flux class, computes numerical fluxes based on AUSM+ scheme. Uses primitive 
+    SLAU2 flux class, computes numerical fluxes based on SLAU2 scheme. Uses primitive 
     variables as input and gives back conservative numerical fluxes.
 
 Author
@@ -39,7 +39,7 @@ SourceFiles
 #ifndef slau2_H
 #define slau2_H
 
-#include "riemannSolver.H" 
+#include "advectionSplitting.H" 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,54 +50,51 @@ namespace Foam
                            Class slau2 Declaration
 \*---------------------------------------------------------------------------*/
 
-class slau2
-:
-    public riemannSolver
+class slau2 : public advectionSplitting
 {
+    scalar massFlux
+    (
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& pLeft,
+        const scalar& pRight,
+        const scalar& eLeft,
+        const scalar& eRight,
+        const scalar& aLeft,
+        const scalar& aRight,
+        const vector& Sf,
+        const scalar& magSf,
+    ) const;
+
+    scalar pressureFlux
+    (
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& pLeft,
+        const scalar& pRight,
+        const scalar& eLeft,
+        const scalar& eRight,
+        const scalar& aLeft,
+        const scalar& aRight,
+        const vector& Sf,
+        const scalar& magSf,
+    ) const;
 
 public:
     //TypeName("slau2");
 
     // Constructors
-
-        //- Constructor null
-        slau2(const fvMesh&, const dictionary&);
-        slau2();
-
+    //- Constructor null
+    slau2(const fvMesh&, const dictionary&);
+    slau2();
 
     // Destructor - default
     virtual ~slau2() {};
 
-
-    // Member Functions
-    
-        //- Update fluxes based on current left and right states
-        virtual void calculateFlux
-        (
-            scalar& rhoFlux,
-            vector& rhoUFlux,
-            scalar& rhoEFlux,
-            const scalar& rhoLeft,
-            const scalar& rhoRight,
-            const vector& ULeft,
-            const vector& URight,
-            const scalar& pLeft,
-            const scalar& pRight,
-            const scalar& eLeft,
-            const scalar& eRight,
-            const scalar& aLeft,
-            const scalar& aRight,
-            const vector& Sf,
-            const scalar& magSf
-        ) const;
-
-private:
-
-    scalar beta_;
-    scalar MaInf_;
-    scalar Kp_;
-    scalar Ku_;
-    scalar sigma_;
 };
 
 
