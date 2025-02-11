@@ -123,7 +123,10 @@
         "mutex": "cpp",
         "semaphore": "cpp",
         "cfenv": "cpp",
-        "DimensionedFieldFunctions.C": "cpp"
+        "DimensionedFieldFunctions.C": "cpp",
+        "volFields.C": "cpp",
+        "stiffenedGas.C": "cpp",
+        "pVirialGas.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

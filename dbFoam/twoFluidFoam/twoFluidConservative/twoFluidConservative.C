@@ -25,9 +25,6 @@ License
 
 #include "fvCFD.H"
 #include "twoFluidConservative.H"
-#include "directionInterpolate.H"
-
-#include "slau2.H"
 #include <iostream>
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

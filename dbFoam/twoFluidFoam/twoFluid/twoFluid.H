@@ -35,9 +35,9 @@ Author
 #ifndef twoFluid_H
 #define twoFluid_H
 
+#include "fvCFD.H"
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
-#include "riemannSolver.H"
 #include "rhoThermo.H"
 #include "gasProperties.H"
 
@@ -61,6 +61,10 @@ namespace twoFluidFoam
 class twoFluid
 {        
     const fvMesh& mesh_;
+
+    word fluid1Name_;
+    word fluid2Name_;
+
         
     volScalarField& p_;
     volScalarField& alpha_;
@@ -96,6 +100,23 @@ class twoFluid
     {
         return *gasProps2_;
     }
+
+    void primitiveFromConservative
+    (
+        scalar& p,
+        scalar& alpha,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld
+    );
 
     
 public:

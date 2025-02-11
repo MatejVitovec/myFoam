@@ -75,19 +75,19 @@ mesh_(mesh)
 {
     autoPtr<rhoThermo> pThermo1
     (
-        rhoThermo::New(mesh)
+        rhoThermo::New(mesh, "fluid1")
     );
     thermo1_ = pThermo1();
 
     autoPtr<rhoThermo> pThermo2
     (
-        rhoThermo::New(mesh)
+        rhoThermo::New(mesh, "fluid2")
     );
     thermo2_ = pThermo2();
 
     p_ = thermo1.p();
     T1_ = thermo1.T();
-    T2_ = thermo2.T(); //TODO
+    T2_ = thermo2.T();
 
     alpha_ = volScalarField
     (
@@ -96,7 +96,7 @@ mesh_(mesh)
             "alpha",
             runTime.timeName(),
             mesh,
-            IOobject::NO_READ,
+            IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_
@@ -145,13 +145,137 @@ mesh_(mesh)
 }
 
 
+void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
+(
+    scalar& pRef,
+    scalar& alphaRef,
+    vector& U1Ref,
+    vector& U2Ref,
+    scalar& T1Ref,
+    scalar& T2Ref,
+    const scalar alphaRho1,
+    const scalar alphaRho2,
+    const vector alphaRhoU1,
+    const vector alphaRhoU2,
+    const scalar epsilon1,
+    const scalar epsilon2,
+    const scalar pIntOld
+)
+{
+    gasProperties& gas1 = this->gas1();
+    gasProperties& gas2 = this->gas2();
+
+    const vector U1 = alphaRhoU1/alphaRho1;
+    const vector U2 = alphaRhoU2/alphaRho2;
+
+    const scalar U1magSqr = magSqr(U1);
+    const scalar U2magSqr = magSqr(U2);
+
+    // Estimate from old values
+    scalar p = pRef;
+    scalar T1 = T1Ref;
+    scalar T2 = T2Ref;
+
+    //Newton
+    {
+        const scalar tol = 1.e-6;
+        const label maxIter = 100;
+
+        const scalar TTol = T*tol;
+        const scalar pTol = p*tol;
+
+        label iter = 0;
+        bool exitLoop = false;
+
+        while(!exitLoop)
+        {
+            const scalar v1 = 1.0/gas1.rho(p, T1);
+            const scalar v2 = 1.0/gas2.rho(p, T2);
+
+            const scalar beta1_T = gas1.beta_T(p, T1);
+            const scalar beta2_T = gas2.beta_T(p, T2);
+            const scalar beta1_p = gas1.beta_p(p, T1);
+            const scalar beta2_p = gas2.beta_p(p, T2);
+
+            const scalar de1dp = -v1*T1*beta1_p + p*v1*beta1_T;
+            const scalar de2dp = -v2*T2*beta2_p + p*v2*beta2_T;
+            const scalar de1dT = gas1.Cp(p, T1) - p*v1*beta1_p;
+            const scalar de2dT = gas2.Cp(p, T2) - p*v2*beta2_p;
+
+            vector f
+            (
+                alphaRho1*v1 + alphaRho2*v2 - 1.0,
+                alphaRho1*(gas1.Es(p, T1) + 0.5*U1magSqr + pIntOld*v1) - epsilon1,
+                alphaRho2*(gas1.Es(p, T1) + 0.5*U2magSqr + pIntOld*v2) - epsilon2
+            );
+
+            tensor J
+            (
+                alphaRho1*(-beta1_T*v1) + alphaRho2*(-beta2_T*v2),
+                alphaRho1*beta1_p*v1;,
+                alphaRho2*beta2_p*v2;,
+                alphaRho1*(1.0 + pIntOld)*de1dp,
+                alphaRho1*(1.0 + pIntOld)*de1dT;,
+                0.0,
+                alphaRho2*(1.0 + pIntOld)*de2dp;,
+                0.0,
+                alphaRho2*(1.0 + pIntOld)*de2dT;
+            );
+
+            vector dx = inv(J) & f;
+
+            p -= dx[0];
+            T1 -= dx[1];
+            T2 -= dx[2];
+
+            exitLoop = (mag(dx[0]) < pTol) && (mag(dx[1]) < TTol) && (mag(dx[2]) < TTol)
+
+            if (iter++ > maxIter)
+            {
+                FatalErrorInFunction
+                    << "Maximum number of iterations exceeded: " << maxIter
+                        //<< " when starting from p0:" << p0
+                        << " T1  : " << T1
+                        << " T2  : " << T2
+                        << " p  : " << p
+                        << " tol: " << tol
+                        << abort(FatalError);
+            }
+        }
+    } //end Newton
+
+    pRef = p;
+    alphaRef = alphaRho1/gas1.rho(p, T1);
+    U1Ref = U1;
+    U2Ref = U2;    
+    T1Ref = T1;
+    T2Ref = T2;    
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void Foam::TwoFluidFoam::twoFluid::correct()
 {
-     
+    forAll(mesh.V(), celli)
+    {
+        primitiveFromConservative
+        (
+            p_[celli],
+            alpha_[celli],
+            U1_[celli],
+            U2_[celli],
+            T1_[celli],
+            T2_[celli],
+            alphaRho1_[celli],
+            alphaRho2_[celli],
+            alphaRhoU1_[celli],
+            alphaRhoU2_[celli],
+            epsilon1_[celli],
+            epsilon2_[celli],
+            pInt_[celli]
+        )
+    }
 }
 
 void Foam::TwoFluidFoam::twoFluid::blend()
@@ -163,13 +287,13 @@ void Foam::TwoFluidFoam::twoFluid::blend()
     {
         const scalar alpha = alpha_[celli]
 
-        if (1.0 - alpha <= epsilonMin)
+        if ((1.0 - alpha) <= epsilonMin)
         {
             alpha[celli] = 1.0 - epsilonMin;
             U2[celli] = U1[celli];
             T2[celli] = T1[celli];
         }
-        else if (1.0 - alpha < epsilonMax)
+        else if ((1.0 - alpha) < epsilonMax)
         {
             const scalar xi = ((1.0 - alpha_) - epsilonMin)/(epsilonMax - epsilonMin);
             const scalar gFunc = -Foam::pow(xi, 2.0)*(2.0*xi - 3.0);
