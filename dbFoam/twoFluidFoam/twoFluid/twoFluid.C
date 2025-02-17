@@ -278,7 +278,7 @@ void Foam::TwoFluidFoam::twoFluid::correct()
     }
 }
 
-void Foam::TwoFluidFoam::twoFluid::blend()
+void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
 {
     const scalar epsilonMin = 1.0e-5;
     const scalar epsilonMax = 1.0e-4;

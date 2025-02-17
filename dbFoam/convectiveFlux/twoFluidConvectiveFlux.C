@@ -152,8 +152,8 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
     surfaceScalarField pos_(IOobject("pos", mesh_), mesh_, dimensionedScalar("one", dimless, 1.0));
     surfaceScalarField neg_(IOobject("neg", mesh_), mesh_, dimensionedScalar("minusOne", dimless, -1.0));
 
-    surfaceScalarField alpha_pos(interpolate(alpha_, pos_));
-    surfaceScalarField alpha_neg(interpolate(alpha_, neg_));
+    alpha_pos_ = interpolate(alpha_, pos_);
+    alpha_neg_ = interpolate(alpha_, neg_);
 
     surfaceScalarField p_pos(interpolate(p_, pos_));
     surfaceScalarField p_neg(interpolate(p_, neg_));
@@ -184,7 +184,7 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
             alphaRhoUFlux1_pos_[faceI], alphaRhoUFlux2_neg_[faceI],
             alphaRhoEFlux1_pos_[faceI], alphaRhoEFlux1_neg_[faceI],
             alphaRhoEFlux2_pos_[faceI], alphaRhoEFlux2_neg_[faceI],
-            alpha_pos[faceI],           alpha_neg[faceI],
+            alpha_pos_[faceI],          alpha_neg_[faceI],
             p_pos[faceI],               p_neg[faceI],
             U1_pos[faceI],              U1_neg[faceI],
             U2_pos[faceI],              U2_neg[faceI],
@@ -228,8 +228,8 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
             const fvsPatchScalarField& pp_pos = p_pos.boundaryField()[patchi];
             const fvsPatchScalarField& pp_neg = p_neg.boundaryField()[patchi];
 
-            const fvsPatchScalarField& pAlpha_pos = alpha_pos.boundaryField()[patchi];
-            const fvsPatchScalarField& pAlpha_neg = alpha_neg.boundaryField()[patchi];
+            const fvsPatchScalarField& pAlpha_pos = alpha_pos_.boundaryField()[patchi];
+            const fvsPatchScalarField& pAlpha_neg = alpha_neg_.boundaryField()[patchi];
             const fvsPatchVectorField& pU1_pos = U1_pos.boundaryField()[patchi];
             const fvsPatchVectorField& pU1_neg = U1_neg.boundaryField()[patchi];
             const fvsPatchVectorField& pU2_pos = U2_pos.boundaryField()[patchi];

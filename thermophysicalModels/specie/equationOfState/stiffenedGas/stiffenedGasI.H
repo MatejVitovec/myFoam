@@ -97,7 +97,7 @@ inline Foam::scalar Foam::stiffenedGas<Specie>::rho(scalar p, scalar T) const
 template<class Specie>
 inline Foam::scalar Foam::stiffenedGas<Specie>::H(scalar p, scalar T) const
 {
-    return 0.0; //not implemented
+    return 0.0;
 }
 
 
@@ -125,7 +125,7 @@ inline Foam::scalar Foam::stiffenedGas<Specie>::Cv(scalar p, scalar T) const
 template<class Specie>
 inline Foam::scalar Foam::stiffenedGas<Specie>::S(scalar p, scalar T) const
 {
-    return 0.0; //TODO
+    return -this->R()*log((p + pInf_)/Pstd);
 }
 
 

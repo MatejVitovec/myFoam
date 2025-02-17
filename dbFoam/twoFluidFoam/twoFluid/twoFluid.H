@@ -211,9 +211,29 @@ public:
         return T2_;
     }
 
+    const volScalarField& pInt() const
+    {
+        return pInt_;
+    }
+
+    volScalarField& pInt()
+    {
+        return pInt_;
+    }
+
+    const twoFluidConservative& conservative() const
+    {
+        return conservative_;
+    }
+
+    twoFluidConservative& conservative()
+    {
+        return conservative_;
+    }
+
     void correct();
 
-    void blend();
+    void blendVanishingFluid();
 
     void correctBoundaryCondition();
 

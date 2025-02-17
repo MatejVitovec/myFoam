@@ -70,7 +70,10 @@ class twoFluidConvectiveFlux
     psiThermo& thermo2_;
     autoPtr<gasProperties> gasProps1_;
     autoPtr<gasProperties> gasProps2_;
-        
+
+    surfaceScalarField alpha_pos_;
+    surfaceScalarField alpha_neg_;
+
     surfaceScalarField alphaRhoFlux1_pos_;
     surfaceVectorField alphaRhoUFlux1_pos_;
     surfaceScalarField alphaRhoEFlux1_pos_;
@@ -137,64 +140,74 @@ public:
         return mesh_;
     }
 
+    const surfaceScalarField& alpha_pos() const
+    {
+        return alpha_pos_;
+    }
+
+    const surfaceScalarField& alpha_neg() const
+    {
+        return alpha_neg_;
+    }
+
     const surfaceScalarField& alphaRhoFlux1_pos() const
     {
-        return alphaRhoFlux1_pos;
+        return alphaRhoFlux1_pos_;
     }
 
     const surfaceScalarField& alphaRhoFlux1_neg() const
     {
-        return alphaRhoFlux1_neg;
+        return alphaRhoFlux1_neg_;
     }
 
     const surfaceScalarField& alphaRhoFlux2_pos() const
     {
-        return alphaRhoFlux2_pos;
+        return alphaRhoFlux2_pos_;
     }
 
     const surfaceScalarField& alphaRhoFlux2_neg() const
     {
-        return alphaRhoFlux2_neg;
+        return alphaRhoFlux2_neg_;
     }
 
     const surfaceVectorField& alphaRhoUFlux1_pos() const
     {
-        return alphaRhoUFlux1_pos;
+        return alphaRhoUFlux1_pos_;
     }
 
     const surfaceVectorField& alphaRhoUFlux1_neg() const
     {
-        return alphaRhoUFlux1_neg;
+        return alphaRhoUFlux1_neg_;
     }
 
     const surfaceVectorField& alphaRhoUFlux2_pos() const
     {
-        return alphaRhoUFlux2_pos;
+        return alphaRhoUFlux2_pos_;
     }
 
     const surfaceVectorField& alphaRhoUFlux2_neg() const
     {
-        return alphaRhoUFlux2_neg;
+        return alphaRhoUFlux2_neg_;
     }
 
     const surfaceScalarField& alphaRhoEFlux1_pos() const
     {
-        return alphaRhoEFlux1_pos;
+        return alphaRhoEFlux1_pos_;
     }
 
     const surfaceScalarField& alphaRhoEFlux1_neg() const
     {
-        return alphaRhoEFlux1_neg;
+        return alphaRhoEFlux1_neg_;
     }
 
     const surfaceScalarField& alphaRhoEFlux2_pos() const
     {
-        return alphaRhoEFlux2_pos;
+        return alphaRhoEFlux2_pos_;
     }
 
     const surfaceScalarField& alphaRhoEFlux2_neg() const
     {
-        return alphaRhoEFlux2_neg;
+        return alphaRhoEFlux2_neg_;
     }
 
     void computeFlux();

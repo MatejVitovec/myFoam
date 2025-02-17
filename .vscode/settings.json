@@ -126,7 +126,8 @@
         "DimensionedFieldFunctions.C": "cpp",
         "volFields.C": "cpp",
         "stiffenedGas.C": "cpp",
-        "pVirialGas.C": "cpp"
+        "pVirialGas.C": "cpp",
+        "AungierRedlichKwongGas.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -40,8 +40,8 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
-#include "twoFluidConvectiveFlux.H"
 #include "twoFluid.H"
+#include "twoFluidConvectiveFlux.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -75,38 +75,43 @@ int main(int argc, char *argv[])
     {
         #include "readTimeControls.H"
 
-        surfaceScalarField amaxSf("amaxSf", 
-            mag(fvc::interpolate(U) & mesh.Sf()) +
-            mesh.magSf() * fvc::interpolate(sqrt(thermo.Cp()/thermo.Cv()/thermo.psi())));
+        surfaceScalarField amaxSf
+        (
+            "amaxSf", 
+            max(mag(fvc::interpolate(U1) & mesh.Sf()), mag(fvc::interpolate(U2) & mesh.Sf()))
+            + max(mesh.magSf() * fvc::interpolate(sqrt(thermo1.Cp()/thermo1.Cv()/thermo1.psi())),
+                  mesh.magSf() * fvc::interpolate(sqrt(thermo2.Cp()/thermo2.Cv()/thermo2.psi()))) //approx sound speed
+        );
 
         #include "courantNo.H"
         #include "setDeltaT.H"
-
-        //if (LTS)
-        //{
-        //    #include "setRDeltaT.H"
-        //}
 
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
        
-        dbFlux.computeFlux();
+        twoFluidFlux.computeFlux();
 
         // --- Solve density
-        solve(fvm::ddt(alphaRho1) + twoFluid::fvc::div(dbFlux.alphaRhoFlux1_pos(), dbFlux.alphaRhoFlux1_neg()));
-        solve(fvm::ddt(alphaRho2) + twoFluid::fvc::div(dbFlux.alphaRhoFlux2_pos(), dbFlux.alphaRhoFlux2_neg()));
+        solve(fvm::ddt(conservative.alphaRho1()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
+        solve(fvm::ddt(conservative.alphaRho2()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
 
         // --- Solve momentum
-        solve(fvm::ddt(alphaRhoU1) + twoFluid::fvc::div(dbFlux.alphaRhoUFlux1_pos(), dbFlux.alphaRhoUFlux1_neg()));
-        solve(fvm::ddt(alphaRhoU2) + twoFluid::fvc::div(dbFlux.alphaRhoUFlux2_pos(), dbFlux.alphaRhoUFlux2_neg()));
+        solve(fvm::ddt(conservative.alphaRhoU1()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+            + fluidSystem.pInt()*twoFluid::fvc::div(twoFluidFlux.alpha_pos()*mesh_.Sf(), twoFluidFlux.alpha_neg()*mesh_.Sf()));
+        solve(fvm::ddt(conservative.alphaRhoU2()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+            + fluidSystem.pInt()*twoFluid::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh_.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh_.Sf()));
 
         // --- Solve energy
-        solve(fvm::ddt(alphaRhoE1) + twoFluid::fvc::div(dbFlux.alphaRhoEFlux1_pos(), dbFlux.alphaRhoEFlux1_neg()));
-        solve(fvm::ddt(alphaRhoE2) + twoFluid::fvc::div(dbFlux.alphaRhoEFlux2_pos(), dbFlux.alphaRhoEFlux2_neg()));
+        solve(fvm::ddt(conservative.alphaRhoE1()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg()));
+        solve(fvm::ddt(conservative.alphaRhoE2()) + twoFluid::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
 
-
-        #include "updateFields.H"
+        fluidSystem.correct();
+        fluidSystem.blendVanishingFluid();
+        fluidSystem.correctBoundaryCondition();
+        fluidSystem.correctThermo();
+        fluidSystem.correctInterfacialPressure();
+        fluidSystem.correctConservative();
 
         runTime.write();
 
