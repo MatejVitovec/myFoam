@@ -39,15 +39,15 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace Foam
+/*namespace Foam
 {
   defineTypeNameAndDebug(riemannSolver, 0);
   defineRunTimeSelectionTable(riemannSolver,dictionary);
-}
+}*/
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+/*
 Foam::autoPtr<Foam::riemannSolver> Foam::riemannSolver::New
 (
     const fvMesh& mesh,
@@ -72,7 +72,7 @@ Foam::autoPtr<Foam::riemannSolver> Foam::riemannSolver::New
     }
 
     return autoPtr<riemannSolver>(cstrIter()(mesh, dict));
-}
+}*/
 
 
 // ************************************************************************* //

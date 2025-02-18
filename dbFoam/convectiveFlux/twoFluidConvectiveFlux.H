@@ -54,8 +54,7 @@ namespace Foam
 class twoFluidConvectiveFlux
 {
 
-    autoPtr<riemannSolver> fluxSolver1_;
-    autoPtr<riemannSolver> fluxSolver2_;
+    autoPtr<riemannSolver> fluxSolver_;
         
     const fvMesh& mesh_;
         
@@ -75,19 +74,18 @@ class twoFluidConvectiveFlux
     surfaceScalarField alpha_neg_;
 
     surfaceScalarField alphaRhoFlux1_pos_;
-    surfaceVectorField alphaRhoUFlux1_pos_;
-    surfaceScalarField alphaRhoEFlux1_pos_;
-
     surfaceScalarField alphaRhoFlux1_neg_;
-    surfaceVectorField alphaRhoUFlux1_neg_;
-    surfaceScalarField alphaRhoEFlux1_neg_;
-
     surfaceScalarField alphaRhoFlux2_pos_;
-    surfaceVectorField alphaRhoUFlux2_pos_;
-    surfaceScalarField alphaRhoEFlux2_pos_;
-
     surfaceScalarField alphaRhoFlux2_neg_;
+
+    surfaceVectorField alphaRhoUFlux1_pos_;
+    surfaceVectorField alphaRhoUFlux1_neg_;
+    surfaceVectorField alphaRhoUFlux2_pos_;
     surfaceVectorField alphaRhoUFlux2_neg_;
+
+    surfaceScalarField alphaRhoEFlux1_pos_;
+    surfaceScalarField alphaRhoEFlux1_neg_;
+    surfaceScalarField alphaRhoEFlux2_pos_;
     surfaceScalarField alphaRhoEFlux2_neg_;
     
     

@@ -65,12 +65,12 @@ private:
 
     virtual scalar massFlux
     (
-        const scalar& rhoLeft,
-        const scalar& rhoRight,
-        const vector& ULeft,
-        const vector& URight,
         const scalar& pLeft,
         const scalar& pRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
         const scalar& aLeft,
         const scalar& aRight,
         const vector& normalVector
@@ -78,47 +78,28 @@ private:
 
     virtual scalar pressureFlux
     (
-        const scalar& rhoLeft,
-        const scalar& rhoRight,
-        const vector& ULeft,
-        const vector& URight,
         const scalar& pLeft,
         const scalar& pRight,
-        const scalar& eLeft,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
         const scalar& aLeft,
         const scalar& aRight,
         const vector& normalVector
     ) const = 0;
 
-
 public:
 
-    TypeName("advectionSplitting");
-
-    declareRunTimeSelectionTable
-    (
-        autoPtr,
-        advectionSplitting,
-        dictionary,
-        (const fvMesh& mesh, const dictionary& dict),
-        (mesh, dict)
-    );
+    //TypeName("advectionSplitting");
 
     // Constructors
-    advectionSplitting() {};
-
-    //- Return a reference to the selected advectionSplitting
-    static autoPtr<advectionSplitting> New(
-        const fvMesh& mesh, 
-        const dictionary& dict,
-	    const word key="advectionSplitting"
-    );
+    advectionSplitting() : riemannSolver() {};
 
     // Destructor - default
     virtual ~advectionSplitting() {};
 
     // Member Functions
-
 
         // Update fluxes based on current left and right states
         void calculateFlux
@@ -136,7 +117,7 @@ public:
             const scalar& magSf,
             const gasProperties& gas
         ) const;
-
+        
         void calculateFlux
         (
             scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,

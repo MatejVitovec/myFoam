@@ -66,26 +66,27 @@ private:
 
 public:
 
-    TypeName("riemannSolver");
+    //TypeName("riemannSolver");
 
-    declareRunTimeSelectionTable
+    /*declareRunTimeSelectionTable
     (
         autoPtr,
         riemannSolver,
         dictionary,
         (const fvMesh& mesh, const dictionary& dict),
         (mesh, dict)
-    );
+    );*/
 
     // Constructors
     riemannSolver() {};
 
     //- Return a reference to the selected riemannSolver
-    static autoPtr<riemannSolver> New(
+    /*static autoPtr<riemannSolver> New
+    (
         const fvMesh& mesh, 
         const dictionary& dict,
 	    const word key="riemannSolver"
-    );
+    );*/
 
     // Destructor - default
     virtual ~riemannSolver() {};
@@ -93,7 +94,7 @@ public:
     // Member Functions
 
         // Update fluxes based on current left and right states
-        void calculateFlux
+        virtual void calculateFlux
         (
             scalar& rhoFlux,
             vector& rhoUFlux,
@@ -109,7 +110,7 @@ public:
             const gasProperties& gas
         ) const = 0;
 
-        void calculateFlux
+        virtual void calculateFlux
         (
             scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,
             scalar& alphaRhoFlux2Left,  scalar& alphaRhoFlux2Right,

@@ -54,34 +54,28 @@ class slau2 : public advectionSplitting
 {
     scalar massFlux
     (
-        const scalar& rhoLeft,
-        const scalar& rhoRight,
-        const vector& ULeft,
-        const vector& URight,
         const scalar& pLeft,
         const scalar& pRight,
-        const scalar& eLeft,
-        const scalar& eRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
         const scalar& aLeft,
         const scalar& aRight,
-        const vector& Sf,
-        const scalar& magSf,
+        const vector& normalVector
     ) const;
 
     scalar pressureFlux
     (
-        const scalar& rhoLeft,
-        const scalar& rhoRight,
-        const vector& ULeft,
-        const vector& URight,
         const scalar& pLeft,
         const scalar& pRight,
-        const scalar& eLeft,
-        const scalar& eRight,
+        const vector& ULeft,
+        const vector& URight,
+        const scalar& rhoLeft,
+        const scalar& rhoRight,
         const scalar& aLeft,
         const scalar& aRight,
-        const vector& Sf,
-        const scalar& magSf,
+        const vector& normalVector
     ) const;
 
 public:
@@ -89,8 +83,8 @@ public:
 
     // Constructors
     //- Constructor null
-    slau2(const fvMesh&, const dictionary&);
-    slau2();
+    slau2(const fvMesh&, const dictionary&) : advectionSplitting() {};
+    slau2() : advectionSplitting() {};
 
     // Destructor - default
     virtual ~slau2() {};

@@ -34,29 +34,17 @@ License
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::slau2::slau2(const fvMesh&, const dictionary&)
-{
-    
-}
-
-Foam::slau2::slau2()
-{
-
-}
-
-
-
 scalar Foam::slau2::massFlux
 (
-    const scalar& rhoLeft,
-    const scalar& rhoRight,
-    const vector& ULeft,
-    const vector& URight,
     const scalar& pLeft,
     const scalar& pRight,
+    const vector& ULeft,
+    const vector& URight,
+    const scalar& rhoLeft,
+    const scalar& rhoRight,
     const scalar& aLeft,
     const scalar& aRight,
-    const vector& normalVector,
+    const vector& normalVector
 ) const
 {
     const scalar qLeft  = (ULeft  & normalVector);
@@ -86,12 +74,12 @@ scalar Foam::slau2::massFlux
 
 scalar Foam::slau2::pressureFlux
 (
-    const scalar& rhoLeft,
-    const scalar& rhoRight,
-    const vector& ULeft,
-    const vector& URight,
     const scalar& pLeft,
     const scalar& pRight,
+    const vector& ULeft,
+    const vector& URight,
+    const scalar& rhoLeft,
+    const scalar& rhoRight,
     const scalar& aLeft,
     const scalar& aRight,
     const vector& normalVector

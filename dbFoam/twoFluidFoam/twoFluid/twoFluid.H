@@ -51,7 +51,7 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-namespace twoFluidFoam
+namespace TwoFluidFoam
 {
 
 /*---------------------------------------------------------------------------*\
@@ -65,22 +65,26 @@ class twoFluid
     word fluid1Name_;
     word fluid2Name_;
 
-        
-    volScalarField& p_;
-    volScalarField& alpha_;
-    volVectorField& U1_;
-    volVectorField& U2_;
-    volScalarField& T1_;
-    volScalarField& T2_;
-        
+    autoPtr<rhoThermo> pthermo1_;
+    autoPtr<rhoThermo> pthermo2_;
     rhoThermo& thermo1_;
     rhoThermo& thermo2_;
-    autoPtr<gasProperties> gasProps1_;
-    autoPtr<gasProperties> gasProps2_;
 
-    volScalarField& pInt_;
+    autoPtr<gasProperties> pGasProps1_;
+    autoPtr<gasProperties> pGasProps2_;
+    gasProperties& gasProps1_;
+    gasProperties& gasProps2_;
 
-    twoFluidConservative& conservative_;
+    volScalarField& p_;
+    volScalarField  alpha_;
+    volVectorField  U1_;
+    volVectorField  U2_;
+    volScalarField& T1_;
+    volScalarField& T2_;
+
+    volScalarField pInt_;
+    
+    twoFluidConservative conservative_;
             
     
     // Private Member Functions
@@ -93,12 +97,12 @@ class twoFluid
 
     const gasProperties& gas1() const
     {
-        return *gasProps1_;
+        return gasProps1_;
     }
 
     const gasProperties& gas2() const
     {
-        return *gasProps2_;
+        return gasProps2_;
     }
 
     void primitiveFromConservative
@@ -124,7 +128,7 @@ public:
     // Constructors
 
     //- Construct from components
-    twoFluid
+    /*twoFluid
     (
         const volScalarField& p,
         const volScalarField& alpha,
@@ -134,7 +138,7 @@ public:
         const volScalarField& T2,
         rhoThermo& thermo1,
         rhoThermo& thermo2
-    );
+    );*/
 
     twoFluid(const fvMesh& mesh);
 
@@ -248,7 +252,7 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace twoFluidFoam
+} // End namespace TwoFluidFoam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

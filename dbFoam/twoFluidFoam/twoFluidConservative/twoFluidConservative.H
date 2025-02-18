@@ -48,12 +48,12 @@ namespace Foam
 
 class twoFluidConservative
 {        
-    volScalarField& alphaRho1_;
-    volScalarField& alphaRho2_;
-    volVectorField& alphaRhoU1_;
-    volVectorField& alphaRhoU2_;
-    volScalarField& epsilon1_;
-    volScalarField& epsilon2_;
+    volScalarField alphaRho1_;
+    volScalarField alphaRho2_;
+    volVectorField alphaRhoU1_;
+    volVectorField alphaRhoU2_;
+    volScalarField epsilon1_;
+    volScalarField epsilon2_;
 
     // Private Member Functions
     
@@ -130,12 +130,12 @@ public:
         return alphaRhoU2_;
     }
 
-    const volScalarField& epsilon1_() const
+    const volScalarField& epsilon1() const
     {
         return epsilon1_;
     }
 
-    volScalarField& epsilon1_()
+    volScalarField& epsilon1()
     {
         return epsilon1_;
     }
@@ -150,7 +150,7 @@ public:
         return epsilon2_;
     }
 
-    void update()
+    void update();
 };
 
 

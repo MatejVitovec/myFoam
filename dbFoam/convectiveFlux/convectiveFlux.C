@@ -27,8 +27,6 @@ License
 #include "convectiveFlux.H"
 #include "directionInterpolate.H"
 
-#include "hllc.H"
-#include "ausmPlusUp.H"
 #include "slau2.H"
 #include <iostream>
 
