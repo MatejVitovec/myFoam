@@ -47,61 +47,6 @@ namespace fvc
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh>>
-div
-(
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_pos,
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_neg
-)
-{
-    return tmp<GeometricField<Type, fvPatchField, volMesh>>
-    (
-        new GeometricField<Type, fvPatchField, volMesh>
-        (
-            "div("+ssf.name()+')',
-            surfaceIntegrate(ssf_pos, ssf_neg)
-        )
-    );
-}
-
-
-template<class Type>
-tmp<GeometricField<Type, fvPatchField, volMesh>>
-surfaceIntegrate
-(
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_pos,
-    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_neg
-)
-{
-    const fvMesh& mesh = ssf.mesh();
-
-    tmp<GeometricField<Type, fvPatchField, volMesh>> tvf
-    (
-        new GeometricField<Type, fvPatchField, volMesh>
-        (
-            IOobject
-            (
-                "surfaceIntegrate("+ssf.name()+')',
-                ssf.instance(),
-                mesh,
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            mesh,
-            dimensioned<Type>(ssf.dimensions()/dimVol, Zero),
-            fvPatchFieldBase::extrapolatedCalculatedType()
-        )
-    );
-    GeometricField<Type, fvPatchField, volMesh>& vf = tvf.ref();
-
-    surfaceIntegrate(vf.primitiveFieldRef(), ssf_pos, ssf_neg);
-    vf.correctBoundaryConditions();
-
-    return tvf;
-}
-
-
-template<class Type>
 void surfaceIntegrate
 (
     Field<Type>& ivf,
@@ -109,7 +54,7 @@ void surfaceIntegrate
     const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_neg
 )
 {
-    const fvMesh& mesh = ssf.mesh();
+    const fvMesh& mesh = ssf_pos.mesh();
 
     const labelUList& owner = mesh.owner();
     const labelUList& neighbour = mesh.neighbour();
@@ -140,6 +85,73 @@ void surfaceIntegrate
 }
 
 
+template<class Type>
+tmp<GeometricField<Type, fvPatchField, volMesh>>
+surfaceIntegrate
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_pos,
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_neg
+)
+{
+    const fvMesh& mesh = ssf_pos.mesh();
+
+    tmp<GeometricField<Type, fvPatchField, volMesh>> tvf
+    (
+        new GeometricField<Type, fvPatchField, volMesh>
+        (
+            IOobject
+            (
+                "surfaceIntegrate("+ssf_pos.name()+')',
+                ssf_pos.instance(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh,
+            dimensioned<Type>(ssf_pos.dimensions()/dimVol, Zero),
+            fvPatchFieldBase::extrapolatedCalculatedType()
+        )
+    );
+    GeometricField<Type, fvPatchField, volMesh>& vf = tvf.ref();
+
+    surfaceIntegrate(vf.primitiveFieldRef(), ssf_pos, ssf_neg);
+    vf.correctBoundaryConditions();
+
+    return tvf;
+}
+
+
+template<class Type>
+tmp<GeometricField<Type, fvPatchField, volMesh>>
+div
+(
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_pos,
+    const GeometricField<Type, fvsPatchField, surfaceMesh>& ssf_neg
+)
+{
+    return tmp<GeometricField<Type, fvPatchField, volMesh>>
+    (
+        new GeometricField<Type, fvPatchField, volMesh>
+        (
+            "div("+ssf_pos.name()+')',
+            surfaceIntegrate(ssf_pos, ssf_neg)
+        )
+    );
+}
+
+template<class Type>
+tmp<GeometricField<Type, fvPatchField, volMesh>>
+div
+(
+    const tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>& tssf_pos,
+    const tmp<GeometricField<Type, fvsPatchField, surfaceMesh>>& tssf_neg
+)
+{
+    tmp<GeometricField<Type, fvPatchField, volMesh>> Div(fvc::div(tssf_pos(), tssf_neg()));
+    tssf_pos.clear();
+    tssf_neg.clear();
+    return Div;
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

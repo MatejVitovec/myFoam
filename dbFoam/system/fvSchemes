@@ -17,7 +17,7 @@ FoamFile
 
 ddtSchemes
 {
- default         Euler;
+    default         Euler;
 }
 
 gradSchemes
@@ -43,14 +43,19 @@ interpolationSchemes
 {
     default        linear;
     //reconstruct(p) Minmod;
-    //reconstruct(U) Minmod;
-    //reconstruct(T) Minmod;
-    //reconstruct(p) upwind;
-    //reconstruct(U) upwind;
-    //reconstruct(T) upwind;
-    reconstruct(p) linearUpwind venkatakrishnan;
-    reconstruct(U) linearUpwindV venkatakrishnan;
-    reconstruct(T) linearUpwind venkatakrishnan;
+    //reconstruct(p)      linearUpwind  upwind;
+    //reconstruct(alpha)  linearUpwind  upwind;
+    //reconstruct(U.1)    linearUpwindV upwind;
+    //reconstruct(U.2)    linearUpwindV upwind;
+    //reconstruct(T.1)    linearUpwind  upwind;
+    //reconstruct(T.2)    linearUpwind  upwind;
+
+    reconstruct(p)      linearUpwind  venkatakrishnan;
+    reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    reconstruct(U.1)    linearUpwindV venkatakrishnan;
+    reconstruct(U.2)    linearUpwindV venkatakrishnan;
+    reconstruct(T.1)    linearUpwind  venkatakrishnan;
+    reconstruct(T.2)    linearUpwind  venkatakrishnan;
 }
 
 snGradSchemes

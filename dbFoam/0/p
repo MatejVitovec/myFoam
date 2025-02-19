@@ -24,24 +24,21 @@ boundaryField
     {
         type            empty;
     }
+
     "(.*Wall)"
     {
         type            zeroGradient;
     }
+
     inlet
     {
-        type totalPressure;
-        rho             none;
-        psi             thermo:psi;
-        gamma           1.4;
-        p0              uniform 1e5;
-        //value           uniform 0.8e5;
+        type            zeroGradient
     }
 
     outlet
     {
-        type fixedValue;
-        value		uniform 7.37e4;
+        type            fixedValue;
+        value           uniform 7.37e4;
     }
 }
 

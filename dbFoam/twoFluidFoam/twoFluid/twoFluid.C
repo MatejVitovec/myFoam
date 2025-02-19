@@ -71,6 +71,9 @@ twoFluidConservative_()
 
 Foam::TwoFluidFoam::twoFluid::twoFluid(const fvMesh& mesh)
 :
+epsilon_(),
+epsilonMin_(1.0e-1*epsilon_),
+epsilonMax_(1.0e3*epsilon_),
 mesh_(mesh),
 pthermo1_(rhoThermo::New(mesh_, "fluid1")),
 pthermo2_(rhoThermo::New(mesh_, "fluid2")),
@@ -86,7 +89,7 @@ alpha_
     IOobject
     (
         "alpha",
-        runTime.timeName(),
+        mesh_.time().timeName(),
         mesh_,
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
@@ -98,7 +101,7 @@ U1_
     IOobject
     (
         "U1",
-        runTime.timeName(),
+        mesh_.time().timeName(),
         mesh_,
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
@@ -110,7 +113,7 @@ U2_
     IOobject
     (
         "U2",
-        runTime.timeName(),
+        mesh_.time().timeName(),
         mesh_,
         IOobject::MUST_READ,
         IOobject::AUTO_WRITE
@@ -124,7 +127,7 @@ pInt_
     IOobject
     (
         "pInt",
-        runTime.timeName(),
+        mesh_.time().timeName(),
         mesh_,
         IOobject::NO_READ,
         IOobject::NO_WRITE
@@ -140,7 +143,8 @@ conservative_
     T1_,
     T2_,
     thermo1_,
-    thermo2_
+    thermo2_,
+    pInt_
 )
 {
     /*autoPtr<rhoThermo> pThermo1
@@ -399,8 +403,8 @@ void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
 
 void Foam::TwoFluidFoam::twoFluid::correctThermo()
 {
-    thermo1_.he() = thermo1_.he(p_, T1_;);
-    thermo2_.he() = thermo2_.he(p_, T2_;);
+    thermo1_.he() = thermo1_.he(p_, T1_);
+    thermo2_.he() = thermo2_.he(p_, T2_);
 
     //TODO thermo correct update z (p, T) - nove "TRhoThermo.H"
     thermo1_.correct();
@@ -424,8 +428,8 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
     const auto& rho1 = thermo1_.rho();
     const auto& rho2 = thermo2_.rho();
 
-    const auto E1 = thermo1_.he() + 0.5*Foam::magSqr(U1);
-    const auto E2 = thermo2_.he() + 0.5*Foam::magSqr(U2);
+    const auto E1 = thermo1_.he() + 0.5*Foam::magSqr(U1_);
+    const auto E2 = thermo2_.he() + 0.5*Foam::magSqr(U2_);
 
     conservative_.alphaRho1() = alpha_*rho1;
     conservative_.alphaRho2() = (1.0 - alpha_)*rho2;
@@ -435,12 +439,12 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
     conservative_.epsilon2() = (1.0 - alpha_)*(rho2*E2 + pInt_);
 
     //nejspise nepotrebuji konzervativní pole staci pouze jako INTERNAL FIELD
-    conservative_.alphaRho1().boundaryFieldRef() = alpha_.boundaryField()*rho1.boundaryField();
+    /*conservative_.alphaRho1().boundaryFieldRef() = alpha_.boundaryField()*rho1.boundaryField();
     conservative_.alphaRho2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*rho2.boundaryField();
     conservative_.alphaRhoU1().boundaryFieldRef() = alpha_.boundaryField()*rho1.boundaryField()*U1_.boundaryField();
     conservative_.alphaRhoU2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*rho2.boundaryField()*U2_.boundaryField();
     conservative_.epsilon1().boundaryFieldRef() = alpha_.boundaryField()*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
-    conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());
+    conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
 }
 
 // ************************************************************************* //

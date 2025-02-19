@@ -36,6 +36,7 @@ Author
 #define twoFluidConservative_H
 
 #include "fvCFD.H"
+#include "rhoThermo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -77,8 +78,9 @@ public:
         const volVectorField& U2,
         const volScalarField& T1,
         const volScalarField& T2,
-        rhoThermo& thermo1,
-        rhoThermo& thermo2
+        const rhoThermo& thermo1,
+        const rhoThermo& thermo2,
+        const volScalarField& pInt
     );
 
 

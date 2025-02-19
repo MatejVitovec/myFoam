@@ -10,13 +10,13 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
-    object      T;
+    object      alpha;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 0 0 1 0 0 0];
+dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform 288;
+internalField   uniform 1e5;
 
 boundaryField
 {
@@ -24,17 +24,16 @@ boundaryField
     {
         type            empty;
     }
+
     "(.*Wall)"
     {
-        type            zeroGradient;;
+        type            zeroGradient;
     }
+
     inlet
     {
-        type            totalTemperature;
-        psi             thermo:psi;
-        gamma           1.4;
-        T0              uniform 288;
-        //value           uniform 288;
+        type            fixedValue;
+        value           uniform 7.37e4;
     }
 
     outlet

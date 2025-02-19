@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volVectorField;
-    object      U;
+    object      U.2;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -24,21 +24,23 @@ boundaryField
     {
         type            empty;
     }
+
     "(.*Wall)"
     {
         type            slip;
     }
+
     inlet
     {
-        type            subsonicInletTotal;
-	inletDirection uniform (1 0 0);
-        value		$internalField;
+        type            fixedValue;
+        value           uniform (0 0 0);
+
     }
+
     outlet
     {
         type            zeroGradient;
     }
-
 }
 
 // ************************************************************************* //

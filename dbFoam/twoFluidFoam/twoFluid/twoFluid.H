@@ -59,7 +59,11 @@ namespace TwoFluidFoam
 \*---------------------------------------------------------------------------*/
 
 class twoFluid
-{        
+{
+    const scalar epsilon_;
+    const scalar epsilonMin_;
+    const scalar epsilonMax_;
+
     const fvMesh& mesh_;
 
     word fluid1Name_;
@@ -150,6 +154,11 @@ public:
 
     // Memeber functions
 
+    scalar epsilon() const
+    {
+        return epsilon_;
+    } 
+
     const fvMesh& mesh() const
     {
         return mesh_;
@@ -223,6 +232,26 @@ public:
     volScalarField& pInt()
     {
         return pInt_;
+    }
+
+    const rhoThermo& thermo1() const
+    {
+        return thermo1_;
+    }
+
+    rhoThermo& thermo1()
+    {
+        return thermo1_;
+    }
+
+    const rhoThermo& thermo2() const
+    {
+        return thermo2_;
+    }
+
+    rhoThermo& thermo2()
+    {
+        return thermo2_;
     }
 
     const twoFluidConservative& conservative() const

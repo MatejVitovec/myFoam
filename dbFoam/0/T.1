@@ -1,54 +1,45 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    location    "system";
-    object      fvSolution;
+    class       volScalarField;
+    object      T.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
+dimensions      [0 0 0 1 0 0 0];
+
+internalField   uniform 288;
+
+boundaryField
 {
-    alphaRho1
+    emptyPlanes
     {
-        solver diag;
+        type            empty;
     }
 
-    alphaRho2
+    "(.*Wall)"
     {
-        solver diag;
+        type            zeroGradient;
     }
 
-    alphaRhoU1 
+    inlet
     {
-        solver diag;
+        type            fixedValue;
+        value           uniform 7.37e4;
     }
 
-    alphaRhoU2
+    outlet
     {
-        solver diag;
+        type            zeroGradient;
     }
-
-    epsilon1 
-    {
-        solver diag;
-    }
-
-    epsilon2
-    {
-        solver diag;
-    }  
 }
-
-
-
 
 // ************************************************************************* //

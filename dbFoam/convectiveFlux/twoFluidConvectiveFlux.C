@@ -41,8 +41,8 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     const volVectorField& U2,
     const volScalarField& T1,
     const volScalarField& T2,
-    psiThermo& thermo1,
-    psiThermo& thermo2
+    rhoThermo& thermo1,
+    rhoThermo& thermo2
 )
 :
     //fluxSolver_(Foam::riemannSolver::New( 

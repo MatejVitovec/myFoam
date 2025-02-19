@@ -2,9 +2,9 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-twoFluid fluidSystem(mesh);
+TwoFluidFoam::twoFluid fluidSystem(mesh);
 
-twoFLuidConservative& conservative = fluidSystem.conservative();
+twoFluidConservative& conservative = fluidSystem.conservative();
 
 twoFluidConvectiveFlux twoFluidFlux
 (
@@ -25,3 +25,7 @@ volVectorField& U1 = fluidSystem.U1();
 volVectorField& U2 = fluidSystem.U2();
 volScalarField& T1 = fluidSystem.T1();
 volScalarField& T2 = fluidSystem.T2();
+
+rhoThermo& thermo1 = fluidSystem.thermo1();
+rhoThermo& thermo2 = fluidSystem.thermo2();
+

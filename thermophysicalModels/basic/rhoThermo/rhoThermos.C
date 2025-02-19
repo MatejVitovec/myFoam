@@ -35,6 +35,7 @@ License
 #include "PengRobinsonGas.H"
 #include "adiabaticPerfectFluid.H"
 #include "AungierRedlichKwongGas.H"
+#include "stiffenedGas.H"
 
 #include "hConstThermo.H"
 #include "janafThermo.H"
@@ -69,6 +70,18 @@ makeThermos
     sensibleEnthalpy,
     hConstThermo,
     AungierRedlichKwongGas,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    stiffenedGas,
     specie
 );
 

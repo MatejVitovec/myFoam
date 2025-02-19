@@ -38,7 +38,7 @@ Author
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "riemannSolver.H"
-#include "psiThermo.H"
+#include "rhoThermo.H"
 #include "gasProperties.H"
 
 
@@ -65,8 +65,8 @@ class twoFluidConvectiveFlux
     const volScalarField& T1_;
     const volScalarField& T2_;
         
-    psiThermo& thermo1_;
-    psiThermo& thermo2_;
+    rhoThermo& thermo1_;
+    rhoThermo& thermo2_;
     autoPtr<gasProperties> gasProps1_;
     autoPtr<gasProperties> gasProps2_;
 
@@ -121,8 +121,8 @@ public:
         const volVectorField& U2,
         const volScalarField& T1,
         const volScalarField& T2,
-        psiThermo& thermo1,
-        psiThermo& thermo2
+        rhoThermo& thermo1,
+        rhoThermo& thermo2
     );
 
 

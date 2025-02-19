@@ -30,7 +30,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-twoFluidConservative
+Foam::twoFluidConservative::twoFluidConservative
 (
     const volScalarField& p,
     const volScalarField& alpha,
@@ -38,8 +38,9 @@ twoFluidConservative
     const volVectorField& U2,
     const volScalarField& T1,
     const volScalarField& T2,
-    rhoThermo& thermo1,
-    rhoThermo& thermo2
+    const rhoThermo& thermo1,
+    const rhoThermo& thermo2,
+    const volScalarField& pInt
 )
 :
     alphaRho1_
@@ -47,8 +48,8 @@ twoFluidConservative
         IOobject
         (
             "alphaRho1",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -59,8 +60,8 @@ twoFluidConservative
         IOobject
         (
             "alphaRho2",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -71,8 +72,8 @@ twoFluidConservative
         IOobject
         (
             "alphaRhoU1",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -83,8 +84,8 @@ twoFluidConservative
         IOobject
         (
             "alphaRhoU2",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
@@ -95,24 +96,24 @@ twoFluidConservative
         IOobject
         (
             "epsilon1",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        alphaRho1*((thermo1.he() + 0.5*magSqr(U1)) - p/thermo1.rho()) //TODO pInt
+        alpha*(thermo1.rho()*(thermo1.he() + 0.5*Foam::magSqr(U1)) + pInt)
     ),
     epsilon2_
     (
         IOobject
         (
             "epsilon2",
-            runTime.timeName(),
-            mesh,
+            p.time().timeName(),
+            p.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        alphaRho2*((thermo2.he() + 0.5*magSqr(U2)) - p/thermo2.rho()) //TODO pInt
+        (1.0 - alpha)*(thermo2.rho()*(thermo2.he() + 0.5*Foam::magSqr(U2)) + pInt)
     )
 {}
 
