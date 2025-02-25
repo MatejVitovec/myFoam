@@ -122,10 +122,10 @@ void Foam::advectionSplitting::calculateFlux
     const scalar H2Left  = gas2.Hs(pLeft,  T2Left)  + 0.5*magSqr(U2Left);    
     const scalar H2Right = gas2.Hs(pRight, T2Right) + 0.5*magSqr(U2Right);
 
-    const scalar massFlux1 = massFlux(pLeft,        pRight,
-                                      U1Left,       U1Right,
-                                      rho1Left,     rho1Right,
-                                      aLeft,        aRight,
+    const scalar massFlux1 = massFlux(pLeft,    pRight,
+                                      U1Left,   U1Right,
+                                      rho1Left, rho1Right,
+                                      aLeft,    aRight,
                                       normalVector);
 
     const scalar leftMassFlux1  = 0.5*(massFlux1 + mag(massFlux1));
@@ -140,16 +140,16 @@ void Foam::advectionSplitting::calculateFlux
     const scalar leftMassFlux2  = 0.5*(massFlux2 + mag(massFlux2));
     const scalar rightMassFlux2 = 0.5*(massFlux2 - mag(massFlux2));
 
-    const scalar pressureFlux1 = pressureFlux(pLeft,        pRight,
-                                              U1Left,       U1Right,
-                                              rho1Left,     rho1Right,
-                                              aLeft,        aRight,
+    const scalar pressureFlux1 = pressureFlux(pLeft,    pRight,
+                                              U1Left,   U1Right,
+                                              rho1Left, rho1Right,
+                                              aLeft,    aRight,
                                               normalVector);
 
-    const scalar pressureFlux2 = pressureFlux(pLeft,        pRight,
-                                              U2Left,       U2Right,
-                                              rho2Left,     rho2Right,
-                                              aLeft,        aRight,
+    const scalar pressureFlux2 = pressureFlux(pLeft,    pRight,
+                                              U2Left,   U2Right,
+                                              rho2Left, rho2Right,
+                                              aLeft,    aRight,
                                               normalVector);
 
     alphaRhoFlux1Left   = (leftMassFlux1*alphaLeft + rightMassFlux1*alphaRight)*magSf;

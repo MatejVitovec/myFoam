@@ -128,7 +128,9 @@
         "stiffenedGas.C": "cpp",
         "pVirialGas.C": "cpp",
         "AungierRedlichKwongGas.C": "cpp",
-        "CoolPropTransport.C": "cpp"
+        "CoolPropTransport.C": "cpp",
+        "rhoThermos.C": "cpp",
+        "linearTsubDiameter.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

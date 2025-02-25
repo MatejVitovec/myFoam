@@ -1,42 +1,54 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2406                                  |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
     version     2.0;
     format      ascii;
-    arch        "LSB;label=32;scalar=64";
-    class       polyBoundaryMesh;
-    location    "constant/polyMesh";
-    object      boundary;
+    class       dictionary;
+    location    "system";
+    object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-3
-(
-    inlet
+solvers
+{
+    alphaRho1
     {
-        type            patch;
-        nFaces          1;
-        startFace       199;
+        solver diag;
     }
-    outlet
+
+    alphaRho2
     {
-        type            patch;
-        nFaces          1;
-        startFace       200;
+        solver diag;
     }
-    emptyPlanes
+
+    alphaRhoU1 
     {
-        type            empty;
-        inGroups        1(empty);
-        nFaces          800;
-        startFace       201;
+        solver diag;
     }
-)
+
+    alphaRhoU2
+    {
+        solver diag;
+    }
+
+    epsilon1 
+    {
+        solver diag;
+    }
+
+    epsilon2
+    {
+        solver diag;
+    }  
+}
+
+
+
 
 // ************************************************************************* //

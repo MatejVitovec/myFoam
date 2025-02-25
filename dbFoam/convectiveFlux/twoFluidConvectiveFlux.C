@@ -89,7 +89,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi1",
+            "alphaPhi1L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -101,7 +101,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi1",
+            "alphaPhi1R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -113,7 +113,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi2",
+            "alphaPhi2L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -125,7 +125,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi2",
+            "alphaPhi2R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -137,7 +137,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoUFlux1",
+            "alphaRhoUFlux1L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -149,7 +149,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoUFlux1",
+            "alphaRhoUFlux1R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -161,7 +161,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoUFlux2",
+            "alphaRhoUFlux2L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -173,7 +173,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoUFlux2",
+            "alphaRhoUFlux2R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -185,7 +185,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoEFlux1",
+            "alphaRhoEFlux1L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -197,7 +197,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoEFlux1",
+            "alphaRhoEFlux1R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -209,7 +209,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoEFlux2",
+            "alphaRhoEFlux2L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -221,7 +221,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaRhoEFlux2",
+            "alphaRhoEFlux2R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -235,10 +235,8 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
 
 void Foam::twoFluidConvectiveFlux::computeFlux()
 {
-    // Get face-to-cell addressing: face area point from owner to neighbour
     const auto& owner = mesh_.owner();
 
-    // Get the face area vector
     const surfaceVectorField& Sf = mesh_.Sf();
     const surfaceScalarField& magSf = mesh_.magSf();
     
@@ -270,7 +268,7 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
             alphaRhoFlux1_pos_[facei],  alphaRhoFlux1_neg_[facei],
             alphaRhoFlux2_pos_[facei],  alphaRhoFlux2_neg_[facei],
             alphaRhoUFlux1_pos_[facei], alphaRhoUFlux1_neg_[facei],
-            alphaRhoUFlux1_pos_[facei], alphaRhoUFlux2_neg_[facei],
+            alphaRhoUFlux2_pos_[facei], alphaRhoUFlux2_neg_[facei],
             alphaRhoEFlux1_pos_[facei], alphaRhoEFlux1_neg_[facei],
             alphaRhoEFlux2_pos_[facei], alphaRhoEFlux2_neg_[facei],
             alpha_pos_[facei],          alpha_neg_[facei],
@@ -291,7 +289,6 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
     {
         const fvPatch& curPatch = p_.boundaryField()[patchi].patch();
 
-        // Fluxes
         fvsPatchScalarField& pAlphaRhoFlux1_pos  = alphaRhoFlux1_pos_.boundaryFieldRef()[patchi];
         fvsPatchScalarField& pAlphaRhoFlux1_neg  = alphaRhoFlux1_neg_.boundaryFieldRef()[patchi];
         fvsPatchVectorField& pAlphaRhoUFlux1_pos = alphaRhoUFlux1_pos_.boundaryFieldRef()[patchi];
@@ -306,14 +303,11 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
         fvsPatchScalarField& pAlphaRhoEFlux2_pos = alphaRhoEFlux2_pos_.boundaryFieldRef()[patchi];
         fvsPatchScalarField& pAlphaRhoEFlux2_neg = alphaRhoEFlux2_neg_.boundaryFieldRef()[patchi];
 
-        // Face areas
         const fvsPatchVectorField& pSf = Sf.boundaryField()[patchi];
         const fvsPatchScalarField& pMagSf = magSf.boundaryField()[patchi];
 
         if (curPatch.coupled())
         {
-            
-            // Patch fields
             const fvsPatchScalarField& pp_pos = p_pos.boundaryField()[patchi];
             const fvsPatchScalarField& pp_neg = p_neg.boundaryField()[patchi];
 
@@ -332,12 +326,12 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
             {
                 fluxSolver_->calculateFlux
                 (
-                    pAlphaRhoFlux1_pos[facei],     pAlphaRhoFlux1_neg[facei],
-                    pAlphaRhoFlux2_pos[facei],     pAlphaRhoFlux2_neg[facei],
-                    pAlphaRhoUFlux1_pos[facei],    pAlphaRhoUFlux1_neg[facei],
-                    pAlphaRhoUFlux2_pos[facei],    pAlphaRhoUFlux2_neg[facei],
-                    pAlphaRhoEFlux1_pos[facei],    pAlphaRhoEFlux1_neg[facei],
-                    pAlphaRhoEFlux2_pos[facei],    pAlphaRhoEFlux2_neg[facei],
+                    pAlphaRhoFlux1_pos[facei],      pAlphaRhoFlux1_neg[facei],
+                    pAlphaRhoFlux2_pos[facei],      pAlphaRhoFlux2_neg[facei],
+                    pAlphaRhoUFlux1_pos[facei],     pAlphaRhoUFlux1_neg[facei],
+                    pAlphaRhoUFlux2_pos[facei],     pAlphaRhoUFlux2_neg[facei],
+                    pAlphaRhoEFlux1_pos[facei],     pAlphaRhoEFlux1_neg[facei],
+                    pAlphaRhoEFlux2_pos[facei],     pAlphaRhoEFlux2_neg[facei],
                     pAlpha_pos[facei],              pAlpha_neg[facei],
                     pp_pos[facei],                  pp_neg[facei],
                     pU1_pos[facei],                 pU1_neg[facei],
@@ -362,7 +356,6 @@ void Foam::twoFluidConvectiveFlux::computeFlux()
 
             forAll (pp, facei)
             {
-                // Calculate fluxes
                 fluxSolver_->calculateFlux
                 (
                     pAlphaRhoFlux1_pos[facei],      pAlphaRhoFlux1_neg[facei],

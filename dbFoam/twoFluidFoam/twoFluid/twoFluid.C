@@ -71,12 +71,12 @@ twoFluidConservative_()
 
 Foam::TwoFluidFoam::twoFluid::twoFluid(const fvMesh& mesh)
 :
-epsilon_(),
+epsilon_(1.0e-7),
 epsilonMin_(1.0e-1*epsilon_),
 epsilonMax_(1.0e3*epsilon_),
 mesh_(mesh),
-pthermo1_(rhoThermo::New(mesh_, "fluid1")),
-pthermo2_(rhoThermo::New(mesh_, "fluid2")),
+pthermo1_(rhoThermo::New(mesh_, "1")),
+pthermo2_(rhoThermo::New(mesh_, "2")),
 thermo1_(pthermo1_()),
 thermo2_(pthermo2_()),
 pGasProps1_(gasProperties::New(thermo1_)),
@@ -100,7 +100,7 @@ U1_
 (
     IOobject
     (
-        "U1",
+        "U.1",
         mesh_.time().timeName(),
         mesh_,
         IOobject::MUST_READ,
@@ -112,7 +112,7 @@ U2_
 (
     IOobject
     (
-        "U2",
+        "U.2",
         mesh_.time().timeName(),
         mesh_,
         IOobject::MUST_READ,
@@ -147,75 +147,11 @@ conservative_
     pInt_
 )
 {
-    /*autoPtr<rhoThermo> pThermo1
-    (
-        rhoThermo::New(mesh_, "fluid1")
-    );
-    thermo1_ = pThermo1();
-
-    autoPtr<rhoThermo> pThermo2
-    (
-        rhoThermo::New(mesh_, "fluid2")
-    );
-    thermo2_ = pThermo2();
-
-    p_ = thermo1_.p();
-    T1_ = thermo1_.T();
-    T2_ = thermo2_.T();
-
-    alpha_ = volScalarField
-    (
-        IOobject
-        (
-            "alpha",
-            runTime.timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    );
-
-    U1_ = volVectorField
-    (
-        IOobject
-        (
-            "U1",
-            runTime.timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    );
-
-    U2_ = volVectorField
-    (
-        IOobject
-        (
-            "U2",
-            runTime.timeName(),
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_
-    );
-
-    pInt_ = volScalarField
-    (
-        IOobject
-        (
-            "pInt",
-            runTime.timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mesh_
-    );
-
-    conservative_ = twoFluidConservative(p_, alpha_, U1_, U2_, T1_, T2_, thermo1_, thermo2_);*/
+    //blendVanishingFluid();
+    //correctBoundaryCondition();
+    //correctThermo();
+    correctInterfacialPressure();
+    correctConservative();
 }
 
 
@@ -242,6 +178,11 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     const scalar U1magSqr = magSqr(U1);
     const scalar U2magSqr = magSqr(U2);
 
+    //Info << "U1_old: " << U1Ref << " U1: " << U1 << endl;
+    //Info << "U2_old: " << U2Ref << " U2: " << U2 << endl;
+    //Info << "rho1: " << alphaRho1/alphaRef << endl;
+    //Info << "rho2: " << alphaRho2/alphaRef << endl;
+
     // Estimate from old values
     scalar p = pRef;
     scalar T1 = T1Ref;
@@ -263,34 +204,34 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
             const scalar v1 = 1.0/gasProps1_.rho(p, T1);
             const scalar v2 = 1.0/gasProps2_.rho(p, T2);
 
-            const scalar beta1_T = gasProps1_.beta_T(p, T1);
-            const scalar beta2_T = gasProps2_.beta_T(p, T2);
-            const scalar beta1_p = gasProps1_.beta_p(p, T1);
-            const scalar beta2_p = gasProps2_.beta_p(p, T2);
+            const scalar beta_T1 = gasProps1_.beta_T(p, T1);
+            const scalar beta_T2 = gasProps2_.beta_T(p, T2);
+            const scalar beta_p1 = gasProps1_.beta_p(p, T1);
+            const scalar beta_p2 = gasProps2_.beta_p(p, T2);
 
-            const scalar de1dp = -v1*T1*beta1_p + p*v1*beta1_T;
-            const scalar de2dp = -v2*T2*beta2_p + p*v2*beta2_T;
-            const scalar de1dT = gasProps1_.Cp(p, T1) - p*v1*beta1_p;
-            const scalar de2dT = gasProps2_.Cp(p, T2) - p*v2*beta2_p;
+            const scalar de1dp = -v1*T1*beta_p1 + p*v1*beta_T1;
+            const scalar de2dp = -v2*T2*beta_p2 + p*v2*beta_T2;
+            const scalar de1dT = gasProps1_.Cp(p, T1) - p*v1*beta_p1;
+            const scalar de2dT = gasProps2_.Cp(p, T2) - p*v2*beta_p2;
 
             vector f
             (
                 alphaRho1*v1 + alphaRho2*v2 - 1.0,
-                alphaRho1*(gasProps1_.Es(p, T1) + 0.5*U1magSqr + pIntOld*v1) - epsilon1,
-                alphaRho2*(gasProps2_.Es(p, T1) + 0.5*U2magSqr + pIntOld*v2) - epsilon2
+                gasProps1_.Es(p, T1) + pIntOld*v1 + 0.5*U1magSqr - epsilon1/alphaRho1,
+                gasProps2_.Es(p, T2) + pIntOld*v2 + 0.5*U2magSqr - epsilon2/alphaRho2
             );
 
             tensor J
             (
-                alphaRho1*(-beta1_T*v1) + alphaRho2*(-beta2_T*v2),
-                alphaRho1*beta1_p*v1,
-                alphaRho2*beta2_p*v2,
-                alphaRho1*(1.0 + pIntOld)*de1dp,
-                alphaRho1*(1.0 + pIntOld)*de1dT,
+                alphaRho1*(-beta_T1*v1) + alphaRho2*(-beta_T2*v2),
+                alphaRho1*beta_p1*v1,
+                alphaRho2*beta_p2*v2,
+                de1dp - beta_T1*v1*pIntOld,
+                de1dT + beta_p1*v1*pIntOld,
                 0.0,
-                alphaRho2*(1.0 + pIntOld)*de2dp,
+                de2dp - beta_T2*v2*pIntOld,
                 0.0,
-                alphaRho2*(1.0 + pIntOld)*de2dT
+                de2dT + beta_p2*v2*pIntOld
             );
 
             vector dx = inv(J) & f;
@@ -306,10 +247,13 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
                 FatalErrorInFunction
                     << "Maximum number of iterations exceeded: " << maxIter
                         //<< " when starting from p0:" << p0
-                        << " T1  : " << T1
-                        << " T2  : " << T2
-                        << " p  : " << p
-                        << " tol: " << tol
+                        << ", T1 : " << T1
+                        << ", T2 : " << T2
+                        << ", p : " << p
+                        << ", T_base_tol: " << TTol
+                        << ", tol_p: " << mag(dx[0])
+                        << ", tol_T1: " << mag(dx[1])
+                        << ", tol_T2: " << mag(dx[2])
                         << abort(FatalError);
             }
         }
@@ -351,37 +295,34 @@ void Foam::TwoFluidFoam::twoFluid::correct()
 
 void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
 {
-    const scalar epsilonMin = 1.0e-5;
-    const scalar epsilonMax = 1.0e-4;
-
     forAll(mesh_.cells(), celli)
     {
         const scalar alpha = alpha_[celli];
 
-        if ((1.0 - alpha) <= epsilonMin)
+        if ((1.0 - alpha) <= epsilonMin_)
         {
-            alpha_[celli] = 1.0 - epsilonMin;
+            alpha_[celli] = 1.0 - epsilonMin_;
             U2_[celli] = U1_[celli];
             T2_[celli] = T1_[celli];
         }
-        else if ((1.0 - alpha) < epsilonMax)
+        else if ((1.0 - alpha) < epsilonMax_)
         {
-            const scalar xi = ((1.0 - alpha) - epsilonMin)/(epsilonMax - epsilonMin);
+            const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
             const scalar gFunc = -Foam::pow(xi, 2.0)*(2.0*xi - 3.0);
             
             U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
             T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T1_[celli];
         }
         
-        if (alpha <= epsilonMin)
+        if (alpha <= epsilonMin_)
         {
-            alpha_[celli] = epsilonMin;
+            alpha_[celli] = epsilonMin_;
             U1_[celli] = U2_[celli];
             T1_[celli] = T2_[celli];
         }
-        else if (alpha < epsilonMax)
+        else if (alpha < epsilonMax_)
         {
-            const double xi = (alpha - epsilonMin)/(epsilonMax - epsilonMin);
+            const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
             const double gFunc = -std::pow(xi, 2.0)*(2.0*xi - 3.0);
 
             U1_[celli] = gFunc*U1_[celli] + (1.0 - gFunc)*U2_[celli];

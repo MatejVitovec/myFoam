@@ -55,7 +55,7 @@ inline Foam::stiffenedGas<Specie>::stiffenedGas
 )
 :
     Specie(name, pg),
-    pInf_(pg.pInf_),
+    pInf_(pg.pInf_)
 {}
 
 
@@ -200,7 +200,7 @@ Foam::stiffenedGas<Specie> Foam::operator+
         return stiffenedGas<Specie>
         (
             sp,
-            pg1.pInf_,
+            pg1.pInf_
         );
     }
     else

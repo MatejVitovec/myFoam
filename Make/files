@@ -1,0 +1,3 @@
+ddtSchemes = finiteVolume/finiteVolume/ddtSchemes
+
+LIB = $(FOAM_USER_LIBBIN)/libmyFoam

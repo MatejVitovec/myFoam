@@ -24,7 +24,7 @@ gradSchemes
 {
     default         Gauss linear;
     limitedGauss    cellLimited Gauss linear 1;
-    venkatakrishnan cellLimited<Venkatakrishnan> Gauss linear 1;
+    venkatakrishnan cellLimited<Venkatakrishnan> edgeCellsLeastSquares 1;
     grad(U) Gauss linear;
     grad(h) Gauss linear;
 }

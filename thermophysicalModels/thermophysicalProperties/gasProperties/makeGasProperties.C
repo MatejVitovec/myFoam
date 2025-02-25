@@ -30,6 +30,7 @@ License
 #include "PengRobinsonGas.H"
 #include "AungierRedlichKwongGas.H"
 #include "pVirialGas.H"
+#include "stiffenedGas.H"
 #include "hConstThermo.H"
 #include "eConstThermo.H"
 #include "janafThermo.H"
@@ -52,6 +53,22 @@ License
 
 namespace Foam
 {
+
+makeGasProperties(
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    perfectGas,
+    specie
+);
+
+makeGasProperties(
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    stiffenedGas,
+    specie
+);
 
 makeGasProperties(
     constTransport,

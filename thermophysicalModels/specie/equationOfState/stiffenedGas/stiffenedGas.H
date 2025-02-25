@@ -90,7 +90,7 @@ class stiffenedGas
     // Private data
 
         //- pressure shift
-        scalar pInf;
+        scalar pInf_;
 
 
 public:
