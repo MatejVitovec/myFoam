@@ -132,7 +132,9 @@
         "rhoThermos.C": "cpp",
         "linearTsubDiameter.C": "cpp",
         "alpha": "cpp",
-        "codeStreamTemplate.C": "cpp"
+        "codeStreamTemplate.C": "cpp",
+        "fvcDdt.C": "cpp",
+        "boundedDdtScheme.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

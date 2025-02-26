@@ -90,11 +90,56 @@ int main(int argc, char *argv[])
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
-        
-       
-        twoFluidFlux.computeFlux();
 
-        // --- Solve density
+       
+        //twoFluidFlux.computeFlux();
+
+        dimensionedScalar dt = runTime.deltaT();
+
+        scalar coeff[3][3] = {{1.0, 0.0 , 1.0}, {3.0/4.0, 1.0/4.0, 1.0/4.0}, {1.0/3.0, 2.0/3.0, 2.0/3.0}};
+
+        for (size_t i = 0; i < 3; i++)
+        {
+            twoFluidFlux.computeFlux();
+            
+            conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
+                                     + coeff[i][1]*conservative.alphaRho1()
+                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
+            
+            conservative.alphaRho2() = coeff[i][0]*conservative.alphaRho2().oldTime()
+                                     + coeff[i][1]*conservative.alphaRho2()
+                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
+
+            conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
+                                      + coeff[i][1]*conservative.alphaRhoU1()
+                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf()));
+            
+            conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
+                                      + coeff[i][1]*conservative.alphaRhoU2()
+                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf()));
+
+            conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
+                                    + coeff[i][1]*conservative.epsilon1()
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg()));
+            
+            conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
+                                    + coeff[i][1]*conservative.epsilon2()
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
+
+            fluidSystem.correct();
+            fluidSystem.blendVanishingFluid();
+            fluidSystem.correctBoundaryCondition();
+            fluidSystem.correctThermo();
+            if(i == 2)
+            {
+                fluidSystem.correctInterfacialPressure();
+            }
+            fluidSystem.correctConservative();
+        }
+
+        /*// --- Solve density
         solve(fvm::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
         solve(fvm::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
 
@@ -114,7 +159,7 @@ int main(int argc, char *argv[])
         fluidSystem.correctBoundaryCondition();
         fluidSystem.correctThermo();
         fluidSystem.correctInterfacialPressure();
-        fluidSystem.correctConservative();
+        fluidSystem.correctConservative();*/
 
         runTime.write();
 

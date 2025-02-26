@@ -178,11 +178,6 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     const scalar U1magSqr = magSqr(U1);
     const scalar U2magSqr = magSqr(U2);
 
-    //Info << "U1_old: " << U1Ref << " U1: " << U1 << endl;
-    //Info << "U2_old: " << U2Ref << " U2: " << U2 << endl;
-    //Info << "rho1: " << alphaRho1/alphaRef << endl;
-    //Info << "rho2: " << alphaRho2/alphaRef << endl;
-
     // Estimate from old values
     scalar p = pRef;
     scalar T1 = T1Ref;
