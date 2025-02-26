@@ -32,7 +32,7 @@ boundaryField
 
     bottom
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
 
     inlet

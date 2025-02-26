@@ -18,20 +18,20 @@ convertToMeters 1;
 
 vertices
 (
-    (0  0 0)            // 0
-    (10 0 0)            // 1
-    (10 1 0)            // 2
-    (0  1 0)            // 3
-    (0  0 0.1)          // 4 (extruded for 2D case)
-    (10 0 0.1)          // 5
-    (10 1 0.1)          // 6
-    (0  1 0.1)          // 7
+    (-0.007 0 0)            // 0
+    (0.005 0 0)             // 1
+    (0.005 0.006 0)         // 2
+    (-0.007 0.006 0)        // 3
+    (-0.007 0 0.0001)       // 4 (extruded for 2D case)
+    (0.005 0 0.0001)        // 5
+    (0.005 0.006 0.0001)    // 6
+    (-0.007 0.006 0.0001)   // 7
 );
 
 
 blocks
 (
-    hex (0 1 2 3 4 5 6 7) (200 1 1) simpleGrading (1 1 1)
+    hex (0 1 2 3 4 5 6 7) (480 240 1) simpleGrading (1 1 1)
 );
 
 edges
@@ -48,7 +48,6 @@ boundary
             (0 3 7 4)
         );
     }
-
     outlet
     {
         type patch;
@@ -57,7 +56,22 @@ boundary
             (1 2 6 5)
         );
     }
-
+    bottom
+    {
+        type symmetryPlane;
+        faces
+        (
+            (0 1 5 4)
+        );
+    }
+    top
+    {
+        type wall;
+        faces
+        (
+            (2 3 7 6)
+        );
+    }
     emptyPlanes
     {
         type empty;
@@ -65,8 +79,6 @@ boundary
         (
             (0 1 2 3)
             (4 5 6 7)
-            (0 1 5 4)
-            (2 3 7 6)
         );
     }
 );

@@ -27,18 +27,22 @@ boundaryField
         type            fixedValue;
         value           uniform 381.85;
     }
+
     outlet
     {
         type            zeroGradient;
     }
+
     bottom
     {
-        type            zeroGradient;
+        type            symmetryPlane;
     }
+
     top
     {
         type            zeroGradient;
     }
+
     emptyPlanes
     {
         type            empty;
