@@ -23,8 +23,8 @@ regions
         box (5 0 0) (10 0.1 0.1);
         fieldValues
         (
-            volScalarFieldValue p   	5e6
-            volScalarFieldValue alpha	0.9999999
+            volScalarFieldValue p   	1e5
+            volScalarFieldValue alpha	1e-7
         );
     }
 );

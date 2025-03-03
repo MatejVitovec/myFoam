@@ -1,0 +1,72 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     3.2                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      fvSchemes;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+gradSchemes
+{
+    default         Gauss linear;
+    limitedGauss    cellLimited Gauss linear 1;
+    venkatakrishnan cellLimited<Venkatakrishnan> Gauss linear 1;
+    grad(U) Gauss linear;
+    grad(h) Gauss linear;
+}
+
+divSchemes
+{
+    default         none;
+}
+
+laplacianSchemes
+{
+   default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default        linear;
+    //reconstruct(p) Minmod;
+    //reconstruct(p)      linearUpwind  upwind;
+    //reconstruct(alpha)  linearUpwind  upwind;
+    //reconstruct(U.1)    linearUpwindV upwind;
+    //reconstruct(U.2)    linearUpwindV upwind;
+    //reconstruct(T.1)    linearUpwind  upwind;
+    //reconstruct(T.2)    linearUpwind  upwind;
+
+    reconstruct(p)      linearUpwind  venkatakrishnan;
+    reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    reconstruct(U.1)    linearUpwindV venkatakrishnan;
+    reconstruct(U.2)    linearUpwindV venkatakrishnan;
+    reconstruct(T.1)    linearUpwind  venkatakrishnan;
+    reconstruct(T.2)    linearUpwind  venkatakrishnan;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
+
+fluxRequired
+{
+    default         no;
+}
+
+
+// ************************************************************************* //

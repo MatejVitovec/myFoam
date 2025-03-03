@@ -12,27 +12,37 @@ FoamFile
     arch        "LSB;label=32;scalar=64";
     class       volVectorField;
     location    "0";
-    object      U.2;
+    object      U.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 dimensions      [0 1 -1 0 0 0 0];
 
-internalField   uniform (100 0 0);
+internalField   uniform (0 0 0);
 
 boundaryField
 {
     inlet
     {
         type            fixedValue;
-        value           uniform (100 0 0);
+        value           uniform (225.86 0 0);
     }
-    
+
     outlet
     {
         type            zeroGradient;
     }
-    
+
+    bottom
+    {
+        type            symmetryPlane;
+    }
+
+    top
+    {
+        type            slip;
+    }
+
     emptyPlanes
     {
         type            empty;

@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      thermophysicalProperties.1;
+    object      thermophysicalProperties.2;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,7 +21,7 @@ thermoType
     mixture         pureMixture;
     transport       const;
     thermo          eConst;
-    equationOfState perfectGas;
+    equationOfState stiffenedGas;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
@@ -31,13 +31,17 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   28.97025302;
+        molWeight   3.089729698;
+    }
+    equationOfState
+    {
+        pInf        8.5e8;
     }
     thermodynamics
     {
-        Cv          717.5;
+	    Cv          1495;
         Hf          0;
-        Tref        0;
+	    Tref        0;
         Eref        0;
     }
     transport
