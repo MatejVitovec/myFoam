@@ -50,7 +50,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     //    p.mesh(), 
     //    p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
     //),
-    fluxSolver_(new Foam::ausmPlusUp()),
+    fluxSolver_(new Foam::slau2()),
     mesh_(p.mesh()),
     p_(p),
     alpha_(alpha),

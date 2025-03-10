@@ -29,3 +29,31 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
+
+
+//Pro ukladani
+volScalarField rho1
+(
+    IOobject
+    (
+        "rho1",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    thermo1.rho()
+);
+
+volScalarField rho2
+(
+    IOobject
+    (
+        "rho2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    thermo2.rho()
+);

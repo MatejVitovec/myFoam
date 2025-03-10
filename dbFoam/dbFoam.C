@@ -124,10 +124,7 @@ int main(int argc, char *argv[])
             fluidSystem.blendVanishingFluid();
             fluidSystem.correctBoundaryCondition();
             fluidSystem.correctThermo();
-            if(i == 2)
-            {
-                fluidSystem.correctInterfacialPressure();
-            }
+            if(i == 2) fluidSystem.correctInterfacialPressure();
             fluidSystem.correctConservative();
         }
 
@@ -152,6 +149,9 @@ int main(int argc, char *argv[])
         fluidSystem.correctThermo();
         fluidSystem.correctInterfacialPressure();
         fluidSystem.correctConservative();*/
+
+        rho1.ref() = thermo1.rho();
+        rho2.ref() = thermo2.rho();
 
         runTime.write();
 

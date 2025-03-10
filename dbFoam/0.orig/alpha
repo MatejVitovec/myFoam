@@ -16,7 +16,57 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 1e-7;
+internalField   #codeStream
+{
+    codeInclude
+    #{
+        #include "fvCFD.H"
+    #};
+
+    codeOptions
+    #{
+        -I$(LIB_SRC)/finiteVolume/lnInclude \
+        -I$(LIB_SRC)/meshTools/lnInclude
+    #};
+
+    codeLibs
+    #{
+        -lmeshTools \
+        -lfiniteVolume
+    #};
+
+    code
+    #{
+        const scalar epsilon = 1e-5;
+
+        const IOdictionary& d = static_cast<const IOdictionary&>(dict);
+        const fvMesh& mesh = refCast<const fvMesh>(d.db());
+        scalarField alpha(mesh.nCells(), 1.0 - epsilon);
+
+        const vector center(0, 0, 0);
+        const scalar R = 0.0032;
+        const scalar delta = 0.000025;
+
+        forAll(mesh.C(), cellI)
+        {
+            vector pos = mesh.C()[cellI];
+            scalar r = mag(pos - center);
+
+            if (R - 2.0*delta <= r && r <= R + 2.0*delta)
+            {
+                scalar xi = (r - (R - 2.0*delta))/(4.0*delta);
+                scalar G = -Foam::pow(xi, 2.0)*(2.0*xi - 3.0);
+                alpha[cellI] = G*(1.0 - epsilon) + (1.0 - G)*epsilon;
+            }
+            else if(r < R)
+            {
+                alpha[cellI] = epsilon;
+            }
+        }
+
+        alpha.writeEntry("", os);
+    #};
+};
 
 boundaryField
 {
@@ -25,10 +75,20 @@ boundaryField
         type            empty;
     }
 
+    top
+    {
+        type            zeroGradient;
+    }
+
+    bottom
+    {
+        type            symmetryPlane;
+    }
+
     inlet
     {
         type            fixedValue;
-        value           uniform 1e-7;
+        value           uniform 0.99999;
     }
 
     outlet

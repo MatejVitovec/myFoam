@@ -138,7 +138,11 @@
         "ausmPlusUpf.C": "cpp",
         "isentropicTemperatureFvPatchScalarField.C": "cpp",
         "isentropicInletVelocityFvPatchVectorField.C": "cpp",
-        "orientedType.C": "cpp"
+        "orientedType.C": "cpp",
+        "IOobject.C": "cpp",
+        "SlicedGeometricField.C": "cpp",
+        "FieldField.C": "cpp",
+        "gaussGrad.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
