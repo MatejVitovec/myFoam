@@ -3,6 +3,7 @@ convectiveFlux/twoFluidConvectiveFlux.C
 convectiveFlux/riemannSolver/riemannSolver.C
 convectiveFlux/riemannSolver/advectionSplitting/advectionSplitting.C
 convectiveFlux/riemannSolver/advectionSplitting/slau2/slau2.C
+convectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
 twoFluidFoam/twoFluid/twoFluid.C
 twoFluidFoam/twoFluidConservative/twoFluidConservative.C
 dbFoam.C

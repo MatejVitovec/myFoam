@@ -134,7 +134,11 @@
         "alpha": "cpp",
         "codeStreamTemplate.C": "cpp",
         "fvcDdt.C": "cpp",
-        "boundedDdtScheme.C": "cpp"
+        "boundedDdtScheme.C": "cpp",
+        "ausmPlusUpf.C": "cpp",
+        "isentropicTemperatureFvPatchScalarField.C": "cpp",
+        "isentropicInletVelocityFvPatchVectorField.C": "cpp",
+        "orientedType.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

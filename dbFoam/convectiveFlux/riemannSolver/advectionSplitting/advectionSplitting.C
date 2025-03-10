@@ -117,6 +117,9 @@ void Foam::advectionSplitting::calculateFlux
     const scalar aLeft  = 0.5*(gas1.c(pLeft,  T1Left)  + gas2.c(pLeft,  T2Left));
     const scalar aRight = 0.5*(gas1.c(pRight, T1Right) + gas2.c(pRight, T2Right));
 
+    //const scalar aLeft  = (alphaLeft/rho1Left   + (1.0 - alphaLeft)*rho2Left)  /(alphaLeft/(rho1Left*gas1.c(pLeft,  T1Left))     + (1.0 - alphaLeft)/(rho2Left*gas2.c(pLeft,  T2Left)));
+    //const scalar aRight = (alphaRight/rho1Right + (1.0 - alphaRight)*rho2Right)/(alphaRight/(rho1Right*gas1.c(pRight,  T1Right)) + (1.0 - alphaRight)/(rho2Right*gas2.c(pRight,  T2Right)));
+
     const scalar H1Left  = gas1.Hs(pLeft,  T1Left)  + 0.5*magSqr(U1Left);
     const scalar H1Right = gas1.Hs(pRight, T1Right) + 0.5*magSqr(U1Right);
     const scalar H2Left  = gas2.Hs(pLeft,  T2Left)  + 0.5*magSqr(U2Left);    

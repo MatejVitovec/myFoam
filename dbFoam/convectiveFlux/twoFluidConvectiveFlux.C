@@ -28,6 +28,7 @@ License
 #include "directionInterpolate.H"
 
 #include "slau2.H"
+#include "ausmPlusUp.H"
 #include <iostream>
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -49,7 +50,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     //    p.mesh(), 
     //    p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
     //),
-    fluxSolver_(new Foam::slau2()),
+    fluxSolver_(new Foam::ausmPlusUp()),
     mesh_(p.mesh()),
     p_(p),
     alpha_(alpha),

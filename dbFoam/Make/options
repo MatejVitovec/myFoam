@@ -13,6 +13,7 @@ EXE_INC = \
     -IconvectiveFlux/riemannSolver \
     -IconvectiveFlux/riemannSolver/advectionSplitting \
     -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
+    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
     -ItwoFluidFoam \
     -ItwoFluidFoam/twoFluid \
     -ItwoFluidFoam/twoFluidConservative

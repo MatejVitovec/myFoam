@@ -188,7 +188,8 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
         const scalar tol = 1.e-6;
         const label maxIter = 100;
 
-        const scalar TTol = T1*tol;
+        const scalar TTol1 = T1*tol;
+        const scalar TTol2 = T2*tol;
         const scalar pTol = p*tol;
 
         label iter = 0;
@@ -235,7 +236,7 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
             T1 -= dx[1];
             T2 -= dx[2];
 
-            exitLoop = (mag(dx[0]) < pTol) && (mag(dx[1]) < TTol) && (mag(dx[2]) < TTol);
+            exitLoop = (mag(dx[0]) < pTol) && (mag(dx[1]) < TTol1) && (mag(dx[2]) < TTol2);
 
             if (iter++ > maxIter)
             {
@@ -245,7 +246,7 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
                         << ", T1 : " << T1
                         << ", T2 : " << T2
                         << ", p : " << p
-                        << ", T_base_tol: " << TTol
+                        << ", T_1_tol: " << TTol1
                         << ", tol_p: " << mag(dx[0])
                         << ", tol_T1: " << mag(dx[1])
                         << ", tol_T2: " << mag(dx[2])
