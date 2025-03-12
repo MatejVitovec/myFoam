@@ -204,11 +204,11 @@ makeGasProperties(
 
 // - perfectGas, hConst
 
-#define optimizePerfectGas(Transport,Type)                                 \
+#define optimizePerfectGas(Thermo, Transport,Type)                         \
                                                                            \
     template<>                                                             \
     scalar genericGasProperties<                                           \
-        Transport<species::thermo<hConstThermo<perfectGas<specie>>,Type>>  \
+        Transport<species::thermo<Thermo<perfectGas<specie>>,Type>>        \
         >::c(scalar p, scalar T) const                                     \
     {                                                                      \
         scalar cp = Cp(p,T);                                               \
@@ -218,7 +218,7 @@ makeGasProperties(
                                                                            \
     template<>                                                             \
     scalar genericGasProperties<                                           \
-        Transport<species::thermo<hConstThermo<perfectGas<specie>>,Type>>  \
+        Transport<species::thermo<Thermo<perfectGas<specie>>,Type>>        \
         >::beta_p(scalar p, scalar T) const                                \
     {                                                                      \
         return 1/T;                                                        \
@@ -226,7 +226,7 @@ makeGasProperties(
                                                                            \
     template<>                                                             \
     scalar genericGasProperties<                                           \
-        Transport<species::thermo<hConstThermo<perfectGas<specie>>,Type>>  \
+        Transport<species::thermo<Thermo<perfectGas<specie>>,Type>>        \
         >::beta_T(scalar p, scalar T) const                                \
     {                                                                      \
         return 1/p;                                                        \
@@ -234,7 +234,7 @@ makeGasProperties(
                                                                            \
     template<>                                                             \
     scalar genericGasProperties<                                           \
-        Transport<species::thermo<hConstThermo<perfectGas<specie>>,Type>>  \
+        Transport<species::thermo<Thermo<perfectGas<specie>>,Type>>        \
     >::THs(const scalar Hs, const scalar p, const scalar T0) const         \
     {                                                                      \
         scalar Href = this->Hs(0,0);                                       \
@@ -243,10 +243,10 @@ makeGasProperties(
                                                                            \
     template<>                                                             \
     scalar genericGasProperties<                                           \
-        Transport<species::thermo<hConstThermo<perfectGas<specie>>,Type>>  \
+        Transport<species::thermo<Thermo<perfectGas<specie>>,Type>>        \
     >::pEs(const scalar Es, const scalar rho, const scalar p0) const       \
     {                                                                      \
-	const scalar Tref = 288.15;                                        \
+	const scalar Tref = 288.15;                                            \
         scalar Eref = this->Es(p0,Tref);                                   \
         scalar T = Tref + (Es - Eref)/Cv(p0,Tref);                         \
         return rho*R()*T;                                                  \
@@ -255,8 +255,44 @@ makeGasProperties(
     
 
 
-optimizePerfectGas(constTransport, sensibleEnthalpy);
-optimizePerfectGas(sutherlandTransport, sensibleEnthalpy);
+optimizePerfectGas(hConstThermo, constTransport, sensibleEnthalpy);
+optimizePerfectGas(hConstThermo, sutherlandTransport, sensibleEnthalpy);
+optimizePerfectGas(eConstThermo, constTransport, sensibleInternalEnergy);
+
+
+// =============== Optimization of Stiffened gas model
+
+#define optimizeStiffenedGas(Thermo, Transport,Type)                       \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<stiffenedGas<specie>>,Type>>      \
+        >::c(scalar p, scalar T) const                                     \
+    {                                                                      \
+        scalar cp = Cp(p,T);                                               \
+        scalar gamma = cp / (cp - R());                                    \
+        return sqrt(gamma*R()*T);                                          \
+    }                                                                      \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<stiffenedGas<specie>>,Type>>      \
+        >::beta_p(scalar p, scalar T) const                                \
+    {                                                                      \
+        return 1/T;                                                        \
+    }                                                                      \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<stiffenedGas<specie>>,Type>>      \
+        >::beta_T(scalar p, scalar T) const                                \
+    {                                                                      \
+        return Z(p, T)/p;                                                  \
+    }                                                                      \
+                                                                           \
+
+optimizeStiffenedGas(eConstThermo, constTransport, sensibleInternalEnergy);
+
 
 // =============== Optimization of Aungier-Redlich-Kwong gas model
 

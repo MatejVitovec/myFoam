@@ -83,9 +83,6 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-       
-        //twoFluidFlux.computeFlux();
-
         dimensionedScalar dt = runTime.deltaT();
 
         scalar coeff[3][3] = {{1.0, 0.0 , 1.0}, {3.0/4.0, 1.0/4.0, 1.0/4.0}, {1.0/3.0, 2.0/3.0, 2.0/3.0}};
@@ -128,7 +125,10 @@ int main(int argc, char *argv[])
             fluidSystem.correctConservative();
         }
 
-        /*// --- Solve density
+
+        /*twoFluidFlux.computeFlux();
+
+        // --- Solve density
         solve(fvm::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
         solve(fvm::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
 
@@ -155,7 +155,9 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        runTime.printExecutionTime(Info);
+        //runTime.printExecutionTime(Info);
+
+        //std::cin.ignore();
     }
 
     Info<< "End\n" << endl;

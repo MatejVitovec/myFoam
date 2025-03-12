@@ -71,9 +71,9 @@ twoFluidConservative_()
 
 Foam::TwoFluidFoam::twoFluid::twoFluid(const fvMesh& mesh)
 :
-epsilon_(1.0e-7),
-epsilonMin_(1.0e-1*epsilon_),
-epsilonMax_(1.0e3*epsilon_),
+epsilon_(1.0e-2),
+epsilonMin_(0.1*epsilon_),
+epsilonMax_(10*epsilon_),
 mesh_(mesh),
 pthermo1_(rhoThermo::New(mesh_, "1")),
 pthermo2_(rhoThermo::New(mesh_, "2")),
@@ -147,9 +147,9 @@ conservative_
     pInt_
 )
 {
-    //blendVanishingFluid();
-    //correctBoundaryCondition();
-    //correctThermo();
+    blendVanishingFluid();
+    correctBoundaryCondition();
+    correctThermo();
     correctInterfacialPressure();
     correctConservative();
 }
@@ -304,7 +304,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
         else if ((1.0 - alpha) < epsilonMax_)
         {
             const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-            const scalar gFunc = -Foam::pow(xi, 2.0)*(2.0*xi - 3.0);
+            const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
             
             U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
             T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T1_[celli];
@@ -319,7 +319,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
         else if (alpha < epsilonMax_)
         {
             const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-            const double gFunc = -std::pow(xi, 2.0)*(2.0*xi - 3.0);
+            const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
 
             U1_[celli] = gFunc*U1_[celli] + (1.0 - gFunc)*U2_[celli];
             T1_[celli] = gFunc*T1_[celli] + (1.0 - gFunc)*T2_[celli];
@@ -356,8 +356,10 @@ void Foam::TwoFluidFoam::twoFluid::correctInterfacialPressure()
     const auto& rho1 = thermo1_.rho();
     const auto& rho2 = thermo2_.rho();
 
-    pInt_ = p_ - Foam::min(sigma*((alpha_*rho1*(1.0 - alpha_)*rho2)/
-        (alpha_*rho2 + (1.0 - alpha_)*rho1))*Foam::magSqr(U2_ - U1_), epsilonP*p_);
+    pInt_ = p_ - min(sigma*((alpha_*rho1*(1.0 - alpha_)*rho2)/
+        (alpha_*rho2 + (1.0 - alpha_)*rho1))*magSqr(U2_ - U1_), epsilonP*p_);
+
+    //pInt_ = p_ - min(sigma*(1.0 - alpha_)*rho1*magSqr(U2_ - U1_), epsilonP*p_);
 }
 
 void Foam::TwoFluidFoam::twoFluid::correctConservative()

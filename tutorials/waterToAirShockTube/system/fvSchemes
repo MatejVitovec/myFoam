@@ -40,20 +40,20 @@ laplacianSchemes
 
 interpolationSchemes
 {
-    default        linear;
-    //reconstruct(p)      blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(alpha)  blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(U.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(U.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(T.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(T.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
+    //default        linear;
+    reconstruct(p)      blended 0.5 linearUpwind venkatakrishnan upwind;
+    reconstruct(alpha)  blended 0.5 linearUpwind venkatakrishnan upwind;
+    reconstruct(U.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
+    reconstruct(U.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
+    reconstruct(T.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
+    reconstruct(T.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
 
-    reconstruct(p)      linearUpwind  venkatakrishnan;
-    reconstruct(alpha)  linearUpwind  venkatakrishnan;
-    reconstruct(U.1)    linearUpwindV venkatakrishnan;
-    reconstruct(U.2)    linearUpwindV venkatakrishnan;
-    reconstruct(T.1)    linearUpwind  venkatakrishnan;
-    reconstruct(T.2)    linearUpwind  venkatakrishnan;
+    //reconstruct(p)      linearUpwind  venkatakrishnan;
+    //reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    //reconstruct(U.1)    linearUpwindV venkatakrishnan;
+    //reconstruct(U.2)    linearUpwindV venkatakrishnan;
+    //reconstruct(T.1)    linearUpwind  venkatakrishnan;
+    //reconstruct(T.2)    linearUpwind  venkatakrishnan;
 
     //reconstruct(p)      MUSCL;
     //reconstruct(alpha)  MUSCL;

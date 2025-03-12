@@ -84,7 +84,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        alpha_pos_
+        1.0 - alpha_pos_
     ),
     alphaRhoFlux1_pos_
     (

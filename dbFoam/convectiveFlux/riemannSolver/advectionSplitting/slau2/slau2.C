@@ -50,9 +50,10 @@ scalar Foam::slau2::massFlux
     const scalar qLeft  = (ULeft  & normalVector);
     const scalar qRight = (URight & normalVector);
 
-    const scalar aTilde   = 0.5*(aLeft   + aRight);
+    const scalar aTilde   = 0.5*(aLeft + aRight);
 
-    const scalar sqrtUDash = Foam::sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    //const scalar sqrtUDash = sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    const scalar sqrtUDash = sqrt(0.5*(magSqr(ULeft) + magSqr(URight)));
 
     const scalar MaRelLeft  = qLeft /aTilde;
     const scalar MaRelRight = qRight/aTilde;
@@ -91,12 +92,12 @@ scalar Foam::slau2::pressureFlux
     const scalar aTilde   = 0.5*(aLeft   + aRight);
     const scalar rhoTilde = 0.5*(rhoLeft + rhoRight);
 
-    const scalar sqrtUDash = Foam::sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    //const scalar sqrtUDash = Foam::sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    const scalar sqrtUDash = sqrt(0.5*(magSqr(ULeft) + magSqr(URight)));
 
     const scalar MaRelLeft  = qLeft /aTilde;
     const scalar MaRelRight = qRight/aTilde;
        
-
     const scalar PPlusLeft   = ((mag(MaRelLeft)  >= 1.0) ?
         0.5*(1.0 + sign(MaRelLeft))
         : (0.25*sqr(MaRelLeft + 1.0)*(2.0 - MaRelLeft)));

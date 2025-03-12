@@ -10,28 +10,29 @@ FoamFile
     version     2.0;
     format      ascii;
     arch        "LSB;label=32;scalar=64";
-    class       volVectorField;
+    class       volScalarField;
     location    "0";
-    object      U.2;
+    object      T.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [0 1 -1 0 0 0 0];
+dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform (-100 0 0);
+internalField   uniform 308.15;
 
 boundaryField
 {
     inlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 308.15;
     }
     
     outlet
     {
         type            zeroGradient;
     }
-    
+
     emptyPlanes
     {
         type            empty;

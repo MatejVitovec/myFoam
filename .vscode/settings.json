@@ -142,7 +142,8 @@
         "IOobject.C": "cpp",
         "SlicedGeometricField.C": "cpp",
         "FieldField.C": "cpp",
-        "gaussGrad.C": "cpp"
+        "gaussGrad.C": "cpp",
+        "makeGasProperties.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
