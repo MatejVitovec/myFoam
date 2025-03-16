@@ -24,8 +24,9 @@ gradSchemes
 {
     default         Gauss linear;
     limitedGauss    cellLimited Gauss linear 1;
-    venkatakrishnan cellLimited<Venkatakrishnan> leastSquares 1;
-    grad(U)         Gauss linear;
+    venkatakrishnan cellLimited<cubic> 1.5 edgeCellsLeastSquares 1;
+    grad(U) Gauss linear;
+    grad(h) Gauss linear;
 }
 
 divSchemes
@@ -41,12 +42,12 @@ laplacianSchemes
 interpolationSchemes
 {
     default        linear;
-    //reconstruct(p)      blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(alpha)  blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(U.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(U.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(T.1)    blended 0.5 linearUpwind venkatakrishnan upwind;
-    //reconstruct(T.2)    blended 0.5 linearUpwind venkatakrishnan upwind;
+    //reconstruct(p)      upwind;
+    //reconstruct(alpha)  upwind;
+    //reconstruct(U.1)    upwind;
+    //reconstruct(U.2)    upwind;
+    //reconstruct(T.1)    upwind;
+    //reconstruct(T.2)    upwind;
 
     reconstruct(p)      linearUpwind  venkatakrishnan;
     reconstruct(alpha)  linearUpwind  venkatakrishnan;
@@ -54,13 +55,6 @@ interpolationSchemes
     reconstruct(U.2)    linearUpwindV venkatakrishnan;
     reconstruct(T.1)    linearUpwind  venkatakrishnan;
     reconstruct(T.2)    linearUpwind  venkatakrishnan;
-
-    //reconstruct(p)      MUSCL;
-    //reconstruct(alpha)  MUSCL;
-    //reconstruct(U.1)    MUSCL;
-    //reconstruct(U.2)    MUSCL;
-    //reconstruct(T.1)    MUSCL;
-    //reconstruct(T.2)    MUSCL;
 }
 
 snGradSchemes

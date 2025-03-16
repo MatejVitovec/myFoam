@@ -24,14 +24,25 @@ boundaryField
 {
     inlet
     {
-        type            fixedValue;
-        value           uniform 1e5;
+        type            zeroGradient;
     }
+
     outlet
     {
         type            fixedValue;
         value           uniform 1e5;
     }
+
+    bottom
+    {
+        type            symmetryPlane;
+    }
+
+    top
+    {
+        type            zeroGradient;
+    }
+
     emptyPlanes
     {
         type            empty;

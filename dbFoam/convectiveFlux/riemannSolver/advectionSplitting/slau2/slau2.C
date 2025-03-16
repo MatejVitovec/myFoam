@@ -50,7 +50,7 @@ scalar Foam::slau2::massFlux
     const scalar qLeft  = (ULeft  & normalVector);
     const scalar qRight = (URight & normalVector);
 
-    const scalar aTilde   = 0.5*(aLeft + aRight);
+    const scalar aTilde = 0.5*(aLeft + aRight);
 
     //const scalar sqrtUDash = sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
     const scalar sqrtUDash = sqrt(0.5*(magSqr(ULeft) + magSqr(URight)));

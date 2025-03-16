@@ -18,16 +18,27 @@ FoamFile
 
 dimensions      [0 0 0 1 0 0 0];
 
-internalField   uniform 300;
+internalField   uniform 293.15;
 
 boundaryField
 {
     inlet
     {
+        type            fixedValue;
+        value           uniform 381.85;
+    }
+
+    outlet
+    {
         type            zeroGradient;
     }
-    
-    outlet
+
+    bottom
+    {
+        type            symmetryPlane;
+    }
+
+    top
     {
         type            zeroGradient;
     }
