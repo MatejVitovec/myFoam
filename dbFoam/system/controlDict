@@ -15,10 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-//libs (
+libs (
 //  "libfluidThermophysicalModels.so"
-//  "libmyFoam.so"
-//);
+  "libmyFoam.so"
+);
 
 startFrom       startTime;
 
@@ -28,11 +28,11 @@ stopAt          endTime;
 
 endTime         25e-3;
 
-deltaT          5e-7;
+deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   1000;
+writeInterval   250;
 
 purgeWrite      0;
 
@@ -48,9 +48,9 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-adjustTimeStep  no;
+adjustTimeStep  yes;
 
-maxCo 0.3;
+maxCo 0.6;
 
 rDeltaTSmoothingCoeff 0.1;
 

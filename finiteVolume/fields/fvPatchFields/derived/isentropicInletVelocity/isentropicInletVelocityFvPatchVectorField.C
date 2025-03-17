@@ -48,7 +48,7 @@ isentropicInletVelocityFvPatchVectorField
     mixedFvPatchVectorField(p, iF),
     fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
     pName_("p"),
-    TName_("T" + (fluidName_ != "" ? "." + fluidName_ : "")),
+    TName_(IOobject::groupName("T", fluidName_)),
     hasInletDir_(false),
     hasTangentialVelocity_(false)
 {
@@ -93,8 +93,9 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(p, iF),
-    pName_(dict.getOrDefault<word>("p", "p")),
-    TName_(dict.getOrDefault<word>("T" + (fluidName_ != "" ? "." + fluidName_ : ""), "T")),
+    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    pName_("p"),
+    TName_(IOobject::groupName("T", fluidName_)),
     hasInletDir_(false),
     hasTangentialVelocity_(false)
 {
@@ -231,7 +232,7 @@ void Foam::isentropicInletVelocityFvPatchVectorField::updateCoeffs()
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
     const auto& thermo =
-        mesh.lookupObject<fluidThermo>(fluidName_);
+        mesh.lookupObject<fluidThermo>(IOobject::groupName("thermophysicalProperties", fluidName_));
 
     autoPtr<gasProperties> gasProps(gasProperties::New(thermo));
     

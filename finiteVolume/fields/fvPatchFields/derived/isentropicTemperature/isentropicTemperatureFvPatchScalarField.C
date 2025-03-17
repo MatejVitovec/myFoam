@@ -45,9 +45,10 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 :
     fixedValueFvPatchScalarField(p, iF),
     fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    //fluidName_(this->internalField().name().component(1, ".")),
     pName_("p"),
-    UName_("U" + (fluidName_ != "" ? "." + fluidName_ : "")),
-    phiName_("phi" + (fluidName_ != "" ? "." + fluidName_ : "")),
+    UName_(IOobject::groupName("U", fluidName_)),
+    phiName_(IOobject::groupName("phi", fluidName_)),
     T0_(p.size(), Zero),
     p0_(p.size(), Zero)
 {}
@@ -78,11 +79,11 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 )
 :
     fixedValueFvPatchScalarField(p, iF, dict, false),
-    fluidName_(this->internalField().name().substr(this->internalField().name().find('.'))),
-    pName_(dict.getOrDefault<word>("p", "p")),
-    UName_(dict.getOrDefault<word>("U" + (fluidName_ != "" ? "." + fluidName_ : ""), "U")),
-    phiName_(dict.getOrDefault<word>("phi" + (fluidName_ != "" ? "." + fluidName_ : ""), "phi")),
-    T0_("T0" + (fluidName_ != "" ? "." + fluidName_ : ""), dict, p.size()),
+    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    pName_("p"),
+    UName_(IOobject::groupName("U", fluidName_)),
+    phiName_(IOobject::groupName("phi", fluidName_)),
+    T0_(IOobject::groupName("T0", fluidName_), dict, p.size()),
     p0_("p0", dict, p.size())
 {
     if (dict.found("value"))
@@ -184,8 +185,8 @@ void Foam::isentropicTemperatureFvPatchScalarField::updateCoeffs()
     //const fluidThermo& thermo =
     //    db().lookupObject<fluidThermo>(fluidThermo::dictName);
 
-    const fluidThermo& thermo =
-        db().lookupObject<fluidThermo>(fluidName_);
+    const auto& thermo =
+        db().lookupObject<fluidThermo>(IOobject::groupName("thermophysicalProperties", fluidName_));
 
     autoPtr<gasProperties> gasProps(gasProperties::New(thermo));
     

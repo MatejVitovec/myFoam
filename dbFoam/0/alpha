@@ -18,18 +18,36 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 0.02;
+internalField   uniform 0.999999;
 
 boundaryField
 {
     inlet
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 0.999999;
     }
+    
     outlet
     {
         type            zeroGradient;
     }
+
+    wall
+    {
+        type            zeroGradient;
+    }
+    
+    periodic1
+    {
+        type            cyclic;
+    }
+    
+    periodic2
+    {
+        type            cyclic;
+    }
+
     emptyPlanes
     {
         type            empty;
