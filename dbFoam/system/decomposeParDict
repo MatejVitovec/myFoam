@@ -1,65 +1,31 @@
-// The FOAM Project // File: decomposeParDict
-/*
--------------------------------------------------------------------------------
- =========         | dictionary
- \\      /         | 
-  \\    /          | Name:   decomposeParDict
-   \\  /           | Family: FoamX configuration file
-    \\/            | 
-    F ield         | FOAM version: 2.1
-    O peration     | Product of Nabla Ltd.
-    A and          | 
-    M anipulation  | Email: Enquiries@Nabla.co.uk
--------------------------------------------------------------------------------
-*/
-// FoamX Case Dictionary.
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "/home/penfold/mattijs/foam/mattijs2.1/run/icoFoam";
-    case            "cavity";
-    instance        "system";
-    local           "";
-
-    class           dictionary;
-    object          decomposeParDict;
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
 }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Počet poddomén (jader)
+numberOfSubdomains 4;
 
+// Metoda rozdělení
+method          scotch;  // Automatické optimalizované dělení
 
-numberOfSubdomains 2;
-
-//method          hierarchical;
-method          metis;
-//method          parMetis;
-
+// Alternativní možnosti rozdělení (pro metody 'simple' a 'hierarchical')
 simpleCoeffs
 {
-    n               (4 1 1);
-    delta           0.001;
+    n           (4 1 1);  // Dělení v x, y, z směru (celkem 4×4×1 = 16 částí)
+    delta       0.001;    // Hraniční tolerance
 }
 
 hierarchicalCoeffs
 {
-    n               (3 2 1);
-    delta           0.001;
-    order           xyz;
+    n           (4 1 1);
+    delta       0.001;
+    order       xyz;
 }
 
-manualCoeffs
-{
-    dataFile        "cellDecomposition";
-}
-
-metisCoeffs
-{
-    //n                   (5 1 1);
-    //cellWeightsFile     "constant/cellWeightsFile";
-}
-
-
-// ************************************************************************* //
+// Výstupní logy
+distributed     no;
+roots          ();

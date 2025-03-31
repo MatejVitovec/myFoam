@@ -90,6 +90,16 @@ int main(int argc, char *argv[])
         for (size_t i = 0; i < 3; i++)
         {
             twoFluidFlux.computeFlux();
+
+            ////////////////////////////
+            /*const scalar dragCoeff = 2.0;
+            const scalar dropletDiameter = 1e-5;
+            volScalarField drag = volScalarField
+            (
+                "dragTerm",
+                dragCoeff*(3.0/(4.0*dropletDiameter))*fluidSystem.thermo1.rho()*(1.0 - fluidSystem.alpha())*mag(fluidSystem.U1() - fluidSystem.U2())*(fluidSystem.U1() - fluidSystem.U2())
+            )*/
+            //////////////////////
             
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
@@ -102,12 +112,14 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf()));
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
+                                          - drag);
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf()));
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
+                                          + drag);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()

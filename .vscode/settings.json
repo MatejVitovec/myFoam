@@ -144,7 +144,12 @@
         "FieldField.C": "cpp",
         "gaussGrad.C": "cpp",
         "makeGasProperties.C": "cpp",
-        "dictionaryTemplates.C": "cpp"
+        "dictionaryTemplates.C": "cpp",
+        "dragForce.C": "cpp",
+        "condensationModel.C": "cpp",
+        "condensationMomentum.C": "cpp",
+        "saturationCurve.C": "cpp",
+        "saturationIF97.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -71,14 +71,9 @@ twoFluidConservative_()
 
 Foam::TwoFluidFoam::twoFluid::twoFluid(const fvMesh& mesh)
 :
-epsilon_(1.0e-5),
-<<<<<<< HEAD
+epsilon_(1.0e-7),
 epsilonMin_(0.1*epsilon_),
-epsilonMax_(1000*epsilon_),
-=======
-epsilonMin_(epsilon_),
-epsilonMax_(10*epsilon_),
->>>>>>> 7d9e0e0a7db44483f691c56739a2157c59e881f2
+epsilonMax_(100*epsilon_),
 mesh_(mesh),
 pthermo1_(rhoThermo::New(mesh_, "1")),
 pthermo2_(rhoThermo::New(mesh_, "2")),
