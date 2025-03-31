@@ -11,48 +11,26 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      controlDict;
+    object      setFieldsDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs (
-  "libfluidThermophysicalModels.so"
-  "libmyFoam.so"
+
+regions
+(
+    boxToCell
+    {
+        box (-0.007 0 0) (-0.004 0.006 0.0001);
+        fieldValues
+        (
+            volScalarFieldValue p   2.35438e5
+            volVectorFieldValue U.1 (225.86 0 0)
+            volVectorFieldValue U.2 (225.86 0 0)
+            volScalarFieldValue T.1 381.85
+            volScalarFieldValue T.2 381.85
+        );
+    }
 );
-
-startFrom       startTime;
-
-startTime       0;
-
-stopAt          endTime;
-
-endTime         3e-1;
-
-deltaT          1e-6;
-
-writeControl    timeStep;
-
-writeInterval   250;
-
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  6;
-
-writeCompression off;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable yes;
-
-adjustTimeStep  yes;
-
-maxCo 0.6;
-
-rDeltaTSmoothingCoeff 0.1;
 
 
 // ************************************************************************* //

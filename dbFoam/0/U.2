@@ -22,11 +22,24 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
+    //inlet
+    //{
+    //    type            isentropicInletVelocity;
+    //    inletDirection  uniform (0.943800516 0.3305143927 0);
+    //    value           $internalField;
+    //}
+
     inlet
     {
-        type            isentropicInletVelocity;
-	    inletDirection  uniform (0.943800516 0.3305143927 0);
-        value           $internalField;
+        type        codedFixedValue;
+        value       uniform (0 0 0);
+
+        name        mapFieldTUToTU;
+        code
+        #{
+            const volVectorField& sourceField = db().lookupObject<volVectorField>("U.1");
+            operator== (sourceField.boundaryField()[patch().index()]);
+        #};
     }
     
     outlet

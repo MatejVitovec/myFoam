@@ -29,6 +29,20 @@ boundaryField
         p0              uniform 98071;
         value           uniform 298.65;
     }
+
+    inlet
+    {
+        type        codedFixedValue;
+        value       uniform 298.65;
+
+        name        mapFieldT1ToT2;
+        code
+        #{
+            const volScalarField& sourceField = db().lookupObject<volScalarField>("T.1");
+            operator== (sourceField.boundaryField()[patch().index()]);
+        #};
+    }
+
     outlet
     {
         type            zeroGradient;

@@ -1,0 +1,6 @@
+/* dynamicCode:
+ * SHA1 = 7b45920900006f2e0af41ee33a0c0d75de2ecece
+ */
+fixedValueFvPatchFieldTemplate.C
+
+LIB = $(PWD)/../platforms/$(WM_OPTIONS)/lib/libmapField_7b45920900006f2e0af41ee33a0c0d75de2ecece
