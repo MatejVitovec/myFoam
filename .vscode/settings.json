@@ -149,7 +149,9 @@
         "condensationModel.C": "cpp",
         "condensationMomentum.C": "cpp",
         "saturationCurve.C": "cpp",
-        "saturationIF97.C": "cpp"
+        "saturationIF97.C": "cpp",
+        "dragModel.C": "cpp",
+        "constantDrag.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

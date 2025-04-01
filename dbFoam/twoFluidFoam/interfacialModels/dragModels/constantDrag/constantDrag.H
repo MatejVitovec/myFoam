@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2016 OpenFOAM Foundation
+    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,83 +24,79 @@ License
     You should have received a copy of the GNU General Public License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
+Class
+    Foam::constantDrag
+
+Description
+
+SourceFiles
+    constantDrag.C
+
 \*---------------------------------------------------------------------------*/
 
-#include "fvCFD.H"
-#include "fvMesh.H"
-#include "rhoThermo.H"
+#ifndef constantDrag_H
+#define constantDrag_H
 
-#include "twoFluidFvc.H"
+#include "dragModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+// Forward Declarations
+class twoFluid;
 
-namespace TwoFluidFoam
+/*---------------------------------------------------------------------------*\
+                           Class constantDrag Declaration
+\*---------------------------------------------------------------------------*/
+
+class constantDrag
+:
+    public dragModel
 {
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+public:
 
-void primitiveFromConservative
-(
-    volScalarField& p,
-    volScalarField& alpha,
-    volVectorField& U1,
-    volVectorField& U2,
-    volScalarField& T1,
-    volScalarField& T2,
-    const volScalarField& alphaRho1,
-    const volScalarField& alphaRho2,
-    const volVectorField& alphaRhoU1,
-    const volVectorField& alphaRhoU2,
-    const volScalarField& alphaRhoE1,
-    const volScalarField& alphaRhoE2,
-    const rhoThermo& thermo1,
-    const rhoThermo& thermo2,
-    const fvMesh& mesh
-)
-{
-    const auto& cells = mesh.C();
-
-    forAll(cells, celli)
-    {
-        //TODO
-    }
-}
+    //- Runtime type information
+    //TypeName("constantDrag");
 
 
+    // Constructors
 
-void updateIntPressure
-(
-    volScalarField& pInt,
-    const volScalarField& alpha,
-    const volVectorField& U1,
-    const volVectorField& U2,
-    const rhoThermo& thermo1,
-    const rhoThermo& thermo2
-)
-{
-    const scalar sigma = 2.0;
-    const scalar epsilonP = 0.01;
+        // Construct without residual constants
+        constantDrag
+        (
+            const twoFluid& fluid,
+            const bool registerObject
+        );
 
-    const auto& rho1 = thermo1.rho();
-    const auto& rho2 = thermo2.rho();
-
-    pInt = sigma*((alpha*rho1*(1.0 - alpha)*rho2)/
-        (alpha*rho2 + (1.0 - alpha)*rho1))*magSqr(U2 - U1);
-}
+        // Construct with residual constants
+        constantDrag
+        (
+            const dictionary& dict,
+            const twoFluid& fluid,
+            const bool registerObject
+        );
 
 
+    //- Destructor
+    virtual ~constantDrag();
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace TwoFluidFoam
+    // Member Functions
+
+        //- Drag coefficient
+        virtual tmp<volScalarField> CdRe() const;
+};
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
 
 // ************************************************************************* //
