@@ -151,7 +151,8 @@
         "saturationCurve.C": "cpp",
         "saturationIF97.C": "cpp",
         "dragModel.C": "cpp",
-        "constantDrag.C": "cpp"
+        "constantDrag.C": "cpp",
+        "UPstreamCommunicator.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,0 +1,37 @@
+EXE_INC = \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/cfdTools \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I../thermophysicalModels/lnInclude \
+    -IconvectiveFlux \
+    -IconvectiveFlux/lnInclude \
+    -IconvectiveFlux/riemannSolver \
+    -IconvectiveFlux/riemannSolver/advectionSplitting \
+    -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
+    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
+    -IinterfacialModels/dragModels/dragModel \
+    -IinterfacialModels/dragModels/constantDrag \
+    -ItwoFluid \
+    -ItwoFluidConservative
+
+EXE_LIBS = \
+    $(CPLIBS) \
+    -lfiniteVolume \
+    -lfvOptions \
+    -lmeshTools \
+    -lcompressibleTransportModels \
+    -lfluidThermophysicalModels \
+    -lspecie \
+    -lturbulenceModels \
+    -lcompressibleTurbulenceModels \
+    -lthermoTools \
+    -ldynamicFvMesh \
+    -ltopoChangerFvMesh \
+    -L$(FOAM_USER_LIBBIN) \
+    -lmyThermophysicalModels
