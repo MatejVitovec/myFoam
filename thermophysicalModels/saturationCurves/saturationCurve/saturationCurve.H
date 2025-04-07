@@ -37,13 +37,10 @@ SourceFiles
 #include "IOdictionary.H"
 #include "runTimeSelectionTables.H"
 #include "volFields.H"
-#include <functional>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
-{
-namespace WetSteam
 {
 
 /*---------------------------------------------------------------------------*\
@@ -99,7 +96,6 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-}
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

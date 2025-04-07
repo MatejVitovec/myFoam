@@ -40,8 +40,6 @@ SourceFiles
 
 namespace Foam
 {
-namespace WetSteam
-{
 
 /*---------------------------------------------------------------------------*\
                          Class saturationCurve Declaration
@@ -84,7 +82,6 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-}
 } // End namespace Foam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

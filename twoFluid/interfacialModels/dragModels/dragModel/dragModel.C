@@ -94,6 +94,35 @@ Foam::TwoFluidFoam::dragModel::dragModel
 
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
+Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
+Foam::TwoFluidFoam::dragModel::New
+(
+    const twoFluid& fluid
+)
+{
+    const dictionary& dict = fluid.subDict("drag");
+
+    const word modelType(dict.get<word>("type"));
+
+    Info<< "Selecting dragModel for "
+        << fluid << ": " << modelType << endl;
+
+    auto* ctorPtr = dictionaryConstructorTable(modelType);
+
+    if (!ctorPtr)
+    {
+        FatalIOErrorInLookup
+        (
+            dict,
+            "dragModel",
+            modelType,
+            *dictionaryConstructorTablePtr_
+        ) << exit(FatalIOError);
+    }
+
+    return ctorPtr(dict, fluid, true);
+}
+
 
 Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
 Foam::TwoFluidFoam::dragModel::New

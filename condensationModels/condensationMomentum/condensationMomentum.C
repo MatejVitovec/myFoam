@@ -42,14 +42,17 @@ namespace WetSteam
 defineTypeNameAndDebug(condensationMomentum, 0);
 addToRunTimeSelectionTable(condensationModel, condensationMomentum, params);
 
-condensationMomentum::condensationMomentum(
+condensationMomentum::condensationMomentum
+(
+    volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-) :
-    condensationModel(rho, U, phi, gasThermo, liquidThermo),
+)
+:
+    condensationModel(alpha, rho, U, phi, gasThermo, liquidThermo),
 
     Q0_(
         IOobject
@@ -156,13 +159,12 @@ void condensationMomentum::correct()
     const volScalarField Ts = saturation_.Ts(p);
     const volScalarField ps = saturation_.ps(T);
 
-    //const volScalarField sigma = steam().liquid().sigma(p, T);    //prepsano naprimo pomoci liquidProps_
     const volScalarField& rho_l = liquidThermo_.rho();
     const volScalarField& rho_g = gasThermo_.rho();
-    const volScalarField L = steam().L();       // TODO latent heat implement (nejspise jako funkce ve tride condenationModel - prozatiom nejjednodusi)
+    const volScalarField L = L();
     const volScalarField& Cp = gasThermo_.Cp();
 
-    const WetSteam::turbulenceModel& turbModel =
+    /*const WetSteam::turbulenceModel& turbModel =
         mesh.lookupObject<WetSteam::turbulenceModel>
         (
             IOobject::groupName
@@ -170,7 +172,7 @@ void condensationMomentum::correct()
                 turbulenceModel::propertiesName,
                 p.group()
             )
-        );
+        );*/
     
     const dimensionedScalar rMin("rMin", dimLength, 1e-20);
     const dimensionedScalar kg("kg", dimMass, 1.0);
@@ -231,7 +233,8 @@ void condensationMomentum::correct()
         {
             if (r <= rMin.value())  // Complete evaporation
             {
-                w[i] = 0;
+                //w[i] = 0;
+                alpha_[i] = 0.0; //epsilon - TODO
                 Q0_[i] = 0;
                 Q1_[i] = 0;
                 Q2_[i] = 0;
@@ -256,8 +259,8 @@ void condensationMomentum::correct()
 #else
             //rc[i] = 2*sigma/(rho_l[i]*Rg*T[i]*log(S));
 
-            scalar dH = steam().gasProps().Ha(p[i],T[i]) - steam().gasProps().Ha(ps[i],T[i]);
-            scalar ds = steam().gasProps().S(p[i],T[i]) - steam().gasProps().S(ps[i],T[i]);
+            scalar dH = gasProps_.Ha(p[i], T[i]) - gasProps_.Ha(ps[i], T[i]);
+            scalar ds = gasProps_.S( p[i], T[i]) - gasProps_.S( ps[i], T[i]);
             scalar dG = dH - T[i]*ds;
             rc[i] = 2*sigma/(rho_l[i]*dG);
 
@@ -295,7 +298,8 @@ void condensationMomentum::correct()
         }
     }
 
-    volScalarField Dt("Dt", rho_*turbModel.nut()/Sct_);
+    //volScalarField Dt("Dt", rho_*turbModel.nut()/Sct_);
+    volScalarField Dt("Dt", rho_*0.0);
     
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
     //fields.add(w);
@@ -378,18 +382,19 @@ void condensationMomentum::correct()
     nucleationMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
     condensationRateMassSource_ = 4*pi*rho_*Q2_*rDot*rho_l;
 
-    // TODO
     // Explicitly constrain w & Q0 in dry steam region
     forAll(w, i)
     {
         if (w[i] <= wMin.value() && J[i] <= 0)
         {
-            w[i]   = 0.0;
+            //w[i]   = 0.0;
+            alpha_[i] = 0.0; //TODO - epsilon
             Q0_[i] = 0.0;
             Q1_[i] = 0.0;
             Q2_[i] = 0.0;
         }
-        w[i]   = max(w[i], 0);
+        //w[i]   = max(w[i], 0);
+        alpha_[i] = max(alpha_[i], 0);
         Q0_[i] = max(Q0_[i], 0);
         Q1_[i] = max(Q1_[i], 0);
         Q2_[i] = max(Q2_[i], 0);

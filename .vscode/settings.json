@@ -152,7 +152,13 @@
         "saturationIF97.C": "cpp",
         "dragModel.C": "cpp",
         "constantDrag.C": "cpp",
-        "UPstreamCommunicator.C": "cpp"
+        "UPstreamCommunicator.C": "cpp",
+        "saturationIAPWS95.C": "cpp",
+        "applyFunctions.C": "cpp",
+        "cyclicamipolypatch.h": "c",
+        "cyclicAMIPolyPatch.H": "cpp",
+        "IAPWSIF97metaGas.C": "cpp",
+        "steamThermos.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

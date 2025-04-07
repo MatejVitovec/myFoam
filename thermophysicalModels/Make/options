@@ -14,15 +14,24 @@ endif
 
 EXE_INC = \
     $(CPMACRO) \
+    -I./IF97 \
     -I./specie/equationOfState/AungierRedlichKwongGas \
     -I./specie/equationOfState/pVirialGas \
     -I./specie/equationOfState/stiffenedGas \
+    -I./equationOfState/IAPWSIF97metaGas \
+    -I./thermo/IAPWSIF97meta \
+    -I./transport/IAPWSIF97Transport \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
-    -I$(LIB_SRC)/meshTools/lnInclude
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I./../applyFunctions \
+    -I./saturationCurves/saturationCurve \
+    -I./saturationCurves/saturationIAPWS95 \
+    -I./saturationCurves/saturationIF97
+
 
 LIB_LIBS = \
     $(CPLIBS) \
@@ -32,3 +41,4 @@ LIB_LIBS = \
     -lthermophysicalProperties \
     -lfiniteVolume \
     -lmeshTools
+

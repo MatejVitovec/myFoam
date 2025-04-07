@@ -30,8 +30,6 @@ License
 
 namespace Foam
 {
-namespace WetSteam
-{
 
 defineTypeNameAndDebug(saturationIF97, 0);
 addToRunTimeSelectionTable(saturationCurve, saturationIF97, dict);
@@ -90,5 +88,3 @@ scalar saturationIF97::Ts(scalar p) const
 
 
 }
-}
-

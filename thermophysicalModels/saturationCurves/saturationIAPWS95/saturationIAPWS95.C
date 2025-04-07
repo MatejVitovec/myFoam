@@ -30,14 +30,13 @@ License
 
 namespace Foam
 {
-namespace WetSteam
-{
 
 defineTypeNameAndDebug(saturationIAPWS95, 0);
 addToRunTimeSelectionTable(saturationCurve, saturationIAPWS95, dict);
 
 
-saturationIAPWS95::saturationIAPWS95(const dictionary& dict):
+saturationIAPWS95::saturationIAPWS95(const dictionary& dict)
+:
     saturationCurve(dict)
 {}
 
@@ -96,5 +95,3 @@ scalar saturationIAPWS95::Ts(scalar p) const
 
 
 }
-}
-

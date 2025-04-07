@@ -25,6 +25,7 @@ License
 
 #include "condensationModel.H"
 #include "addToRunTimeSelectionTable.H"
+#include "applyFunctions.H"
 
 namespace Foam
 {
@@ -38,6 +39,7 @@ defineRunTimeSelectionTable(condensationModel, params);
 autoPtr<condensationModel>
 condensationModel::New
 (
+    volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& phi,
@@ -65,12 +67,13 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(rho, U, phi, gasThermo, liquidThermo));
+    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, phi, gasThermo, liquidThermo));
 }
 
 
 condensationModel::condensationModel
 (
+    volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& alphaPhi,
@@ -79,6 +82,7 @@ condensationModel::condensationModel
 ) :
     mesh_(U.mesh()),
     time_(U.time()),
+    alpha_(alpha)
     rho_(rho),
     U_(U),
     alphaPhi_(alphaPhi),
@@ -110,10 +114,36 @@ condensationModel::condensationModel
     )
 {}
 
+tmp<volScalarField> condensationModel::L() const
+{
+    volScalarField Ts = saturation_->Ts(liquidThermo_.p());
+
+    const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
+        { return gasProps_.rho(pp,TT); }; //TODO namam gasProps
+        
+    volScalarField rhos = applyFunction2(f, liquidThermo_.p(), Ts, "rhos", dimDensity);
+
+    return tmp<volScalarField>
+        (
+	        //new volScalarField("L", saturation_.dpsdT(Ts)*Ts/rhos)
+            new volScalarField("L", gasThermo_.p()*(T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
+        );
+
+    /*const std::function<scalar(scalar)> f = [&](scalar TT)
+        {return 461.52*(-2.7246e-2*sqr(TT) + 2*1.6853e-5*pow(TT,3) + 2.4576*TT + 6094.4642);};
+
+    return applyFunction1(f, T(), "L", dimEnergy/dimMass);*/
+}
+
 
 tmp<volVectorField> condensationModel::w() const
 {
     return (liquidThermo_.rho()*(scalar(1) - alpha_))/(gasThermo_.rho() + (scalar(1) - alpha_)*(liquidThermo_.rho() - gasThermo_.rho()));
+}
+
+tmp<volVectorField> condensationModel::dropletDiameter() const
+{
+    return alpha_*0.0 + 2.0; //TODO
 }
 
 }

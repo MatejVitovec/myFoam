@@ -56,9 +56,6 @@ class condensationModel
 protected:
     // Prprotected data
 
-    //- Reference to wetSteamSystem
-    wetSteamSystem& steam_;
-
     //- Refernce to the mesh
     const fvMesh& mesh_;
 
@@ -68,13 +65,14 @@ protected:
     volScalarField nucleationMassSource_;
     volScalarField condensationRateMassSource_;
 
-    const volScalarField& alpha_; //gas alpha
-    const volScalarField& rho_;
-    const volVectorField& U_;
-    const surfaceScalarField& alphaPhi_;
+    const volScalarField& alpha_;           //gas alpha
+    const volScalarField& rho_;             //liquid rho
+    const volVectorField& U_;               //liquid velocity
+    const surfaceScalarField& alphaPhi_;    //liquid phi
 
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
+    const gasProperties& gasProps_;
     const liquidProperties& liquidProps_;
     const saturationCurve& saturation_;
     
@@ -86,6 +84,9 @@ private:
 
     //- Disallow default bitwise assignment
     void operator=(const condensationModel&) = delete;
+
+    //Latent heat
+    tmp<volScalarField> L() const;
 
 
 public:
@@ -99,11 +100,14 @@ public:
         condensationModel,
         params,
         (
+            volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
-            const surfaceScalarField& alphaPhi
+            const surfaceScalarField& alphaPhi,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
         ),
-        (rho, U, phi)
+        (alpha, rho, U, phi, gasThermo, liquidThermo)
     );
 
     
@@ -112,6 +116,7 @@ public:
     //- Construct from components
     condensationModel
     (
+        volScalarField& alpha,
         const volScalarField& rho,
         const volVectorField& U,
         const surfaceScalarField& alphaPhi,
@@ -121,11 +126,10 @@ public:
        
 
     // Selectors
-
     
     //- Return a reference to the selected condensation model
     static autoPtr<condensationModel> New
-    (
+    (   volScalarField& alpha;
         const volScalarField& rho,
         const volVectorField& U,
         const surfaceScalarField& alphaPhi,
@@ -161,6 +165,8 @@ public:
     }
 
     tmp<volVectorField> w() const;
+
+    tmp<volVectorField> dropletDiameter() const;
     
     // Check
     

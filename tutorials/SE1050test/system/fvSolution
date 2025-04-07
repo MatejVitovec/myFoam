@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  2.1.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -11,45 +11,44 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      controlDict;
+    object      fvSolution;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs (
-   "libmyThermophysicalModels.so"
-);
+solvers
+{
+    alphaRho1
+    {
+        solver diag;
+    }
 
-application     sandbox;
+    alphaRho2
+    {
+        solver diag;
+    }
 
-startFrom       startTime;
+    alphaRhoU1 
+    {
+        solver diag;
+    }
 
-startTime       0;
+    alphaRhoU2
+    {
+        solver diag;
+    }
 
-stopAt          endTime;
+    epsilon1 
+    {
+        solver diag;
+    }
 
-endTime         1;
+    epsilon2
+    {
+        solver diag;
+    }  
+}
 
-deltaT          1;
 
-writeControl    timeStep;
-
-writeInterval   1;
-
-purgeWrite      0;
-
-writeFormat     ascii;
-
-writePrecision  8;
-
-writeCompression off;
-
-timeFormat      general;
-
-timePrecision   6;
-
-runTimeModifiable yes;
-
-adjustTimeStep  no;
 
 
 // ************************************************************************* //

@@ -44,6 +44,7 @@ Description
 #include "twoFluidConvectiveFlux.H"
 #include "twoFluidFvc.H"
 #include "dragModel.H"
+#include "saturationCurve.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

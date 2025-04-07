@@ -36,16 +36,19 @@ License
 #include "adiabaticPerfectFluid.H"
 #include "AungierRedlichKwongGas.H"
 #include "stiffenedGas.H"
+#include "IAPWSIF97metaGas.H"
 
 #include "hConstThermo.H"
 #include "eConstThermo.H"
 #include "janafThermo.H"
 #include "sensibleEnthalpy.H"
 #include "sensibleInternalEnergy.H"
+#include "IAPWSIF97metaThermo.H"
 #include "thermo.H"
 
 #include "constTransport.H"
 #include "sutherlandTransport.H"
+#include "IAPWSIF97Transport.H"
 
 #include "icoPolynomial.H"
 #include "hPolynomialThermo.H"
@@ -83,6 +86,18 @@ makeThermos
     sensibleInternalEnergy,
     eConstThermo,
     stiffenedGas,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    IAPWSIF97Transport,
+    sensibleInternalEnergy,
+    IAPWSIF97metaThermo,
+    IAPWSIF97metaGas,
     specie
 );
 

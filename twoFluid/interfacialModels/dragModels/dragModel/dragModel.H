@@ -121,6 +121,11 @@ public:
 
         static autoPtr<dragModel> New
         (
+            const twoFluid& fluid
+        );
+
+        static autoPtr<dragModel> New
+        (
             const dictionary& dict,
             const twoFluid& fluid
         );

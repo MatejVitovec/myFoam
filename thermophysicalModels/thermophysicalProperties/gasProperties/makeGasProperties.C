@@ -31,15 +31,19 @@ License
 #include "AungierRedlichKwongGas.H"
 #include "pVirialGas.H"
 #include "stiffenedGas.H"
+#include "IAPWSIF97metaGas.H"
+
 #include "hConstThermo.H"
 #include "eConstThermo.H"
 #include "janafThermo.H"
 #include "sensibleEnthalpy.H"
 #include "sensibleInternalEnergy.H"
+#include "IAPWSIF97metaThermo.H"
 #include "thermo.H"
 
 #include "constTransport.H"
 #include "sutherlandTransport.H"
+#include "IAPWSIF97Transport.H"
 
 #include "hPolynomialThermo.H"
 #include "hTabulatedThermo.H"
@@ -67,6 +71,22 @@ makeGasProperties(
     sensibleInternalEnergy,
     eConstThermo,
     stiffenedGas,
+    specie
+);
+
+makeGasProperties(
+    constTransport,
+    sensibleInternalEnergy,
+    IAPWSIF97metaThermo,
+    IAPWSIF97metaGas,
+    specie
+);
+
+makeGasProperties(
+    IAPWSIF97Transport,
+    sensibleInternalEnergy,
+    IAPWSIF97metaThermo,
+    IAPWSIF97metaGas,
     specie
 );
 

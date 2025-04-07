@@ -94,6 +94,7 @@ public:
     //- Construct from components
     condensationMomentum
     (
+        volScalarField& alpha,
         const volScalarField& rho,
         const volVectorField& U,
         const surfaceScalarField& phi,

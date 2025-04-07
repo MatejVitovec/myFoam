@@ -24,15 +24,12 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "saturationCurve.H"
-#include "wetSteamSystem.H"
+#include "applyFunctions.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 namespace Foam
 {
-namespace WetSteam
-{
-
 defineTypeNameAndDebug(saturationCurve, 0);
 defineRunTimeSelectionTable(saturationCurve, dict);
 
@@ -87,4 +84,4 @@ tmp<volScalarField> saturationCurve::dpsdT(const volScalarField& T) const
 }
 
 }
-}
+

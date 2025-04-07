@@ -29,8 +29,13 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem.subDict("drag"), fluidSystem);
+autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem);
 TwoFluidFoam::dragModel& drag = pDrag();
+
+
+autoPtr<saturationCurve> pSaturation = saturationCurve::New(fluidSystem);
+saturationCurve& saturation = pSaturation();
+
 
 //Pro ukladani
 volScalarField rho1
