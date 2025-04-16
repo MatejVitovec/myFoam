@@ -37,6 +37,7 @@ SourceFiles
 #define genericGasProperties_H
 
 #include "gasProperties.H"
+#include "thermodynamicConstants.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

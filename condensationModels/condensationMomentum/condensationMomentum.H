@@ -97,9 +97,10 @@ public:
         volScalarField& alpha,
         const volScalarField& rho,
         const volVectorField& U,
-        const surfaceScalarField& phi,
+        const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const liquidProperties& liquidProps
     );
     
     //- Destructor

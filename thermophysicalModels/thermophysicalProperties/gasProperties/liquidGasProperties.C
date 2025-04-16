@@ -1,9 +1,11 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2019 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
+-------------------------------------------------------------------------------
+    Copyright (C) 2017 OpenFOAM Foundation
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -23,73 +25,32 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "makeGasProperties.H"
+#include "liquidGasProperties.H"
+#include "addToRunTimeSelectionTable.H"
 
-#include "specie.H"
-#include "perfectGas.H"
-#include "IAPWSIF97metaGas.H"
-#include "IAPWSIF97metaThermo.H"
-#include "IAPWSIF97Transport.H"
-#include "sensibleEnthalpy.H"
-
-#include "thermo.H"
-
-#include "constTransport.H"
-#include "sutherlandTransport.H"
-
-#include "hPolynomialThermo.H"
-#include "polynomialTransport.H"
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-makeGasProperties
+/* * * * * * * * * * * * * * * private static data * * * * * * * * * * * * * */
+
+defineTemplateTypeNameAndDebugWithName
 (
-    constTransport,
-    sensibleEnthalpy,
-    hPolynomialThermo,
-    perfectGas,
-    specie
-);
+    gasliquidProperties,
+    ("gasProperties<liquid,sensibleInternalEnergy>"),
+    0
+); 
 
-makeGasProperties
+addToRunTimeSelectionTable
 (
-    sutherlandTransport,
-    sensibleEnthalpy,
-    hPolynomialThermo,
-    perfectGas,
-    specie
+    gasProperties,
+    gasliquidProperties,
+    dictionary
 );
 
-makeGasProperties
-(
-    polynomialTransport,
-    sensibleEnthalpy,
-    hPolynomialThermo,
-    perfectGas,
-    specie
-);
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-
-// IAPWS IF97
-makeGasProperties
-(
-    constTransport,
-    sensibleEnthalpy,
-    IAPWSIF97metaThermo,
-    IAPWSIF97metaGas,
-    specie
-);
-
-makeGasProperties(
-    IAPWSIF97Transport,
-    sensibleEnthalpy,
-    IAPWSIF97metaThermo,
-    IAPWSIF97metaGas,
-    specie
-);
-
-}
+} // End namespace Foam
 
 // ************************************************************************* //

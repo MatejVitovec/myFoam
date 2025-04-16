@@ -37,6 +37,7 @@ License
 #include "AungierRedlichKwongGas.H"
 #include "stiffenedGas.H"
 #include "IAPWSIF97metaGas.H"
+#include "IAPWSIF97reg1.H"
 
 #include "hConstThermo.H"
 #include "eConstThermo.H"
@@ -98,6 +99,18 @@ makeThermos
     sensibleInternalEnergy,
     IAPWSIF97metaThermo,
     IAPWSIF97metaGas,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    IAPWSIF97reg1,
     specie
 );
 

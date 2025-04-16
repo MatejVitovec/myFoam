@@ -29,7 +29,6 @@ License
 #include "physicoChemicalConstants.H"
 #include "fundamentalConstants.H"
 #include "mathematicalConstants.H"
-#include "turbulentWetSteamModel.H"
 #include <cassert>
 
 #define NOHALAMA
@@ -47,12 +46,13 @@ condensationMomentum::condensationMomentum
     volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
-    const surfaceScalarField& phi,
+    const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const liquidProperties& liquidProps
 )
 :
-    condensationModel(alpha, rho, U, phi, gasThermo, liquidThermo),
+    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps),
 
     Q0_(
         IOobject
@@ -153,7 +153,8 @@ void condensationMomentum::correct()
     const scalar Rg = constant::physicoChemical::R.value()/M;
 
     const fvMesh& mesh = mesh_;
-    const volScalarField w  = w();
+    tmp<volScalarField> tw = w();
+    volScalarField& w = tw.ref();
     const volScalarField& p = liquidThermo_.p();
     const volScalarField& T = liquidThermo_.T();     //liquid temperature
     const volScalarField Ts = saturation_.Ts(p);
@@ -161,7 +162,7 @@ void condensationMomentum::correct()
 
     const volScalarField& rho_l = liquidThermo_.rho();
     const volScalarField& rho_g = gasThermo_.rho();
-    const volScalarField L = L();
+    //const volScalarField L = L();
     const volScalarField& Cp = gasThermo_.Cp();
 
     /*const WetSteam::turbulenceModel& turbModel =
@@ -214,6 +215,7 @@ void condensationMomentum::correct()
         // Dynamic viscosity and thermal conductivity
         scalar eta = 1.823e-6*sqrt(T[i])/(1 + 673.0/T[i]);
         scalar lambda_g = 7.341e-3 - 1.013e-5*T[i] + 1.801e-7*sqr(T[i]) - 9.1e-11*pow3(T[i]);
+        scalar L = p[i]*(gasThermo_.T()[i] - Ts[i]) + saturation_.dpsdT(Ts[i])*Ts[i]/gasProps_.rho(p[i], Ts[i]);
 
         // Prandtl number
         scalar Pr = eta*Cp[i]/lambda_g;
@@ -234,7 +236,7 @@ void condensationMomentum::correct()
             if (r <= rMin.value())  // Complete evaporation
             {
                 //w[i] = 0;
-                alpha_[i] = 0.0; //epsilon - TODO
+                //alpha_[i] = 0.0; //epsilon - TODO
                 Q0_[i] = 0;
                 Q1_[i] = 0;
                 Q2_[i] = 0;
@@ -244,18 +246,18 @@ void condensationMomentum::correct()
             else    // No new droplets, only evaporation
             {
                 J[i] = 0;
-                rDot[i] = lambda_g*(Ts[i] - T[i])/(L[i]*rho_l[i]*(1 + 3.18*Kn/Pr))/r;
+                rDot[i] = lambda_g*(Ts[i] - T[i])/(L*rho_l[i]*(1 + 3.18*Kn/Pr))/r;
             }
         }
         else    // Condensation (T < Ts)
         {
             scalar S = p[i]/ps[i];
-            assert(S>=1.0);
+            assert(S >= 1.0);
 
             scalar sigma = liquidProps_.sigma(p[i], T[i]);
 
 #ifdef HALAMA
-            rc[i] = 2*sigma/(L[i]*rho_l[i]*log(Ts[i]/T[i]));
+            rc[i] = 2*sigma/(L*rho_l[i]*log(Ts[i]/T[i]));
 #else
             //rc[i] = 2*sigma/(rho_l[i]*Rg*T[i]*log(S));
 
@@ -273,7 +275,7 @@ void condensationMomentum::correct()
             if (kantrowitz_)
             {
                 scalar psi = 2*(gamma - 1)/(gamma + 1) *
-                    L[i]/(Rg*T[i])*(L[i]/(Rg*T[i]) - 0.5);
+                    L/(Rg*T[i])*(L/(Rg*T[i]) - 0.5);
                 
                 J[i] /= (1 + psi);      // Kantrowitz correction
             }
@@ -288,10 +290,10 @@ void condensationMomentum::correct()
                 scalar theta = Ts[i]/T[i] - 1.0;
                 scalar dTbyLog = T[i]*(1.0 + theta/2.0 - sqr(theta)/12.0 + pow3(theta)/24.0 
                     - 19.0*pow4(theta)/720.0 + 3*pow5(theta)/160.0);
-                rDot[i] = lambda_g/(L[i]*rho_l[i]*(1.0 + 3.18*Kn/Pr))*
-                    ((Ts[i] - T[i])/r - 2.0*sigma/(L[i]*rho_l[i]*sqr(r))*dTbyLog);
+                rDot[i] = lambda_g/(L*rho_l[i]*(1.0 + 3.18*Kn/Pr))*
+                    ((Ts[i] - T[i])/r - 2.0*sigma/(L*rho_l[i]*sqr(r))*dTbyLog);
 #else
-                rDot[i] = lambda_g*(Ts[i] - T[i])/(L[i]*rho_l[i]*(1 + 3.18*Kn/Pr)) *
+                rDot[i] = lambda_g*(Ts[i] - T[i])/(L*rho_l[i]*(1 + 3.18*Kn/Pr)) *
                     (r - rc[i])/sqr(r);
 #endif
             }
@@ -299,7 +301,6 @@ void condensationMomentum::correct()
     }
 
     //volScalarField Dt("Dt", rho_*turbModel.nut()/Sct_);
-    volScalarField Dt("Dt", rho_*0.0);
     
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
     //fields.add(w);
@@ -313,8 +314,8 @@ void condensationMomentum::correct()
         (
             mesh,
             fields,
-            phi_,
-            mesh.divScheme("div(phi,w_Q)")
+            alphaRhoPhi_,
+            mesh.divScheme("div(alphaPhi,w_Q)")
         )
     );
     
@@ -324,7 +325,7 @@ void condensationMomentum::correct()
         fvScalarMatrix wEqn
         (
             fvm::ddt(rho_, w) 
-            + mvConvection->fvmDiv(phi_, w) 
+            + mvConvection->fvmDiv(alphaRhoPhi_, w) 
             - fvm::laplacian(Dt, w)
             ==
             4.0/3.0*pi*pow3(rc)*J*rho_l
@@ -338,9 +339,9 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q2Eqn
         (
-            fvm::ddt(rho_, Q2_) 
-            + mvConvection->fvmDiv(phi_, Q2_) 
-            - fvm::laplacian(Dt, Q2_)
+            fvm::ddt(alpha_, rho_, Q2_) 
+            + mvConvection->fvmDiv(alphaRhoPhi_, Q2_) 
+            //- fvm::laplacian(Dt, Q2_)
             ==
             sqr(rc)*J + 2*rho_*Q1_*rDot
         );
@@ -352,9 +353,9 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q1Eqn
         (
-            fvm::ddt(rho_, Q1_) 
-            + mvConvection->fvmDiv(phi_, Q1_) 
-            - fvm::laplacian(Dt, Q1_)
+            fvm::ddt(alpha_, rho_, Q1_) 
+            + mvConvection->fvmDiv(alphaRhoPhi_, Q1_) 
+            //- fvm::laplacian(Dt, Q1_)
             ==
             rc*J + rho_*Q0_*rDot
         );
@@ -366,9 +367,9 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q0Eqn
         (
-            fvm::ddt(rho_, Q0_) 
-            + mvConvection->fvmDiv(phi_, Q0_) 
-            - fvm::laplacian(Dt, Q0_)
+            fvm::ddt(alpha_, rho_, Q0_) 
+            + mvConvection->fvmDiv(alphaRhoPhi_, Q0_) 
+            //- fvm::laplacian(Dt, Q0_)
             ==
             J
         );
@@ -379,8 +380,8 @@ void condensationMomentum::correct()
     
     //mDotGL_ = 4.0/3.0*pi*pow3(rc)*J*rho_l + 4*pi*rho_*Q2_*rDot*rho_l;
 
-    nucleationMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
-    condensationRateMassSource_ = 4*pi*rho_*Q2_*rDot*rho_l;
+    nucleationRateMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
+    growthRateMassSource_ = 4*pi*rho_*Q2_*rDot*rho_l;
 
     // Explicitly constrain w & Q0 in dry steam region
     forAll(w, i)
@@ -388,13 +389,13 @@ void condensationMomentum::correct()
         if (w[i] <= wMin.value() && J[i] <= 0)
         {
             //w[i]   = 0.0;
-            alpha_[i] = 0.0; //TODO - epsilon
+            //alpha_[i] = 0.0; //TODO - epsilon
             Q0_[i] = 0.0;
             Q1_[i] = 0.0;
             Q2_[i] = 0.0;
         }
         //w[i]   = max(w[i], 0);
-        alpha_[i] = max(alpha_[i], 0);
+        //alpha_[i] = max(alpha_[i], 0);
         Q0_[i] = max(Q0_[i], 0);
         Q1_[i] = max(Q1_[i], 0);
         Q2_[i] = max(Q2_[i], 0);

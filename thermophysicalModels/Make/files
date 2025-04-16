@@ -2,8 +2,10 @@ basic/rhoThermo/rhoThermos.C
 basic/psiThermo/psiThermos.C
 thermophysicalProperties/gasProperties/gasProperties.C
 thermophysicalProperties/gasProperties/makeGasProperties.C
+thermophysicalProperties/gasProperties/liquidGasProperties.C
 thermophysicalProperties/liquidProperties/H2O_DBB/H2O_DBB.C
 thermophysicalProperties/liquidProperties/H2O_IAPWS/H2O_IAPWS.C
+thermophysicalProperties/liquidProperties/H2O_IAPWS97reg1/H2O_IAPWS97reg1.C
 saturationCurves/saturationCurve/saturationCurve.C
 saturationCurves/saturationIAPWS95/saturationIAPWS95.C
 saturationCurves/saturationIF97/saturationIF97.C

@@ -32,6 +32,7 @@ License
 #include "pVirialGas.H"
 #include "stiffenedGas.H"
 #include "IAPWSIF97metaGas.H"
+#include "IAPWSIF97reg1.H"
 
 #include "hConstThermo.H"
 #include "eConstThermo.H"
@@ -89,6 +90,15 @@ makeGasProperties(
     IAPWSIF97metaGas,
     specie
 );
+
+makeGasProperties(
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    IAPWSIF97reg1,
+    specie
+);
+
 
 makeGasProperties(
     constTransport,

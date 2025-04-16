@@ -158,7 +158,15 @@
         "cyclicamipolypatch.h": "c",
         "cyclicAMIPolyPatch.H": "cpp",
         "IAPWSIF97metaGas.C": "cpp",
-        "steamThermos.C": "cpp"
+        "steamThermos.C": "cpp",
+        "files": "cpp",
+        "liquidThermo.C": "cpp",
+        "H2O_IAPWS.C": "cpp",
+        "H2O_DBB.C": "cpp",
+        "H2O_IAPWS97reg1.C": "cpp",
+        "liquidGasProperties.C": "cpp",
+        "thermodynamicConstants.C": "cpp",
+        "IAPWSIF97reg1.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

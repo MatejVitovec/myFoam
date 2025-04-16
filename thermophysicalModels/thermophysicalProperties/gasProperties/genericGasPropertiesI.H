@@ -47,7 +47,8 @@ scalar genericGasProperties<TransportModel>::W() const
 template<typename TransportModel>
 scalar genericGasProperties<TransportModel>::R() const
 {
-    return transport_.R();
+    //return transport_.R();
+    return RR/transport_.W();
 }
 
 
@@ -61,7 +62,8 @@ scalar genericGasProperties<TransportModel>::rho(scalar p, scalar T) const
 template<typename TransportModel>
 scalar genericGasProperties<TransportModel>::Z(scalar p, scalar T) const
 {
-    return transport_.Z(p,T);
+    //return transport_.Z(p,T);
+    return p/(transport_.rho(p, T)*R()*T);
 }
 
 

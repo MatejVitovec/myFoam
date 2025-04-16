@@ -38,6 +38,8 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "volFields.H"
 #include "fluidThermo.H"
+#include "gasProperties.H"
+#include "liquidProperties.H"
 #include "saturationCurve.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -62,19 +64,24 @@ protected:
     //- Time
     const Time& time_;
 
-    volScalarField nucleationMassSource_;
-    volScalarField condensationRateMassSource_;
-
     const volScalarField& alpha_;           //gas alpha
     const volScalarField& rho_;             //liquid rho
     const volVectorField& U_;               //liquid velocity
-    const surfaceScalarField& alphaPhi_;    //liquid phi
+    const surfaceScalarField& alphaRhoPhi_; //liquid alphaPhi
 
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
+
+    autoPtr<gasProperties> pGasProps_;
     const gasProperties& gasProps_;
+
     const liquidProperties& liquidProps_;
+
+    autoPtr<saturationCurve> pSaturation_;
     const saturationCurve& saturation_;
+
+    volScalarField nucleationRateMassSource_;
+    volScalarField growthRateMassSource_;
     
     // Private Member Functions
 
@@ -103,11 +110,12 @@ public:
             volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
-            const surfaceScalarField& alphaPhi,
+            const surfaceScalarField& alphaRhoPhi,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
+            const liquidProperties& liquidProps
         ),
-        (alpha, rho, U, phi, gasThermo, liquidThermo)
+        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps)
     );
 
     
@@ -119,9 +127,10 @@ public:
         volScalarField& alpha,
         const volScalarField& rho,
         const volVectorField& U,
-        const surfaceScalarField& alphaPhi,
+        const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const liquidProperties& liquidProps
     );
        
 
@@ -129,12 +138,14 @@ public:
     
     //- Return a reference to the selected condensation model
     static autoPtr<condensationModel> New
-    (   volScalarField& alpha;
+    (
+        volScalarField& alpha,
         const volScalarField& rho,
         const volVectorField& U,
-        const surfaceScalarField& alphaPhi,
+        const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const liquidProperties& liquidProps
     );
     
 
@@ -148,14 +159,19 @@ public:
     virtual void correct() = 0;
     
     // Access
-    const volScalarField& nucleationMassSource() const
+    const volScalarField& nucleationRateMassSource() const
     {
-        return nucleationMassSource_;
+        return nucleationRateMassSource_;
     }
 
-    const volScalarField& condensationRateMassSource() const
+    const volScalarField& growthRateMassSource() const
     {
-        return condensationRateMassSource_;
+        return growthRateMassSource_;
+    }
+
+    tmp<volScalarField> condensationRateMassSource() const
+    {
+        return nucleationRateMassSource_ + growthRateMassSource_;
     }
 
 
@@ -164,9 +180,9 @@ public:
         return mesh_;
     }
 
-    tmp<volVectorField> w() const;
+    tmp<volScalarField> w() const;
 
-    tmp<volVectorField> dropletDiameter() const;
+    virtual tmp<volScalarField> dropletDiameter() const;
     
     // Check
     

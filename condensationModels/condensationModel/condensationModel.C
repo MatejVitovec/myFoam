@@ -42,9 +42,10 @@ condensationModel::New
     volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
-    const surfaceScalarField& phi,
+    const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const liquidProperties& liquidProps
 )
 {
     word condensationModelName
@@ -67,7 +68,7 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, phi, gasThermo, liquidThermo));
+    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps));
 }
 
 
@@ -76,19 +77,26 @@ condensationModel::condensationModel
     volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
-    const surfaceScalarField& alphaPhi,
+    const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-) :
+    const liquidProperties& liquidProps
+)
+:
     mesh_(U.mesh()),
     time_(U.time()),
-    alpha_(alpha)
+    alpha_(alpha),
     rho_(rho),
     U_(U),
-    alphaPhi_(alphaPhi),
+    alphaRhoPhi_(alphaRhoPhi),
     gasThermo_(gasThermo),
     liquidThermo_(liquidThermo),
-    nucleationMassSource_(
+    pGasProps_(gasProperties::New(gasThermo)),
+    gasProps_(pGasProps_()),
+    liquidProps_(liquidProps),
+    pSaturation_(saturationCurve::New(gasThermo)),
+    saturation_(pSaturation_()),
+    nucleationRateMassSource_(
         IOobject
         (
             "mDotNucleation",
@@ -100,10 +108,10 @@ condensationModel::condensationModel
         mesh_,
         dimensionedScalar("zero", dimDensity/dimTime, 0.0)
     ),
-    condenstaionRateMassSource_(
+    growthRateMassSource_(
         IOobject
         (
-            "mDotCondensationRate",
+            "mDotGrowthRate",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -114,9 +122,10 @@ condensationModel::condensationModel
     )
 {}
 
+
 tmp<volScalarField> condensationModel::L() const
 {
-    volScalarField Ts = saturation_->Ts(liquidThermo_.p());
+    volScalarField Ts = saturation_.Ts(liquidThermo_.p());
 
     const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
         { return gasProps_.rho(pp,TT); }; //TODO namam gasProps
@@ -126,7 +135,7 @@ tmp<volScalarField> condensationModel::L() const
     return tmp<volScalarField>
         (
 	        //new volScalarField("L", saturation_.dpsdT(Ts)*Ts/rhos)
-            new volScalarField("L", gasThermo_.p()*(T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
+            new volScalarField("L", gasThermo_.p()*(gasThermo_.T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
         );
 
     /*const std::function<scalar(scalar)> f = [&](scalar TT)
@@ -136,14 +145,30 @@ tmp<volScalarField> condensationModel::L() const
 }
 
 
-tmp<volVectorField> condensationModel::w() const
+tmp<volScalarField> condensationModel::w() const
 {
-    return (liquidThermo_.rho()*(scalar(1) - alpha_))/(gasThermo_.rho() + (scalar(1) - alpha_)*(liquidThermo_.rho() - gasThermo_.rho()));
+    return (liquidThermo_.rho()*(1.0 - alpha_))/(gasThermo_.rho() + (1.0 - alpha_)*(liquidThermo_.rho() - gasThermo_.rho()));
 }
 
-tmp<volVectorField> condensationModel::dropletDiameter() const
+tmp<volScalarField> condensationModel::dropletDiameter() const
 {
-    return alpha_*0.0 + 2.0; //TODO
+    return
+        tmp<volScalarField>
+        (
+            new volScalarField
+            (
+                IOobject
+                (
+                    "condensationDropletDiemeter",
+                    mesh_.time().timeName(),
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh_,
+                2.0
+            )
+        );
 }
 
 }
