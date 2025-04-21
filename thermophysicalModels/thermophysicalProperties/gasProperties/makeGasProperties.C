@@ -31,6 +31,7 @@ License
 #include "AungierRedlichKwongGas.H"
 #include "pVirialGas.H"
 #include "stiffenedGas.H"
+#include "NASG.H"
 #include "IAPWSIF97metaGas.H"
 #include "IAPWSIF97reg1.H"
 
@@ -72,6 +73,14 @@ makeGasProperties(
     sensibleInternalEnergy,
     eConstThermo,
     stiffenedGas,
+    specie
+);
+
+makeGasProperties(
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    NASG,
     specie
 );
 
@@ -322,6 +331,44 @@ optimizePerfectGas(eConstThermo, constTransport, sensibleInternalEnergy);
                                                                            \
 
 optimizeStiffenedGas(eConstThermo, constTransport, sensibleInternalEnergy);
+
+
+// =============== Optimization of modified NASG
+
+/*#define optimizeModifiedNASG(Thermo, Transport,Type)                       \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<NASG<specie>>,Type>>      \
+        >::c(scalar p, scalar T) const                                     \
+    {                                                                      \
+        scalar rho_ = transport_.rho(p, T);                                \
+        scalar pPlusPInf = (R()*T)/(1 - (transport_.H(p, T)*rho_)/p);      \
+        scalar cp = Cp(p,T);                                               \
+        scalar gamma = cp/(cp - R());                                      \
+        return (pPlusPInf/rho_)*sqrt(gamma/(R()*T));                       \
+    }                                                                      \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<NASG<specie>>,Type>>      \
+        >::beta_p(scalar p, scalar T) const                                \
+    {                                                                      \
+        return (1.0 - (transport_.H(p, T)*rho(p, T))/p)/T;                 \
+    }                                                                      \
+                                                                           \
+    template<>                                                             \
+    scalar genericGasProperties<                                           \
+        Transport<species::thermo<Thermo<NASG<specie>>,Type>>      \
+        >::beta_T(scalar p, scalar T) const                                \
+    {                                                                      \
+        scalar pPlusPInf = (R()*T)/(1 - (transport_.H(p, T)*rho(p, T))/p); \
+        return (rho(p, T)*T*R())/pow(pPlusPInf, 2);                        \
+    }                                                                      \
+                                                                           \
+*/
+
+//optimizeModifiedNASG(eConstThermo, constTransport, sensibleInternalEnergy);
 
 
 // =============== Optimization of Aungier-Redlich-Kwong gas model

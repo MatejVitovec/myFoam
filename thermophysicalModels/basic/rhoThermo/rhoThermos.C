@@ -36,6 +36,7 @@ License
 #include "adiabaticPerfectFluid.H"
 #include "AungierRedlichKwongGas.H"
 #include "stiffenedGas.H"
+#include "NASG.H"
 #include "IAPWSIF97metaGas.H"
 #include "IAPWSIF97reg1.H"
 
@@ -87,6 +88,18 @@ makeThermos
     sensibleInternalEnergy,
     eConstThermo,
     stiffenedGas,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    constTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    NASG,
     specie
 );
 

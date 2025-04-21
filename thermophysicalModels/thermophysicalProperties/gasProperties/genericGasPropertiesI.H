@@ -139,18 +139,18 @@ scalar genericGasProperties<TransportModel>::S(scalar p, scalar T) const
 template<typename TransportModel>
 scalar genericGasProperties<TransportModel>::beta_p(scalar p, scalar T) const
 {
-    scalar v  = 1/rho(p,T);
-    scalar T1 = (1 + 1.e-6)*T;
-    scalar v1 = 1/rho(p,T1);
+    const scalar T1 = (1 + 1.e-6)*T;
+    const scalar v  = 1/rho(p, T);
+    const scalar v1 = 1/rho(p, T1);
     return 1/v*(v1 - v)/(T1 - T);
 }
 
 template<typename TransportModel>
 scalar genericGasProperties<TransportModel>::beta_T(scalar p, scalar T) const
 {
-    scalar v  = 1/rho(p,T);
-    scalar p1 = (1 + 1e-6)*p;
-    scalar v1 = 1/rho(p1,T);    
+    const scalar p1 = (1 + 1e-6)*p;
+    const scalar v  = 1/rho(p, T);
+    const scalar v1 = 1/rho(p1, T);    
     return -1/v*(v1 - v)/(p1 - p);
 }
 

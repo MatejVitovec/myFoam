@@ -7,7 +7,7 @@ FoamFile
 }
 
 // Počet poddomén (jader)
-numberOfSubdomains 8;
+numberOfSubdomains 4;
 
 // Metoda rozdělení
 method          scotch;  // Automatické optimalizované dělení
@@ -15,13 +15,13 @@ method          scotch;  // Automatické optimalizované dělení
 // Alternativní možnosti rozdělení (pro metody 'simple' a 'hierarchical')
 simpleCoeffs
 {
-    n           (4 2 1);  // Dělení v x, y, z směru (celkem 4×2×1 = 8 částí)
+    n           (4 1 1);  // Dělení v x, y, z směru (celkem 4×2×1 = 8 částí)
     delta       0.001;    // Hraniční tolerance
 }
 
 hierarchicalCoeffs
 {
-    n           (4 2 1);
+    n           (4 1 1);
     delta       0.001;
     order       xyz;
 }

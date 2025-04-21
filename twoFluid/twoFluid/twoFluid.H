@@ -256,6 +256,16 @@ public:
         return thermo2_;
     }
 
+    const gasProperties& gasProps1() const
+    {
+        return gasProps1_;
+    }
+
+    const gasProperties& gasProps2() const
+    {
+        return gasProps2_;
+    }
+
     const twoFluidConservative& conservative() const
     {
         return conservative_;

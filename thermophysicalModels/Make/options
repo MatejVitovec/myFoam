@@ -18,6 +18,7 @@ EXE_INC = \
     -I./specie/equationOfState/AungierRedlichKwongGas \
     -I./specie/equationOfState/pVirialGas \
     -I./specie/equationOfState/stiffenedGas \
+    -I./specie/equationOfState/NASG \
     -I./specie/equationOfState/IAPWSIF97metaGas \
     -I./specie/equationOfState/IAPWSIF97reg1 \
     -I./thermo/IAPWSIF97meta \

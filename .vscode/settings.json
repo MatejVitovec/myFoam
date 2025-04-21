@@ -166,7 +166,10 @@
         "H2O_IAPWS97reg1.C": "cpp",
         "liquidGasProperties.C": "cpp",
         "thermodynamicConstants.C": "cpp",
-        "IAPWSIF97reg1.C": "cpp"
+        "IAPWSIF97reg1.C": "cpp",
+        "modifiedNASG.C": "cpp",
+        "basicSolidChemistryModel.C": "cpp",
+        "NASG.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
