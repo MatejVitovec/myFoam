@@ -169,7 +169,10 @@
         "IAPWSIF97reg1.C": "cpp",
         "modifiedNASG.C": "cpp",
         "basicSolidChemistryModel.C": "cpp",
-        "NASG.C": "cpp"
+        "NASG.C": "cpp",
+        "wetSteamDbFoam.C": "cpp",
+        "uLabel.C": "cpp",
+        "viscousDrag.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

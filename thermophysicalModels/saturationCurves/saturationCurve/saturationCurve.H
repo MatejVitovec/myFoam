@@ -90,7 +90,23 @@ public:
     virtual scalar dpsdT(scalar T) const = 0;
     virtual tmp<volScalarField> dpsdT(const volScalarField& T) const;
 
+    virtual scalar rhosl(scalar T) const = 0;
+    virtual tmp<volScalarField> rhosl(const volScalarField& T) const;
 
+    virtual scalar rhosv(scalar T) const = 0;
+    virtual tmp<volScalarField> rhosv(const volScalarField& T) const;
+
+    virtual scalar hsl(scalar T) const = 0;
+    virtual tmp<volScalarField> hsl(const volScalarField& T) const;
+
+    virtual scalar hsv(scalar T) const = 0;
+    virtual tmp<volScalarField> hsv(const volScalarField& T) const;
+
+    virtual scalar esl(scalar T) const = 0;
+    virtual tmp<volScalarField> esl(const volScalarField& T) const;
+
+    virtual scalar esv(scalar T) const = 0;
+    virtual tmp<volScalarField> esv(const volScalarField& T) const;
 };
 
 

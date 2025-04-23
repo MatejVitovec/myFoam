@@ -88,6 +88,9 @@ class twoFluid
     volScalarField& T1_;
     volScalarField& T2_;
 
+    volScalarField a1_;
+    volScalarField a2_;
+
     volScalarField pInt_;
     
     twoFluidConservative conservative_;
@@ -128,6 +131,7 @@ class twoFluid
         const scalar pIntOld
     );
 
+    void correctSoundSpeeds();
     
 public:
 
@@ -226,6 +230,16 @@ public:
         return T2_;
     }
 
+    const volScalarField& a1() const
+    {
+        return a1_;
+    }
+
+    const volScalarField& a2() const
+    {
+        return a2_;
+    }
+
     const volScalarField& pInt() const
     {
         return pInt_;
@@ -287,6 +301,8 @@ public:
     void correctInterfacialPressure();
 
     void correctConservative();
+
+    tmp<surfaceScalarField> amaxSf() const;
     
 };
 

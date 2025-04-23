@@ -161,15 +161,15 @@ Foam::TwoFluidFoam::dragModel::~dragModel()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::Ki() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::Ki(const volScalarField& d) const
 {
-    return (0.75*CdRe()*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/dropletDiameter_;
+    return (0.75*CdRe()*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d;
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K(const volScalarField& d) const
 {
-    return Ki()*(1.0 - fluid_.alpha());
+    return Ki(d)*(1.0 - fluid_.alpha());
 }
 
 

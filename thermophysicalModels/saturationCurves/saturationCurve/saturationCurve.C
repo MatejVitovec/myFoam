@@ -65,22 +65,58 @@ saturationCurve::New
 
 tmp<volScalarField> saturationCurve::ps(const volScalarField& T) const
 {
-    const std::function<scalar(scalar)> f = [&](scalar x){return ps(x);};
+    const std::function<scalar(scalar)> f = [&](scalar x){ return ps(x); };
     return applyFunction1(f, T, "pSat", dimPressure);
 }
 
 //- Saturation temperature at given pressure [K]
 tmp<volScalarField> saturationCurve::Ts(const volScalarField& p) const
 {
-    const std::function<scalar(scalar)> f = [&](scalar x){return Ts(x);};
+    const std::function<scalar(scalar)> f = [&](scalar x){ return Ts(x); };
     return applyFunction1(f, p, "TSat", dimTemperature);
 }
 
 //- Derivative of saturation pressure by temperature [Pa/K]
 tmp<volScalarField> saturationCurve::dpsdT(const volScalarField& T) const
 {
-    const std::function<scalar(scalar)> f = [&](scalar x){return dpsdT(x);};
+    const std::function<scalar(scalar)> f = [&](scalar x){ return dpsdT(x); };
     return applyFunction1(f, T, "dpsdT", dimPressure/dimTemperature);
+}
+
+tmp<volScalarField> saturationCurve::rhosl(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return rhosl(x); };
+    return applyFunction1(f, T, "rhoSatLiquid", dimDensity);
+}
+
+tmp<volScalarField> saturationCurve::rhosv(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return rhosv(x); };
+    return applyFunction1(f, T, "rhoSatVapor", dimDensity);
+}
+
+tmp<volScalarField> saturationCurve::hsl(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return hsl(x); };
+    return applyFunction1(f, T, "hSatLiquid", dimEnergy/dimMass);
+}
+
+tmp<volScalarField> saturationCurve::hsv(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return hsv(x); };
+    return applyFunction1(f, T, "hSatVapor", dimEnergy/dimMass);
+}
+
+tmp<volScalarField> saturationCurve::esl(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return esl(x); };
+    return applyFunction1(f, T, "eSatLiquid", dimEnergy/dimMass);
+}
+
+tmp<volScalarField> saturationCurve::esv(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return esv(x); };
+    return applyFunction1(f, T, "eSatVapor", dimEnergy/dimMass);
 }
 
 }

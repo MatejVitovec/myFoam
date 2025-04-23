@@ -17,6 +17,7 @@ EXE_INC = \
     -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
     -IinterfacialModels/dragModels/dragModel \
     -IinterfacialModels/dragModels/constantDrag \
+    -IinterfacialModels/dragModels/viscousDrag \
     -ItwoFluid \
     -ItwoFluidConservative
 

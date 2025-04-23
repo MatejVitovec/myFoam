@@ -133,6 +133,32 @@ U2_
 ),
 T1_(thermo1_.T()),
 T2_(thermo2_.T()),
+a1_
+(
+    IOobject
+    (
+        "a1",
+        mesh_.time().timeName(),
+        mesh_,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimLength/dimTime
+),
+a2_
+(
+    IOobject
+    (
+        "a2",
+        mesh_.time().timeName(),
+        mesh_,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimLength/dimTime
+),
 pInt_
 (
     IOobject
@@ -274,6 +300,36 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     T2Ref = T2;    
 }
 
+void Foam::TwoFluidFoam::twoFluid::correctSoundSpeeds()
+{
+    forAll(a1_, celli)
+    {
+        a1_[celli] = gasProps1_.c(p_[celli], T1_[celli]);
+        a2_[celli] = gasProps2_.c(p_[celli], T2_[celli]);
+    }
+
+    const volScalarField::Boundary& pBf = p_.boundaryField();
+    const volScalarField::Boundary& T1Bf = T1_.boundaryFieldRef();
+    const volScalarField::Boundary& T2Bf = T2_.boundaryFieldRef();
+    volScalarField::Boundary& a1Bf = a1_.boundaryFieldRef();
+    volScalarField::Boundary& a2Bf = a2_.boundaryFieldRef();
+    
+    forAll(pBf, patchi)
+    {
+        const fvPatchScalarField& pp = pBf[patchi];
+        const fvPatchScalarField& pT1 = T1Bf[patchi];
+        const fvPatchScalarField& pT2 = T2Bf[patchi];
+        fvPatchScalarField& pa1 = a1Bf[patchi];
+        fvPatchScalarField& pa2 = a2Bf[patchi];
+
+        forAll(pp, facei)
+        {
+            pa1[facei] = gasProps1_.c(pp[facei], pT1[facei]);
+            pa2[facei] = gasProps2_.c(pp[facei], pT2[facei]);
+        }
+    }
+}
+
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
@@ -357,6 +413,8 @@ void Foam::TwoFluidFoam::twoFluid::correctThermo()
     //TODO thermo correct update z (p, T) - nove "TRhoThermo.H"
     thermo1_.correct();
     thermo2_.correct();
+
+    correctSoundSpeeds();
 }
 
 void Foam::TwoFluidFoam::twoFluid::correctInterfacialPressure()
@@ -395,6 +453,12 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
     conservative_.alphaRhoU2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*rho2.boundaryField()*U2_.boundaryField();
     conservative_.epsilon1().boundaryFieldRef() = alpha_.boundaryField()*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
     conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
+}
+
+tmp<surfaceScalarField> Foam::TwoFluidFoam::twoFluid::amaxSf() const
+{
+    return max(mag(fvc::interpolate(U1_) & mesh_.Sf()), mag(fvc::interpolate(U2_) & mesh_.Sf()))
+         + max(mesh_.magSf()*fvc::interpolate(a1_), mesh_.magSf()*fvc::interpolate(a2_));
 }
 
 // ************************************************************************* //

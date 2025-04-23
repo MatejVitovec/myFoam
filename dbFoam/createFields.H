@@ -29,53 +29,14 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
-volScalarField a1
+surfaceScalarField amaxSf
 (
-    IOobject
-    (
-        "a1",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("a1", dimensionSet(0, 1, -1, 0, 0, 0, 0), 0.0)
+    "amaxSf",
+    fluidSystem.amaxSf()
 );
-
-volScalarField a2
-(
-    IOobject
-    (
-        "a2",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("a2", dimensionSet(0, 1, -1, 0, 0, 0, 0), 0.0)
-);
-
-//surfaceScalarField alphaRhoPhi2();
 
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem);
 TwoFluidFoam::dragModel& drag = pDrag();
-
-
-autoPtr<saturationCurve> pSaturation = saturationCurve::New(fluidSystem);
-saturationCurve& saturation = pSaturation();
-
-
-/*condensationModel pCondensation = condensationModel::New
-(
-    fluidSystem.alpha(),
-    fluidSystem.thermo2(),
-    fluidSystem.U2(),
-    alphaRhoPhi2,
-    fluidSystem.thermo1(),
-    fluidSystem.thermo2()
-);*/
 
 
 //Pro ukladani

@@ -35,8 +35,16 @@ Description
 (
     "amaxSf", 
     max(mag(fvc::interpolate(U1) & mesh.Sf()), mag(fvc::interpolate(U2) & mesh.Sf()))
-    + max(mesh.magSf() * fvc::interpolate(a1), mesh.magSf() * fvc::interpolate(a2))
+    + max(mesh.magSf() * fvc::interpolate(sqrt(thermo1.Cp()/thermo1.Cv()/thermo1.psi())),
+          mesh.magSf() * fvc::interpolate(sqrt(thermo2.Cp()/thermo2.Cv()/thermo2.psi()))) //approx sound speed
 );*/
+
+surfaceScalarField amaxSf
+(
+    "amaxSf", 
+    max(mag(fvc::interpolate(U1) & mesh.Sf()), mag(fvc::interpolate(U2) & mesh.Sf()))
+    + max(mesh.magSf() * fvc::interpolate(a1), mesh.magSf() * fvc::interpolate(a2))
+);
 
 if (mesh.nInternalFaces())
 {

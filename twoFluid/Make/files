@@ -5,6 +5,7 @@ convectiveFlux/riemannSolver/advectionSplitting/slau2/slau2.C
 convectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
 interfacialModels/dragModels/dragModel/dragModel.C
 interfacialModels/dragModels/constantDrag/constantDrag.C
+interfacialModels/dragModels/viscousDrag/viscousDrag.C
 twoFluid/twoFluid.C
 twoFluidConservative/twoFluidConservative.C
 

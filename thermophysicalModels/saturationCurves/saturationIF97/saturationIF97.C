@@ -86,5 +86,35 @@ scalar saturationIF97::Ts(scalar p) const
     return T;
 }
 
+scalar saturationIF97::rhosl(scalar T) const
+{
+    return 0.0; //TODO
+}
+
+scalar saturationIF97::rhosv(scalar T) const
+{
+    return 0.0; //TODO
+}
+
+scalar saturationIF97::hsl(scalar T) const
+{
+    return 0.0; //TODO
+}
+
+scalar saturationIF97::hsv(scalar T) const
+{
+    return 0.0; //TODO
+}
+
+scalar saturationIF97::esl(scalar T) const
+{
+    return 0.0; //TODO
+}
+
+scalar saturationIF97::esv(scalar T) const
+{
+    return 0.0; //TODO
+}
+
 
 }

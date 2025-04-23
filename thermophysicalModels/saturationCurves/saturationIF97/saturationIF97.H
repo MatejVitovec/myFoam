@@ -78,6 +78,12 @@ public:
     virtual scalar ps(scalar T) const;
     virtual scalar Ts(scalar p) const;
     virtual scalar dpsdT(scalar T) const;
+    virtual scalar rhosl(scalar T) const;
+    virtual scalar rhosv(scalar T) const;
+    virtual scalar hsl(scalar T) const;
+    virtual scalar hsv(scalar T) const;
+    virtual scalar esl(scalar T) const;
+    virtual scalar esv(scalar T) const;
 
     virtual ~saturationIF97() {};
 };

@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      thermophysicalProperties.2;
+    object      thermophysicalProperties.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,7 +21,7 @@ thermoType
     mixture         pureMixture;
     transport       const;
     thermo          eConst;
-    equationOfState IAPWSIF97reg1;
+    equationOfState perfectGas;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
@@ -31,11 +31,11 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   3.089729698;
+        molWeight   28.97025302;
     }
     thermodynamics
     {
-	    Cv          0;
+        Cv          715.5;
         Hf          0;
 	    Tref        0;
         Eref        0;
@@ -47,6 +47,5 @@ mixture
     }
 }
 
-liquidProperties H2O_IAPWS;
 
 // ************************************************************************* //

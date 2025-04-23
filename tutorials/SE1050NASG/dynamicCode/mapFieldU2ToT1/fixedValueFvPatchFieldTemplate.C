@@ -58,7 +58,7 @@ namespace Foam
 //
 // unique function name that can be checked if the correct library version
 // has been loaded
-extern "C" void mapFieldU2ToU1_bf766773243118fdfeb54c6f9d87d057e8e10002(bool load)
+extern "C" void mapFieldU2ToT1_bf766773243118fdfeb54c6f9d87d057e8e10002(bool load)
 {
     if (load)
     {
@@ -75,7 +75,7 @@ extern "C" void mapFieldU2ToU1_bf766773243118fdfeb54c6f9d87d057e8e10002(bool loa
 makeRemovablePatchTypeField
 (
     fvPatchVectorField,
-    mapFieldU2ToU1FixedValueFvPatchVectorField
+    mapFieldU2ToT1FixedValueFvPatchVectorField
 );
 
 } // End namespace Foam
@@ -84,8 +84,8 @@ makeRemovablePatchTypeField
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+mapFieldU2ToT1FixedValueFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF
@@ -95,16 +95,16 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/DimensionedField");
+        printMessage("Construct mapFieldU2ToT1 : patch/DimensionedField");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+mapFieldU2ToT1FixedValueFvPatchVectorField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs,
+    const mapFieldU2ToT1FixedValueFvPatchVectorField& rhs,
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -114,14 +114,14 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/DimensionedField/mapper");
+        printMessage("Construct mapFieldU2ToT1 : patch/DimensionedField/mapper");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+mapFieldU2ToT1FixedValueFvPatchVectorField
 (
     const fvPatch& p,
     const DimensionedField<vector, volMesh>& iF,
@@ -132,16 +132,16 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/dictionary");
+        printMessage("Construct mapFieldU2ToT1 : patch/dictionary");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+mapFieldU2ToT1FixedValueFvPatchVectorField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs
+    const mapFieldU2ToT1FixedValueFvPatchVectorField& rhs
 )
 :
     parent_bctype(rhs),
@@ -149,16 +149,16 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Copy construct mapFieldU2ToU1");
+        printMessage("Copy construct mapFieldU2ToT1");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+mapFieldU2ToT1FixedValueFvPatchVectorField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs,
+    const mapFieldU2ToT1FixedValueFvPatchVectorField& rhs,
     const DimensionedField<vector, volMesh>& iF
 )
 :
@@ -166,7 +166,7 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : copy/DimensionedField");
+        printMessage("Construct mapFieldU2ToT1 : copy/DimensionedField");
     }
 }
 
@@ -174,12 +174,12 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-~mapFieldU2ToU1FixedValueFvPatchVectorField()
+mapFieldU2ToT1FixedValueFvPatchVectorField::
+~mapFieldU2ToT1FixedValueFvPatchVectorField()
 {
     if (false)
     {
-        printMessage("Destroy mapFieldU2ToU1");
+        printMessage("Destroy mapFieldU2ToT1");
     }
 }
 
@@ -188,7 +188,7 @@ mapFieldU2ToU1FixedValueFvPatchVectorField::
 
 void
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::updateCoeffs()
+mapFieldU2ToT1FixedValueFvPatchVectorField::updateCoeffs()
 {
     if (this->updated())
     {
@@ -197,7 +197,7 @@ mapFieldU2ToU1FixedValueFvPatchVectorField::updateCoeffs()
 
     if (false)
     {
-        printMessage("updateCoeffs mapFieldU2ToU1");
+        printMessage("updateCoeffs mapFieldU2ToT1");
     }
 
 //{{{ begin code
