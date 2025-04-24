@@ -300,7 +300,7 @@ void condensationMomentum::correct()
         }
     }
 
-    //volScalarField Dt("Dt", rho_*turbModel.nut()/Sct_);
+    //volScalarField Dt("Dt", alpha_*rho_*turbModel.nut()/Sct_);
     
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
     //fields.add(w);
@@ -343,7 +343,7 @@ void condensationMomentum::correct()
             + mvConvection->fvmDiv(alphaRhoPhi_, Q2_) 
             //- fvm::laplacian(Dt, Q2_)
             ==
-            sqr(rc)*J + 2*rho_*Q1_*rDot
+            sqr(rc)*J + 2*alpha_*rho_*Q1_*rDot
         );
 
         Q2Eqn.relax();
@@ -357,7 +357,7 @@ void condensationMomentum::correct()
             + mvConvection->fvmDiv(alphaRhoPhi_, Q1_) 
             //- fvm::laplacian(Dt, Q1_)
             ==
-            rc*J + rho_*Q0_*rDot
+            rc*J + alpha_*rho_*Q0_*rDot
         );
 
         Q1Eqn.relax();

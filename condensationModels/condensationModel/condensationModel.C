@@ -147,7 +147,7 @@ tmp<volScalarField> condensationModel::L() const
 
 tmp<volScalarField> condensationModel::w() const
 {
-    return (liquidThermo_.rho()*(1.0 - alpha_))/(gasThermo_.rho() + (1.0 - alpha_)*(liquidThermo_.rho() - gasThermo_.rho()));
+    return (liquidThermo_.rho()*alpha_)/(gasThermo_.rho() + alpha_*(liquidThermo_.rho() - gasThermo_.rho()));
 }
 
 tmp<volScalarField> condensationModel::dropletDiameter() const

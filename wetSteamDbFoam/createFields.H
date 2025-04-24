@@ -29,32 +29,10 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
-volScalarField a1
+surfaceScalarField amaxSf
 (
-    IOobject
-    (
-        "a1",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("a1", dimensionSet(0, 1, -1, 0, 0, 0, 0), 0.0)
-);
-
-volScalarField a2
-(
-    IOobject
-    (
-        "a2",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("a2", dimensionSet(0, 1, -1, 0, 0, 0, 0), 0.0)
+    "amaxSf",
+    fluidSystem.amaxSf()
 );
 
 surfaceScalarField alphaRhoPhi2

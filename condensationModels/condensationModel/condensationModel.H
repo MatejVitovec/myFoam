@@ -64,7 +64,7 @@ protected:
     //- Time
     const Time& time_;
 
-    const volScalarField& alpha_;           //gas alpha
+    const volScalarField& alpha_;           //liquid alpha
     const volScalarField& rho_;             //liquid rho
     const volVectorField& U_;               //liquid velocity
     const surfaceScalarField& alphaRhoPhi_; //liquid alphaPhi

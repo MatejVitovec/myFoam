@@ -79,12 +79,7 @@ int main(int argc, char *argv[])
     {
         #include "readTimeControls.H"
 
-        forAll (a1, celli)
-        {
-            a1[celli] = fluidSystem.gasProps1().c(p[celli], T1[celli]);
-            a2[celli] = fluidSystem.gasProps1().c(p[celli], T2[celli]);
-        }
-
+        amaxSf = fluidSystem.amaxSf();
         #include "courantNo.H"
         #include "setDeltaT.H"
         ++runTime;

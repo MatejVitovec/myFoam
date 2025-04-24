@@ -172,7 +172,10 @@
         "NASG.C": "cpp",
         "wetSteamDbFoam.C": "cpp",
         "uLabel.C": "cpp",
-        "viscousDrag.C": "cpp"
+        "viscousDrag.C": "cpp",
+        "condensationMonodispersion.C": "cpp",
+        "condensationWilson.C": "cpp",
+        "condensationEquilibrium.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
