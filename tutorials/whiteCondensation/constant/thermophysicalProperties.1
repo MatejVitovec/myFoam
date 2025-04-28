@@ -19,9 +19,9 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       const;
-    thermo          eConst;
-    equationOfState perfectGas;
+    transport       IAPWSIF97;
+    thermo          IAPWSIF97meta;
+    equationOfState IAPWSIF97metaGas;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
@@ -31,7 +31,7 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   28.97025302;
+        molWeight   18.0153;
     }
     thermodynamics
     {
@@ -47,5 +47,13 @@ mixture
     }
 }
 
+saturationCurve IF97;
+
+condensationModel momentum;
+
+//surfaceTensionCorrection 1.194;
+Kantrowitz on;
+
+liquidProperties H2O_IAPWS97reg1;
 
 // ************************************************************************* //

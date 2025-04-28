@@ -16,14 +16,16 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-epsilon         1.0e-10;
-epsilonMin      1.0e-11;
-epsilonMax      1.0e-8;
+epsilon         1.0e-17;
+epsilonMin      1.0e-20;
+epsilonMax      1.0e-16;
 
 drag
 {
     type        constantDrag;
     dragCoeff   2.0;
 }
+
+saturationCurve IAPWS95;
 
 // ************************************************************************* //

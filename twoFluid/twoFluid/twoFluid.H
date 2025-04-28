@@ -83,6 +83,7 @@ class twoFluid
 
     volScalarField& p_;
     volScalarField  alpha_;
+    volScalarField  alpha2_;
     volVectorField  U1_;
     volVectorField  U2_;
     volScalarField& T1_;
@@ -188,6 +189,16 @@ public:
     volScalarField& alpha()
     {
         return alpha_;
+    }
+
+    const volScalarField& alpha2() const
+    {
+        return alpha2_;
+    }
+
+    volScalarField& alpha2() 
+    {
+        return alpha2_; //TODO predelat v condenzaci a pak odstranit
     }
 
     const volVectorField& U1() const

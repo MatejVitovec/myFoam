@@ -106,13 +106,13 @@ int main(int argc, char *argv[])
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
-                                          + drag.K()*(fluidSystem.U1() - fluidSystem.U2()));
-            
+                                          /*+ drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2())*/);
+          
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
-                                          + drag.K()*(fluidSystem.U2() - fluidSystem.U1()));
+                                          /*+ drag.K(condensation.dropletDiameter())*(fluidSystem.U2() - fluidSystem.U1())*/);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
@@ -123,6 +123,7 @@ int main(int argc, char *argv[])
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
 
             fluidSystem.correct();
+
             fluidSystem.blendVanishingFluid();
             fluidSystem.correctBoundaryCondition();
             fluidSystem.correctThermo();
@@ -130,9 +131,14 @@ int main(int argc, char *argv[])
             fluidSystem.correctConservative();
         }
 
-        alphaRhoPhi2 = fvc::interpolate(thermo2.rho())*fvc::interpolate((1.0 - alpha))*fvc::flux(U2);
+        Info << "TF OK" <<endl;
+
+        alphaRhoPhi2 = fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2);
 
         condensation.correct();
+
+
+        Info << "condenstaion complete " <<endl;
 
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();

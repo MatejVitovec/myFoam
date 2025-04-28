@@ -45,6 +45,7 @@ condensationModel::New
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturationCurve& saturation,
     const liquidProperties& liquidProps
 )
 {
@@ -68,7 +69,7 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps));
+    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps));
 }
 
 
@@ -80,6 +81,7 @@ condensationModel::condensationModel
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturationCurve& saturation,
     const liquidProperties& liquidProps
 )
 :
@@ -94,8 +96,7 @@ condensationModel::condensationModel
     pGasProps_(gasProperties::New(gasThermo)),
     gasProps_(pGasProps_()),
     liquidProps_(liquidProps),
-    pSaturation_(saturationCurve::New(gasThermo)),
-    saturation_(pSaturation_()),
+    saturation_(saturation),
     nucleationRateMassSource_(
         IOobject
         (

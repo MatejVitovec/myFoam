@@ -60,12 +60,8 @@ class viscousDrag
     public dragModel
 {
     // Private data
-
-        //- Constant drag coefficient
-        const dimensionedScalar dragCoeff_;
-
     
-    tmp<volScalarField> Cc() const;
+    tmp<volScalarField> Cc(const volScalarField& d) const;
 
 
 public:

@@ -79,6 +79,8 @@ protected:
     //- Turbulent schmidt number
     const dimensionedScalar Sct_;
 
+    const dimensionedScalar rMin_;
+
     //- Use Kantrowitz correction factor
     Switch kantrowitz_;
 
@@ -100,6 +102,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const saturationCurve& saturation,
         const liquidProperties& liquidProps
     );
     
@@ -111,7 +114,8 @@ public:
 
     //- Main update/correction routine
     virtual void correct();
-    
+
+    virtual tmp<volScalarField> dropletDiameter() const;    
 };
 
 

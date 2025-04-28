@@ -107,6 +107,18 @@ alpha_
     ),
     mesh_
 ),
+alpha2_
+(
+    IOobject
+    (
+        "alpha2",
+        mesh_.time().timeName(),
+        mesh_,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    1.0 - alpha_
+),
 U1_
 (
     IOobject
@@ -354,6 +366,8 @@ void Foam::TwoFluidFoam::twoFluid::correct()
             pInt_[celli]
         );
     }
+
+    alpha2_ = 1.0 - alpha_;
 }
 
 void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
@@ -392,6 +406,8 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
             T1_[celli] = gFunc*T1_[celli] + (1.0 - gFunc)*T2_[celli];
         }
     }
+    
+    alpha2_ = 1.0 - alpha_;
 }
 
 void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()

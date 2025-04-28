@@ -49,10 +49,11 @@ condensationMomentum::condensationMomentum
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturationCurve& saturation,
     const liquidProperties& liquidProps
 )
 :
-    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps),
+    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps),
 
     Q0_(
         IOobject
@@ -108,6 +109,12 @@ condensationMomentum::condensationMomentum
         gasThermo_.lookupOrDefault<scalar>("SchmidtNumber", 0.9)
     ),
 
+    rMin_(
+        "rMin",
+        dimLength,
+        1e-20
+    ),
+
 #if (OPENFOAM >= 1912)    
     kantrowitz_(
         "Kantrowitz",
@@ -146,7 +153,6 @@ condensationMomentum::condensationMomentum
 
 void condensationMomentum::correct()
 {
-
     const scalar pi = constant::mathematical::pi;
     const scalar kB = constant::physicoChemical::k.value();
     const scalar M  = constant::physicoChemical::NA.value()*m1_.value();
@@ -175,7 +181,7 @@ void condensationMomentum::correct()
             )
         );*/
     
-    const dimensionedScalar rMin("rMin", dimLength, 1e-20);
+    //const dimensionedScalar rMin("rMin", dimLength, 1e-20);
     const dimensionedScalar kg("kg", dimMass, 1.0);
     const dimensionedScalar wMin("wMin", dimless, 1.e-16);
 
@@ -209,6 +215,8 @@ void condensationMomentum::correct()
         dimensionedScalar("zero", dimLength, 0.0)
     );
 
+    Info << "COND OK1" << endl;
+
     
     forAll(J, i)
     {         
@@ -225,7 +233,7 @@ void condensationMomentum::correct()
 
         // Average droplet radius
         scalar r = 0;
-        if (w[i] > wMin.value() && Q0_[i] > 0 && Q2_[i] > sqr(rMin.value())*Q0_[i])
+        if (w[i] > wMin.value() && Q0_[i] > 0 && Q2_[i] > sqr(rMin_.value())*Q0_[i])
         {
             r = sqrt(Q2_[i]/Q0_[i]);
             Kn = 1.5*eta*sqrt(Rg*T[i])/(2*r*p[i]);
@@ -233,7 +241,7 @@ void condensationMomentum::correct()
 
         if (T[i] >= Ts[i])  // Evaporation
         {
-            if (r <= rMin.value())  // Complete evaporation
+            if (r <= rMin_.value())  // Complete evaporation
             {
                 //w[i] = 0;
                 //alpha_[i] = 0.0; //epsilon - TODO
@@ -301,6 +309,8 @@ void condensationMomentum::correct()
     }
 
     //volScalarField Dt("Dt", alpha_*rho_*turbModel.nut()/Sct_);
+
+    Info << "COND OK2" << endl;
     
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
     //fields.add(w);
@@ -315,10 +325,10 @@ void condensationMomentum::correct()
             mesh,
             fields,
             alphaRhoPhi_,
-            mesh.divScheme("div(alphaPhi,w_Q)")
+            mesh.divScheme("div(alphaRhoPhi2,w_Q)")
         )
     );
-    
+
 
     // Solution of Q3/w in main conservative scheme via mass source term -> alpha ~ w
     /*{
@@ -339,8 +349,8 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q2Eqn
         (
-            fvm::ddt(alpha_, rho_, Q2_) 
-            + mvConvection->fvmDiv(alphaRhoPhi_, Q2_) 
+            fvm::ddt(alpha_, rho_, Q2_)
+            + mvConvection->fvmDiv(alphaRhoPhi_, Q2_)
             //- fvm::laplacian(Dt, Q2_)
             ==
             sqr(rc)*J + 2*alpha_*rho_*Q1_*rDot
@@ -406,6 +416,11 @@ void condensationMomentum::correct()
     {
         J.write();
     }
+}
+
+tmp<volScalarField> condensationMomentum::dropletDiameter() const
+{
+    return 2*max(sqrt(Q2_/(Q0_ + dimensionedScalar("small", Q0_.dimensions(), VSMALL))), rMin_);
 }
 
 }

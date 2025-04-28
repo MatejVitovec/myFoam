@@ -21,7 +21,7 @@ thermoType
     mixture         pureMixture;
     transport       const;
     thermo          eConst;
-    equationOfState stiffenedGas;
+    equationOfState NASG;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
@@ -31,18 +31,19 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   3.089729698;
+        molWeight   6.658068018;
     }
     equationOfState
     {
-        pInf        8.5e8;
+        pInf        8.899e8;
+        b           4.78e-4;
     }
     thermodynamics
     {
-	    Cv          1495;
+	    Cv          3202;
         Hf          0;
 	    Tref        0;
-        Eref        0;
+        Eref        -1244191;
     }
     transport
     {
@@ -51,5 +52,6 @@ mixture
     }
 }
 
+liquidProperties H2O_IAPWS97reg1;
 
 // ************************************************************************* //

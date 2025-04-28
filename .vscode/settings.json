@@ -175,7 +175,16 @@
         "viscousDrag.C": "cpp",
         "condensationMonodispersion.C": "cpp",
         "condensationWilson.C": "cpp",
-        "condensationEquilibrium.C": "cpp"
+        "condensationEquilibrium.C": "cpp",
+        "Polynomial.C": "cpp",
+        "liquidProperties.C": "cpp",
+        "fvschemes": "cpp",
+        "multivariateGaussConvectionScheme.C": "cpp",
+        "convectionScheme.C": "cpp",
+        "fvmDdt.C": "cpp",
+        "ddtScheme.C": "cpp",
+        "EulerDdtScheme.C": "cpp",
+        "lusgsDbFoam.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

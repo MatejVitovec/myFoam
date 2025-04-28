@@ -53,8 +53,7 @@ Foam::TwoFluidFoam::dragModels::viscousDrag::viscousDrag
     const bool registerObject
 )
 :
-    dragModel(dict, fluid, registerObject),
-    dragCoeff_("dragCoeff", dimless, dict)
+    dragModel(dict, fluid, registerObject)
 {}
 
 
@@ -66,9 +65,26 @@ Foam::TwoFluidFoam::dragModels::viscousDrag::~viscousDrag()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(const volScalarField& d) const
 {
-    volScalarField Kn = fluid_.alpha(); // TODO pouze pro test - jedna se o bezrozmernou velicinu
+    const volScalarField& p = fluid_.p();
+    const volScalarField& T = fluid_.T2();
+
+    const dimensionedScalar Rg("Rsteam", dimensionSet(0, 2, -2, -1, 0, 0, 0), 461.685);
+    
+    volScalarField Kn = volScalarField //todo prez databazi z condensation
+    (
+        IOobject
+        (
+            "Kn",
+            fluid_.mesh().time().timeName(),
+            fluid_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        1.5*(fluid_.thermo1().mu())*sqrt(Rg*T)/(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20))*p)
+    );
+
     return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn)))*Kn;
 }
 
@@ -95,13 +111,13 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdR
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Ki(const volScalarField& d) const
 {
-    return 9/2*fluid_.thermo1().mu()/(sqr(d)*Cc());
+    return 18*fluid_.thermo1().mu()/(sqr(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20)))*Cc(d));
 }
 
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::K(const volScalarField& d) const
 {
-    return Ki(d)*(1.0 - fluid_.alpha());
+    return Ki(d)*fluid_.alpha2();
 }
 
 

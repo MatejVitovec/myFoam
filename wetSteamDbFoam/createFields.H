@@ -29,6 +29,8 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
+volScalarField& alpha2 = fluidSystem.alpha2();
+
 surfaceScalarField amaxSf
 (
     "amaxSf",
@@ -45,13 +47,13 @@ surfaceScalarField alphaRhoPhi2
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    fvc::interpolate(thermo2.rho())*fvc::interpolate((1.0 - alpha))*fvc::flux(U2)
+    fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2)
 );
 
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem);
 TwoFluidFoam::dragModel& drag = pDrag();
 
-autoPtr<liquidProperties> pLiquidProps = liquidProperties::New(fluidSystem.thermo2());
+autoPtr<liquidProperties> pLiquidProps = liquidProperties::New(fluidSystem.thermo2().lookupOrDefault<word>("liquidProperties", "H2O"));
 liquidProperties& liquidProps = pLiquidProps();
 autoPtr<saturationCurve> pSaturation = saturationCurve::New(fluidSystem);
 saturationCurve& saturation = pSaturation();
@@ -59,12 +61,13 @@ saturationCurve& saturation = pSaturation();
 
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
-    fluidSystem.alpha(),
+    fluidSystem.alpha2(),
     fluidSystem.thermo2().rho(),
     fluidSystem.U2(),
     alphaRhoPhi2,
     fluidSystem.thermo1(),
     fluidSystem.thermo2(),
+    saturation,
     liquidProps
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();

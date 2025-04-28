@@ -113,9 +113,10 @@ public:
             const surfaceScalarField& alphaRhoPhi,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
+            const saturationCurve& saturation,
             const liquidProperties& liquidProps
         ),
-        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, liquidProps)
+        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps)
     );
 
     
@@ -130,6 +131,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const saturationCurve& saturation,
         const liquidProperties& liquidProps
     );
        
@@ -145,6 +147,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const saturationCurve& saturation,
         const liquidProperties& liquidProps
     );
     
