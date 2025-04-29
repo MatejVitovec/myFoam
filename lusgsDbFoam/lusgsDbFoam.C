@@ -154,6 +154,14 @@ int main(int argc, char *argv[])
             fluid.correct();
             fluid.blendVanishingFluid();
             fluid.correctBoundaryCondition();
+
+            /*if (runTime.timeIndex() > 2525)
+            {
+                Info << ">>> Forcing write <<<" << endl;
+                runTime.writeNow();
+                runTime.write();
+            }*/
+
             fluid.correctThermo();
             fluid.correctInterfacialPressure();
             fluid.correctConservative();
@@ -170,7 +178,7 @@ int main(int argc, char *argv[])
             Info << "LUSGS:  Solving for alphaRhoU1,         " << "Initial residual = " << rezAlphaRhoU1 << ", " << "Final residual = " << finalRezAlphaRhoU1 << ", No Iterations 1" << nl;
             Info << "LUSGS:  Solving for alphaRhoU2,         " << "Initial residual = " << rezAlphaRhoU2 << ", " << "Final residual = " << finalRezAlphaRhoU2 << ", No Iterations 1" << nl;
             Info << "LUSGS:  Solving for alpha1(rhoE1+pInt), " << "Initial residual = " << rezEpsilon1   << ", " << "Final residual = " << finalRezEpsilon1   << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alpha2(rhoE2+pInt), " << "Initial residual = " << rezEpsilon2   << ", " << "Final residual = " << finalRezEpsilon2   << ", No Iterations 1" << nl << nl;
+            Info << "LUSGS:  Solving for alpha2(rhoE2+pInt), " << "Initial residual = " << rezEpsilon2   << ", " << "Final residual = " << finalRezEpsilon2   << ", No Iterations 1" << nl;
 
             bool lastIteration = ((intIter + 1) == lusgsIntIters);
 
@@ -191,7 +199,7 @@ int main(int argc, char *argv[])
                 (finalRezEpsilon2   < lusgsTolerance) );
 
             if (lastIteration) {
-                Info << "LUSGS: converged in " << intIter + 1 << " iterations." << nl;
+                Info << "LUSGS: converged in " << intIter + 1 << " iterations." << nl << nl;
                 break;
             }
         }

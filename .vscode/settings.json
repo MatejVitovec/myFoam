@@ -184,7 +184,8 @@
         "fvmDdt.C": "cpp",
         "ddtScheme.C": "cpp",
         "EulerDdtScheme.C": "cpp",
-        "lusgsDbFoam.C": "cpp"
+        "lusgsDbFoam.C": "cpp",
+        "regIOobjectWrite.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

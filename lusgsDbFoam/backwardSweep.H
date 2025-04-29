@@ -69,6 +69,8 @@
                         pInt
                     );
 
+                    fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1);
+
                     const scalar alphaRhoE1_0 = epsilon1[nei] - alpha[nei]*pInt;
                     const scalar alphaRhoE2_0 = epsilon2[nei] - (1.0 - alpha[nei])*pInt;
                     const scalar alphaRhoE1_1 = epsilon1_1 - alpha1_1*pInt;

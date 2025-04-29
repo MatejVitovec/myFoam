@@ -98,6 +98,8 @@
                         pInt
                     );
 
+                    fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1); //TODO i pro conservative
+
                     const scalar alphaRhoE1_0 = epsilon1[own] - alpha[own]*pInt;
                     const scalar alphaRhoE2_0 = epsilon2[own] - (1.0 - alpha[own])*pInt;
                     const scalar alphaRhoE1_1 = epsilon1_1 - alpha1_1*pInt;
@@ -115,8 +117,8 @@
 
                     rAlphaRho1 += (ac + av)*dAlphaRho1Star[own]
                         + 0.5*(alphaRho1_1*phi1_1 - alphaRho1[own]*phi1_0);
-                    rAlphaRho2 += (ac + av)*dAlphaRho2Star[own] + 
-                        0.5*(alphaRho2_1*phi2_1 - alphaRho2[own]*phi2_0);
+                    rAlphaRho2 += (ac + av)*dAlphaRho2Star[own]
+                        + 0.5*(alphaRho2_1*phi2_1 - alphaRho2[own]*phi2_0);
 
                     rAlphaRhoU1 += (ac + av)*dAlphaRhoU1Star[own]
                         + 0.5*((alphaRhoU1_1*phi1_1 - alphaRhoU1[own]*phi1_0) + (alphaP1_1 - alphaP1_0)*Sf[faceI]);
@@ -127,12 +129,6 @@
                         + 0.5*((alphaRhoE1_1 + alphaP1_1)*phi1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av)*dEpsilon2Star[own]
                         + 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
-
-                    /*rEpsilon1 += (ac + av)*dEpsilon1Star[own]
-                        + 0.5*(epsilon1_1*phi1_1 + p_1*phi1_1 - (epsilon1[own]*phi1_0 + p[own]*phi1_0));
-
-                    rEpsilon2 += (ac + av)*dEpsilon2Star[own]
-                        + 0.5*(epsilon2_1*phi2_1 + p_1*phi2_1 - (epsilon1[own]*phi2_0 + p[own]*phi2_0));*/
                 }
             }
         }

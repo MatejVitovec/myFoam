@@ -175,6 +175,15 @@ public:
         const scalar pIntOld
     ) const;
 
+    void blendVanishingFluid
+    (
+        scalar& alpha,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2
+    ) const;
+
 
     // Memeber functions
 

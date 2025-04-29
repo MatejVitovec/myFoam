@@ -26,7 +26,7 @@
     Field<vector> dAlphaRhoU1Star(dAlphaRhoU1);
     Field<vector> dAlphaRhoU2Star(dAlphaRhoU2);
     Field<scalar> dEpsilon1Star  (dEpsilon1);
-    Field<scalar> dEpsilon2Star  (dEpsilon1);
+    Field<scalar> dEpsilon2Star  (dEpsilon2);
     
     #include "forwardSweep.H"
     #include "backwardSweep.H"

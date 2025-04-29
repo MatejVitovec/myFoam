@@ -312,6 +312,48 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     T2Ref = T2;    
 }
 
+
+void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
+(
+    scalar& alpha,
+    vector& U1,
+    vector& U2,
+    scalar& T1,
+    scalar& T2
+) const
+{
+    if ((1.0 - alpha) <= epsilonMin_)
+    {
+        alpha = 1.0 - epsilonMin_;
+        U2 = U1;
+        T2 = T1;
+    }
+    else if ((1.0 - alpha) < epsilonMax_)
+    {
+        const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
+            
+        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
+        T2 = gFunc*T2 + (1.0 - gFunc)*T1;
+    }
+        
+    if (alpha <= epsilonMin_)
+    {
+        alpha = epsilonMin_;
+        U1 = U2;
+        T1 = T2;
+    }
+    else if (alpha < epsilonMax_)
+    {
+        const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
+
+        U1 = gFunc*U1 + (1.0 - gFunc)*U2;
+        T1 = gFunc*T1 + (1.0 - gFunc)*T2;
+    }
+}
+
+
 void Foam::TwoFluidFoam::twoFluid::correctSoundSpeeds()
 {
     forAll(a1_, celli)
