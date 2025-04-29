@@ -115,7 +115,7 @@ class twoFluid
         return gasProps2_;
     }
 
-    void primitiveFromConservative
+    /*void primitiveFromConservative
     (
         scalar& p,
         scalar& alpha,
@@ -130,7 +130,7 @@ class twoFluid
         const scalar epsilon1,
         const scalar epsilon2,
         const scalar pIntOld
-    );
+    );*/
 
     void correctSoundSpeeds();
     
@@ -157,6 +157,23 @@ public:
     //- Destructor
     virtual ~twoFluid()
     {}
+
+    void primitiveFromConservative
+    (
+        scalar& p,
+        scalar& alpha,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld
+    ) const;
 
 
     // Memeber functions

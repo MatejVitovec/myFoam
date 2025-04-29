@@ -8,7 +8,6 @@
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
         const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
-        const scalarField& pMeshPhi = meshPhi.boundaryField()[patchi];
 
         forAll(mesh.boundary()[patchi], facei)
         {
@@ -45,12 +44,12 @@
                 label nei = neighbour[faceI];
                 //scalar dvol = mag((mesh.C()[own] - mesh.C()[nei]) & Sf[faceI]);
 
-                scalar ac = 0.5*lusgsOmega*( 
+                const scalar ac = 0.5*lusgsOmega*( 
                     max(mag(U1[cellI] & Sf[faceI]), mag(U2[cellI] & Sf[faceI])) 
                     + max(fluid.a1()[cellI] * magSf[faceI], fluid.a2()[cellI] * magSf[faceI]));
 
                 //scalar av = sqr(magSf[faceI]) / dvol * nuMax[cellI];
-                scalar av = 0.0;
+                const scalar av = 0.0;
 
                 D[cellI] += ac + av;
 
@@ -58,30 +57,34 @@
                 if (own != cellI)  // then data[own] belongs to lower triangle
                 {
                      // Calculate L based on A+
-                    scalar ac = 0.5*lusgsOmega*( 
+                    const scalar ac = 0.5*lusgsOmega*( 
                         max(mag(U1[own] & Sf[faceI]), mag(U2[own] & Sf[faceI])) 
                         + max(fluid.a1()[own] * magSf[faceI], fluid.a2()[own] * magSf[faceI]));
                     //scalar av = sqr(magSf[faceI]) / dvol * nuMax[own];
-                    scalar av = 0.0;
+                    const scalar av = 0.0;
                     
-                    scalar alphaRho1_1  = alphaRho1[own]  + dAlphaRho1Star[own];
-                    scalar alphaRho2_1  = alphaRho2[own]  + dAlphaRho2Star[own];
-                    vector alphaRhoU1_1 = alphaRhoU1[own] + dAlphaRhoU1Star[own];
-                    vector alphaRhoU2_1 = alphaRhoU2[own] + dAlphaRhoU2Star[own];
-                    scalar epsilon1_1   = epsilon1[own]   + dEpsilon1Star[own];
-                    scalar epsilon2_1   = epsilon2[own]   + dEpsilon2Star[own];
+                    const scalar alphaRho1_1  = alphaRho1[own]  + dAlphaRho1Star[own];
+                    const scalar alphaRho2_1  = alphaRho2[own]  + dAlphaRho2Star[own];
+                    const vector alphaRhoU1_1 = alphaRhoU1[own] + dAlphaRhoU1Star[own];
+                    const vector alphaRhoU2_1 = alphaRhoU2[own] + dAlphaRhoU2Star[own];
+                    const scalar epsilon1_1   = epsilon1[own]   + dEpsilon1Star[own];
+                    const scalar epsilon2_1   = epsilon2[own]   + dEpsilon2Star[own];
                     
-                    scalar p_1;
-                    scalar alpha_1;
+                    //this also serves as an init value for Newton iteration in primitiveFromConservative function
+                    scalar p_1 = p[own];
+                    scalar T1_1 = T1[own];
+                    scalar T2_1 = T2[own];
+
+                    scalar alpha1_1;
                     vector U1_1;
                     vector U2_1;
-                    scalar T1_1;
-                    scalar T2_1;
 
-                    twoFluid::primitiveFromConservative
+                    const scalar pInt = fluid.pInt()[cellI];
+
+                    fluid.primitiveFromConservative
                     (
                         p_1,
-                        alpha_1,
+                        alpha1_1,
                         U1_1,
                         U2_1,
                         T1_1,
@@ -92,13 +95,23 @@
                         alphaRhoU2_1,
                         epsilon1_1,
                         epsilon2_1,
-                        fluid.pInt()[celli]
+                        pInt
                     );
 
-                    scalar phi1_0 = U1[own] & Sf[faceI];
-                    scalar phi2_0 = U2[own] & Sf[faceI];
-                    scalar phi1_1 = U1_1 & Sf[faceI];
-                    scalar phi2_1 = U2_1 & Sf[faceI];
+                    const scalar alphaRhoE1_0 = epsilon1[own] - alpha[own]*pInt;
+                    const scalar alphaRhoE2_0 = epsilon2[own] - (1.0 - alpha[own])*pInt;
+                    const scalar alphaRhoE1_1 = epsilon1_1 - alpha1_1*pInt;
+                    const scalar alphaRhoE2_1 = epsilon2_1 - (1.0 - alpha1_1)*pInt;
+
+                    const scalar alphaP1_0 = alpha[own]*p[own];
+                    const scalar alphaP2_0 = (1.0 - alpha[own])*p[own];
+                    const scalar alphaP1_1 = alpha1_1*p_1;
+                    const scalar alphaP2_1 = (1.0 - alpha1_1)*p_1;
+
+                    const scalar phi1_0 = U1[own] & Sf[faceI];
+                    const scalar phi2_0 = U2[own] & Sf[faceI];
+                    const scalar phi1_1 = U1_1 & Sf[faceI];
+                    const scalar phi2_1 = U2_1 & Sf[faceI];
 
                     rAlphaRho1 += (ac + av)*dAlphaRho1Star[own]
                         + 0.5*(alphaRho1_1*phi1_1 - alphaRho1[own]*phi1_0);
@@ -106,16 +119,20 @@
                         0.5*(alphaRho2_1*phi2_1 - alphaRho2[own]*phi2_0);
 
                     rAlphaRhoU1 += (ac + av)*dAlphaRhoU1Star[own]
-                        + 0.5*((alphaRhoU1_1*phi1_1 - alphaRhoU1[own]*phi1_0) + (p_1 - p[own])*Sf[faceI]);
-
+                        + 0.5*((alphaRhoU1_1*phi1_1 - alphaRhoU1[own]*phi1_0) + (alphaP1_1 - alphaP1_0)*Sf[faceI]);
                     rAlphaRhoU2 += (ac + av)*dAlphaRhoU2Star[own]
-                        + 0.5*((alphaRhoU2_1*phi2_1 - alphaRhoU2[own]*phi2_0) + (p_1 - p[own])*Sf[faceI]);
+                        + 0.5*((alphaRhoU2_1*phi2_1 - alphaRhoU2[own]*phi2_0) + (alphaP2_1 - alphaP2_0)*Sf[faceI]);
 
                     rEpsilon1 += (ac + av)*dEpsilon1Star[own]
+                        + 0.5*((alphaRhoE1_1 + alphaP1_1)*phi1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
+                    rEpsilon2 += (ac + av)*dEpsilon2Star[own]
+                        + 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
+
+                    /*rEpsilon1 += (ac + av)*dEpsilon1Star[own]
                         + 0.5*(epsilon1_1*phi1_1 + p_1*phi1_1 - (epsilon1[own]*phi1_0 + p[own]*phi1_0));
 
                     rEpsilon2 += (ac + av)*dEpsilon2Star[own]
-                        + 0.5*(epsilon2_1*phi2_1 + p_1*phi2_1 - (epsilon1[own]*phi2_0 + p[own]*phi2_0));
+                        + 0.5*(epsilon2_1*phi2_1 + p_1*phi2_1 - (epsilon1[own]*phi2_0 + p[own]*phi2_0));*/
                 }
             }
         }

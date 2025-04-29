@@ -9,16 +9,12 @@
     {
         const labelList& cellFaces = mesh.cells()[cellI];    // list of faces enclosing cellI
 
-        scalar rRho  = 0;
-        vector rRhoU = vector(0,0,0);
-        scalar rRhoE = 0;
-
         scalar rAlphaRho1  = 0;
-        scalar rAlphaRho1  = 0;
-        vector rAlphaRhoU1 = vector(0,0,0);
-        vector rAlphaRhoU2 = vector(0,0,0);
+        scalar rAlphaRho2  = 0;
+        vector rAlphaRhoU1 = vector(0, 0, 0);
+        vector rAlphaRhoU2 = vector(0, 0, 0);
         scalar rEpsilon1   = 0;
-        scalar rEpsilon1   = 0;
+        scalar rEpsilon2   = 0;
             
         forAll(cellFaces,i)
         {
@@ -32,30 +28,34 @@
                 if (nei != cellI)  // then data[nei] belongs to upper triangle
                 {
                     //scalar dvol = mag( (mesh.C()[own] - mesh.C()[nei]) & Sf[faceI] );
-                    scalar ac = 0.5*lusgsOmega*( 
+                    const scalar ac = 0.5*lusgsOmega*( 
                         max(mag(U1[nei] & Sf[faceI]), mag(U2[nei] & Sf[faceI])) 
                       + max(a1[nei] * magSf[faceI], a2[nei] * magSf[faceI]));
                     //scalar av = sqr(magSf[faceI]) / dvol * nuMax[nei];
-                    scalar av = 0.0;
+                    const scalar av = 0.0;
 
-                    scalar alphaRho1_1  = alphaRho1[nei]  + dAlphaRho1[nei];
-                    scalar alphaRho2_1  = alphaRho2[nei]  + dAlphaRho2[nei];
-                    vector alphaRhoU1_1 = alphaRhoU1[nei] + dAlphaRhoU1[nei];
-                    vector alphaRhoU2_1 = alphaRhoU2[nei] + dAlphaRhoU2[nei];
-                    scalar epsilon1_1   = epsilon1[nei]   + dEpsilon1[nei];
-                    scalar epsilon2_1   = epsilon2[nei]   + dEpsilon2[nei];
+                    const scalar alphaRho1_1  = alphaRho1[nei]  + dAlphaRho1[nei];
+                    const scalar alphaRho2_1  = alphaRho2[nei]  + dAlphaRho2[nei];
+                    const vector alphaRhoU1_1 = alphaRhoU1[nei] + dAlphaRhoU1[nei];
+                    const vector alphaRhoU2_1 = alphaRhoU2[nei] + dAlphaRhoU2[nei];
+                    const scalar epsilon1_1   = epsilon1[nei]   + dEpsilon1[nei];
+                    const scalar epsilon2_1   = epsilon2[nei]   + dEpsilon2[nei];
 
-                    scalar p_1;
-                    scalar alpha_1;
+                    //this also serves as an init value for Newton iteration in primitiveFromConservative function
+                    scalar p_1 = p[nei];
+                    scalar T1_1 = T1[nei];
+                    scalar T2_1 = T2[nei];
+
+                    scalar alpha1_1;
                     vector U1_1;
                     vector U2_1;
-                    scalar T1_1;
-                    scalar T2_1;
 
-                    twoFluid::primitiveFromConservative
+                    const scalar pInt = fluid.pInt()[cellI];
+
+                    fluid.primitiveFromConservative
                     (
                         p_1,
-                        alpha_1,
+                        alpha1_1,
                         U1_1,
                         U2_1,
                         T1_1,
@@ -66,28 +66,38 @@
                         alphaRhoU2_1,
                         epsilon1_1,
                         epsilon2_1,
-                        fluid.pInt()[celli]
+                        pInt
                     );
 
-                    scalar phi1_0 = U1[own] & Sf[faceI];
-                    scalar phi2_0 = U2[own] & Sf[faceI];
-                    scalar phi1_1 = U1_1 & Sf[faceI];
-                    scalar phi2_1 = U2_1 & Sf[faceI];
+                    const scalar alphaRhoE1_0 = epsilon1[nei] - alpha[nei]*pInt;
+                    const scalar alphaRhoE2_0 = epsilon2[nei] - (1.0 - alpha[nei])*pInt;
+                    const scalar alphaRhoE1_1 = epsilon1_1 - alpha1_1*pInt;
+                    const scalar alphaRhoE2_1 = epsilon2_1 - (1.0 - alpha1_1)*pInt;
+
+                    const scalar alphaP1_0 = alpha[nei]*p[nei];
+                    const scalar alphaP2_0 = (1.0 - alpha[nei])*p[nei];
+                    const scalar alphaP1_1 = alpha1_1*p_1;
+                    const scalar alphaP2_1 = (1.0 - alpha1_1)*p_1;
+
+                    const scalar phi1_0 = U1[nei] & Sf[faceI];
+                    const scalar phi2_0 = U2[nei] & Sf[faceI];
+                    const scalar phi1_1 = U1_1 & Sf[faceI];
+                    const scalar phi2_1 = U2_1 & Sf[faceI];
 
                     rAlphaRho1 += (ac + av) * dAlphaRho1[nei] 
-                        - 0.5*(alphaRho1_1*phi1_1 - alphaRho1[nei]*ph1_0);
+                        - 0.5*(alphaRho1_1*phi1_1 - alphaRho1[nei]*phi1_0);
                     rAlphaRho2 += (ac + av) * dAlphaRho2[nei] 
-                        - 0.5*(alphaRho2_1*phi2_1 - alphaRho2[nei]*ph2_0);
+                        - 0.5*(alphaRho2_1*phi2_1 - alphaRho2[nei]*phi2_0);
 
                     rAlphaRhoU1 += (ac + av) * dAlphaRhoU1[nei]
-                        - 0.5*((alphaRhoU1_1*phi1_1 - alphaRhoU1[nei]*phi1_0) + (p_1 - p[nei])*Sf[faceI]);
+                        - 0.5*((alphaRhoU1_1*phi1_1 - alphaRhoU1[nei]*phi1_0) + (alphaP1_1 - alphaP1_0)*Sf[faceI]);
                     rAlphaRhoU2 += (ac + av) * dAlphaRhoU2[nei]
-                        - 0.5*((alphaRhoU2_1*phi2_1 - alphaRhoU2[nei]*phi2_0) + (p_1 - p[nei])*Sf[faceI]);
+                        - 0.5*((alphaRhoU2_1*phi2_1 - alphaRhoU2[nei]*phi2_0) + (alphaP2_1 - alphaP2_0)*Sf[faceI]);
 
                     rEpsilon1 += (ac + av) * dEpsilon1[nei]
-                        - 0.5*((epsilon1_1*phi1_1 + p_1*phi1_1) - (epsilon1[nei]*phi1_0 + p[nei]*phi1_0));
+                        - 0.5*((alphaRhoE1_1 + alphaP1_1)*phi1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av) * dEpsilon2[nei]
-                        - 0.5*((epsilon2_1*phi2_1 + p_1*phi2_1) - (epsilon2[nei]*phi2_0 + p[nei]*phi2_0));
+                        - 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
                 }
             }
         }

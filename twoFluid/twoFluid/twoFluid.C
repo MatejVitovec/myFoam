@@ -219,7 +219,7 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     const scalar epsilon1,
     const scalar epsilon2,
     const scalar pIntOld
-)
+) const
 {
     const vector U1 = alphaRhoU1/alphaRho1;
     const vector U2 = alphaRhoU2/alphaRho2;

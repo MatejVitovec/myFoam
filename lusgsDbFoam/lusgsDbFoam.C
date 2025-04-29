@@ -82,11 +82,13 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
         ++runTime;
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info << "Iter = " << runTime.timeIndex() << endl;
+        Info << "Time = " << runTime.timeName() << endl;
 
         dimensionedScalar dt = runTime.deltaT();
 
         scalar initialRezAlphaRho1 = 0, initialRezAlphaRho2 = 0, initialRezAlphaRhoU1 = 0, initialRezAlphaRhoU2 = 0, initialRezEpsilon1 = 0, initialRezEpsilon2 = 0;
+
 
         for (int intIter = 0; intIter < lusgsIntIters; intIter++)
         {
@@ -104,12 +106,14 @@ int main(int argc, char *argv[])
                 fvc::ddt(conservative.alphaRhoU1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
+                + drag.K(d)*(fluid.U1() - fluid.U2())
             ));
 
             volVectorField dAlphaRhoU2(-dt*(
                 fvc::ddt(conservative.alphaRhoU2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
+                + drag.K(d)*(fluid.U2() - fluid.U1())
             ));
 
             volScalarField dEpsilon1(-dt*(
@@ -143,8 +147,8 @@ int main(int argc, char *argv[])
             conservative.alphaRho2()  += dAlphaRho2;
             conservative.alphaRhoU1() += dAlphaRhoU1;
             conservative.alphaRhoU2() += dAlphaRhoU2;
-            conservative.epsilon1()   += depsilon1;
-            conservative.epsilon2()   += depsilon2;
+            conservative.epsilon1()   += dEpsilon1;
+            conservative.epsilon2()   += dEpsilon2;
 
 
             fluid.correct();
@@ -161,12 +165,12 @@ int main(int argc, char *argv[])
             scalar finalRezEpsilon1   = fvc::domainIntegrate(mag(dEpsilon1)  /dt).value();
             scalar finalRezEpsilon2   = fvc::domainIntegrate(mag(dEpsilon2)  /dt).value();
 
-            Info << "LUSGS:  Solving for alphaRho1,  " << "Initial residual = " << rezAlpaRho1 << ", " << "Final residual = " << finalRezAlphaRho1 << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alphaRho2,  " << "Initial residual = " << rezAlpaRho2 << ", " << "Final residual = " << finalRezAlphaRho2 << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alphaRhoU1,  " << "Initial residual = " << rezAlpaRhoU1 << ", " << "Final residual = " << finalRezAlphaRhoU1 << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alphaRhoU2,  " << "Initial residual = " << rezAlpaRhoU2 << ", " << "Final residual = " << finalRezAlphaRhoU2 << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alpha1(rhoE1+pInt), " << "Initial residual = " << rezEpsilon1 << ", " << "Final residual = " << finalRezEpsilon1 << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alpha2(rhoE2+pInt), " << "Initial residual = " << rezEpsilon2 << ", " << "Final residual = " << finalRezEpsilon2 << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alphaRho1,          " << "Initial residual = " << rezAlphaRho1  << ", " << "Final residual = " << finalRezAlphaRho1  << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alphaRho2,          " << "Initial residual = " << rezAlphaRho2  << ", " << "Final residual = " << finalRezAlphaRho2  << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alphaRhoU1,         " << "Initial residual = " << rezAlphaRhoU1 << ", " << "Final residual = " << finalRezAlphaRhoU1 << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alphaRhoU2,         " << "Initial residual = " << rezAlphaRhoU2 << ", " << "Final residual = " << finalRezAlphaRhoU2 << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alpha1(rhoE1+pInt), " << "Initial residual = " << rezEpsilon1   << ", " << "Final residual = " << finalRezEpsilon1   << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alpha2(rhoE2+pInt), " << "Initial residual = " << rezEpsilon2   << ", " << "Final residual = " << finalRezEpsilon2   << ", No Iterations 1" << nl << nl;
 
             bool lastIteration = ((intIter + 1) == lusgsIntIters);
 
