@@ -184,6 +184,23 @@ public:
         scalar& T2
     ) const;
 
+    void fluxFromConservative
+    (
+        scalar& fluxAlphaRho1,
+        scalar& fluxAlphaRho2,
+        vector& fluxAlphaRhoU1,
+        vector& fluxAlphaRhoU2,
+        scalar& fluxAlphaRhoE1,
+        scalar& fluxAlphaRhoE2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld
+    ) const;
+
 
     // Memeber functions
 

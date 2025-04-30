@@ -155,12 +155,12 @@ int main(int argc, char *argv[])
             fluid.blendVanishingFluid();
             fluid.correctBoundaryCondition();
 
-            /*if (runTime.timeIndex() > 2525)
+            if (runTime.timeIndex() > 3254)
             {
                 Info << ">>> Forcing write <<<" << endl;
                 runTime.writeNow();
                 runTime.write();
-            }*/
+            }
 
             fluid.correctThermo();
             fluid.correctInterfacialPressure();
