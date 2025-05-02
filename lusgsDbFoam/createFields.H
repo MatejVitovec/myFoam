@@ -80,3 +80,28 @@ volScalarField rho2
     thermo2.rho()
 );
 
+volVectorField DU1
+(
+    IOobject
+    (
+        "DU1",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1)
+);
+
+volVectorField DU2
+(
+    IOobject
+    (
+        "DU2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2)
+);

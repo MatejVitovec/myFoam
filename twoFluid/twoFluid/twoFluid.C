@@ -25,6 +25,7 @@ License
 
 #include "fvCFD.H"
 #include "twoFluid.H"
+#include "boundMinMax.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -367,17 +368,21 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
     const vector alphaRhoU2,
     const scalar epsilon1,
     const scalar epsilon2,
-    const scalar pIntOld
+    const scalar pIntOld,
+    const vector Sf,
+    const scalar p0,
+    const scalar T10,
+    const scalar T20
 ) const
 {
-    scalar p;
+    scalar p = p0;;
     scalar alpha;
     vector U1;
     vector U2;
-    scalar T1;
-    scalar T2;
+    scalar T1 = T10;
+    scalar T2 = T20;
 
-    fluid.primitiveFromConservative
+    primitiveFromConservative
     (
         p,
         alpha,
@@ -402,8 +407,13 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
         U2 = U1;
         T2 = T1;
 
-        scalar rho2 = gasProps2_.rho(p, T2);
-
+        const scalar alpha2 = 1.0 - alpha;
+        const scalar rho2 = gasProps2_.rho(p, T2);
+        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alpha2*rho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
+        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
     }
     else if ((1.0 - alpha) < epsilonMax_)
     {
@@ -412,6 +422,22 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
             
         U2 = gFunc*U2 + (1.0 - gFunc)*U1;
         T2 = gFunc*T2 + (1.0 - gFunc)*T1;
+
+        const scalar alpha2 = 1.0 - alpha;
+        const scalar rho2 = gasProps2_.rho(p, T2);
+        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alpha2*rho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
+        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
+    }
+    else
+    {
+        const scalar alpha2 = 1.0 - alpha;
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alphaRho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
+        fluxAlphaRhoE2 = ((epsilon2 - alpha2*pIntOld) + alpha2*p)*phi2;
     }
         
     if (alpha <= epsilonMin_)
@@ -419,6 +445,13 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
         alpha = epsilonMin_;
         U1 = U2;
         T1 = T2;
+
+        const scalar rho1 = gasProps1_.rho(p, T1);
+        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alpha*rho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
+        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
     }
     else if (alpha < epsilonMax_)
     {
@@ -427,6 +460,20 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
 
         U1 = gFunc*U1 + (1.0 - gFunc)*U2;
         T1 = gFunc*T1 + (1.0 - gFunc)*T2;
+
+        const scalar rho1 = gasProps1_.rho(p, T1);
+        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alpha*rho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
+        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
+    }
+    else
+    {
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alphaRho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
+        fluxAlphaRhoE1 = ((epsilon1 - alpha*pIntOld) + alpha*p)*phi1;
     }
 }
 
@@ -487,6 +534,20 @@ void Foam::TwoFluidFoam::twoFluid::correct()
     }
 
     alpha2_ = 1.0 - alpha_;
+}
+
+void Foam::TwoFluidFoam::twoFluid::bound()
+{
+    const dimensionedScalar pMin = dimensionedScalar("pMin", dimPressure, 1e3);
+    const dimensionedScalar pMax = dimensionedScalar("pMax", dimPressure, 1e12);
+    const dimensionedScalar T1Min = dimensionedScalar("T1Min", dimTemperature, 50);
+    const dimensionedScalar T1Max = dimensionedScalar("T1Max", dimTemperature, 1000);
+    const dimensionedScalar T2Min = dimensionedScalar("T2Min", dimTemperature, 50);
+    const dimensionedScalar T2Max = dimensionedScalar("T2Max", dimTemperature, 1000);
+
+    boundMinMax(p_, pMin, pMax);
+    boundMinMax(T1_, T1Min, T1Max);
+    boundMinMax(T2_, T2Min, T2Max);
 }
 
 void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()

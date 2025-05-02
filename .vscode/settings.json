@@ -185,7 +185,8 @@
         "ddtScheme.C": "cpp",
         "EulerDdtScheme.C": "cpp",
         "lusgsDbFoam.C": "cpp",
-        "regIOobjectWrite.C": "cpp"
+        "regIOobjectWrite.C": "cpp",
+        "boundMinMax.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

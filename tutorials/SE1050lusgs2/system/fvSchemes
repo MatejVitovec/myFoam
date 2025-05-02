@@ -33,8 +33,6 @@ gradSchemes
 divSchemes
 {
     default         none;
-    div(interpolate(U.1),U.1)   Gauss linear;
-    div(interpolate(U.2),U.2)   Gauss linear;
 }
 
 laplacianSchemes

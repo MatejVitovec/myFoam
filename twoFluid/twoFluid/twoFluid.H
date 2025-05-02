@@ -198,7 +198,11 @@ public:
         const vector alphaRhoU2,
         const scalar epsilon1,
         const scalar epsilon2,
-        const scalar pIntOld
+        const scalar pIntOld,
+        const vector Sf,
+        const scalar p0,
+        const scalar T10,
+        const scalar T20
     ) const;
 
 
@@ -347,6 +351,8 @@ public:
     void correct();
 
     void blendVanishingFluid();
+
+    void bound();
 
     void correctBoundaryCondition();
 
