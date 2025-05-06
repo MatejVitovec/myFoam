@@ -1,8 +1,9 @@
+
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,49 +11,19 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system";
-    object      fvSolution;
+    object      phaseProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
+
+epsilon         1.0e-10;
+epsilonMin      1.0e-11;
+epsilonMax      1.0e-6;
+
+drag
 {
-    alphaRho1
-    {
-        solver diag;
-    }
-
-    alphaRho2
-    {
-        solver diag;
-    }
-
-    alphaRhoU1 
-    {
-        solver diag;
-    }
-
-    alphaRhoU2
-    {
-        solver diag;
-    }
-
-    epsilon1 
-    {
-        solver diag;
-    }
-
-    epsilon2
-    {
-        solver diag;
-    }  
+    type        constantDrag;
+    dragCoeff   2.0;
 }
-
-LUSGS {
-    internalIterations 1;
-    localTimestepping false;
-    omega 1.4;
-}
-
 
 // ************************************************************************* //

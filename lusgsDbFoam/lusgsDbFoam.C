@@ -172,12 +172,12 @@ int main(int argc, char *argv[])
             //fluid.bound();
             fluid.correctBoundaryCondition();
 
-            if (runTime.timeIndex() > 5770)
+            /*if (runTime.timeIndex() > 5590)
             {
                 Info << ">>> Forcing write , alpha: <<<" << alpha[15248] << endl;
                 runTime.writeNow();
                 runTime.write();
-            }
+            }*/
 
             fluid.correctThermo();
             fluid.correctInterfacialPressure();

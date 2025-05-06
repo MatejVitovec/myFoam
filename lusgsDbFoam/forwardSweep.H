@@ -48,8 +48,8 @@
                     max(mag(U1[cellI] & Sf[faceI]), mag(U2[cellI] & Sf[faceI])) 
                     + max(a1[cellI]*magSf[faceI], a2[cellI]*magSf[faceI]));*/
                 const scalar ac = 0.5*lusgsOmega*( 
-                    max(max(mag(U1[cellI] & Sf[faceI]) + a1[cellI]*magSf[faceI],
-                            mag(U2[cellI] & Sf[faceI]) + a2[cellI]*magSf[faceI]),
+                    max(max(mag(U1[own] & Sf[faceI]) + a1[own]*magSf[faceI],
+                            mag(U2[own] & Sf[faceI]) + a2[own]*magSf[faceI]),
                         max(mag(U1[nei] & Sf[faceI]) + a1[nei]*magSf[faceI],
                             mag(U2[nei] & Sf[faceI]) + a2[nei]*magSf[faceI])));
 
@@ -76,7 +76,7 @@
                     const scalar epsilon1_1   = epsilon1[own]   + dEpsilon1Star[own];
                     const scalar epsilon2_1   = epsilon2[own]   + dEpsilon2Star[own];
 
-                    scalar fluxAlphaRho1_1;
+                    /*scalar fluxAlphaRho1_1;
                     scalar fluxAlphaRho2_1;
                     vector fluxAlphaRhoU1_1;
                     vector fluxAlphaRhoU2_1;
@@ -124,9 +124,9 @@
                     rEpsilon1 += (ac + av)*dEpsilon1Star[own]
                         + 0.5*(fluxAlphaRhoE1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av)*dEpsilon2Star[own]
-                        + 0.5*(fluxAlphaRhoE2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
+                        + 0.5*(fluxAlphaRhoE2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);*/
 
-                    /*
+                    
                     //this also serves as an init value for Newton iteration in primitiveFromConservative function
                     scalar p_1 = p[own];
                     scalar T1_1 = T1[own];
@@ -155,7 +155,7 @@
                         pInt
                     );
 
-                    fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1); //TODO i pro conservative
+                    //fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1); //TODO i pro conservative
 
                     const scalar alphaRhoE1_0 = epsilon1[own] - alpha[own]*pInt;
                     const scalar alphaRhoE2_0 = epsilon2[own] - (1.0 - alpha[own])*pInt;
@@ -185,7 +185,7 @@
                     rEpsilon1 += (ac + av)*dEpsilon1Star[own]
                         + 0.5*((alphaRhoE1_1 + alphaP1_1)*phi1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av)*dEpsilon2Star[own]
-                        + 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);*/
+                        + 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
                 }
             }
         }

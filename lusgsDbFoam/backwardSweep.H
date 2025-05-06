@@ -32,8 +32,8 @@
                         max(mag(U1[nei] & Sf[faceI]), mag(U2[nei] & Sf[faceI])) 
                       + max(a1[nei] * magSf[faceI], a2[nei] * magSf[faceI]));*/
                     const scalar ac = 0.5*lusgsOmega*( 
-                        max(max(mag(U1[cellI] & Sf[faceI]) + a1[cellI]*magSf[faceI],
-                                mag(U2[cellI] & Sf[faceI]) + a2[cellI]*magSf[faceI]),
+                        max(max(mag(U1[own] & Sf[faceI]) + a1[own]*magSf[faceI],
+                                mag(U2[own] & Sf[faceI]) + a2[own]*magSf[faceI]),
                             max(mag(U1[nei] & Sf[faceI]) + a1[nei]*magSf[faceI],
                                 mag(U2[nei] & Sf[faceI]) + a2[nei]*magSf[faceI])));
                     //scalar av = sqr(magSf[faceI]) / dvol * nuMax[nei];
@@ -46,7 +46,7 @@
                     const scalar epsilon1_1   = epsilon1[nei]   + dEpsilon1[nei];
                     const scalar epsilon2_1   = epsilon2[nei]   + dEpsilon2[nei];
 
-                    scalar fluxAlphaRho1_1;
+                    /*scalar fluxAlphaRho1_1;
                     scalar fluxAlphaRho2_1;
                     vector fluxAlphaRhoU1_1;
                     vector fluxAlphaRhoU2_1;
@@ -94,10 +94,9 @@
                     rEpsilon1 += (ac + av)*dEpsilon1Star[nei]
                         + 0.5*(fluxAlphaRhoE1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av)*dEpsilon2Star[nei]
-                        + 0.5*(fluxAlphaRhoE2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
+                        + 0.5*(fluxAlphaRhoE2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);*/
 
 
-                    /*
                     //this also serves as an init value for Newton iteration in primitiveFromConservative function
                     scalar p_1 = p[nei];
                     scalar T1_1 = T1[nei];
@@ -126,7 +125,7 @@
                         pInt
                     );
 
-                    fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1);
 
                     const scalar alphaRhoE1_0 = epsilon1[nei] - alpha[nei]*pInt;
                     const scalar alphaRhoE2_0 = epsilon2[nei] - (1.0 - alpha[nei])*pInt;
@@ -156,7 +155,7 @@
                     rEpsilon1 += (ac + av) * dEpsilon1[nei]
                         - 0.5*((alphaRhoE1_1 + alphaP1_1)*phi1_1 - (alphaRhoE1_0 + alphaP1_0)*phi1_0);
                     rEpsilon2 += (ac + av) * dEpsilon2[nei]
-                        - 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);*/
+                        - 0.5*((alphaRhoE2_1 + alphaP2_1)*phi2_1 - (alphaRhoE2_0 + alphaP2_0)*phi2_0);
                 }
             }
         }
