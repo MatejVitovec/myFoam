@@ -71,6 +71,8 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(
     const volScalarField& T = fluid_.T2();
 
     const dimensionedScalar Rg("Rsteam", dimensionSet(0, 2, -2, -1, 0, 0, 0), 461.685);
+
+    volScalarField eta = 1.823e-6*sqrt(T)/(1.0/dimensionedScalar("1Temp", dimTemperature, 1) + 673.0/T); 
     
     volScalarField Kn = volScalarField //todo prez databazi z condensation
     (
@@ -82,8 +84,10 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        1.5*(fluid_.thermo1().mu())*sqrt(Rg*T)/(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20))*p)
+        1.5*(eta)*sqrt(Rg*T)/(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20))*p)
     );
+
+    Info << "Kn: " << Kn << endl;
 
     return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn)))*Kn;
 }

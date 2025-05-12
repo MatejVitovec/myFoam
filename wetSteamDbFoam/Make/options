@@ -28,4 +28,5 @@ EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
     -lmyTwoFluid \
-    -lmyCondensationModels
+    -lmyCondensationModels \
+    -lmyFoam

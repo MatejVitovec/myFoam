@@ -22,8 +22,7 @@ epsilonMax      1.0e-16;
 
 drag
 {
-    type        constantDrag;
-    dragCoeff   2.0;
+    type        viscousDrag;
 }
 
 saturationCurve IAPWS95;

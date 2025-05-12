@@ -169,7 +169,7 @@ void condensationMomentum::correct()
     const volScalarField& rho_l = liquidThermo_.rho();
     const volScalarField& rho_g = gasThermo_.rho();
     //const volScalarField L = L();
-    const volScalarField& Cp = gasThermo_.Cp();
+    const volScalarField Cp = gasThermo_.Cp();
 
     /*const WetSteam::turbulenceModel& turbModel =
         mesh.lookupObject<WetSteam::turbulenceModel>
@@ -238,9 +238,11 @@ void condensationMomentum::correct()
             r = sqrt(Q2_[i]/Q0_[i]);
             Kn = 1.5*eta*sqrt(Rg*T[i])/(2*r*p[i]);
         }
+        
 
         if (T[i] >= Ts[i])  // Evaporation
         {
+            //Info << "i: " << i << " , r: " << r << " , L: " << L << " , Lambda: " << lambda_g << " , TsmT: " << Ts[i] - T[i] << " eta: " << eta << " Cp: " << Cp[i] <<endl;
             if (r <= rMin_.value())  // Complete evaporation
             {
                 //w[i] = 0;
@@ -280,7 +282,7 @@ void condensationMomentum::correct()
 
             double gamma = Cp[i]/(Cp[i] - Rg);
 
-            if (kantrowitz_)
+            /*if (kantrowitz_)
             {
                 scalar psi = 2*(gamma - 1)/(gamma + 1) *
                     L/(Rg*T[i])*(L/(Rg*T[i]) - 0.5);
@@ -290,7 +292,7 @@ void condensationMomentum::correct()
             if (courtney_)
             {
                 J[i] /= S;              // Courtney's correction
-            }
+            }*/
 
             if (r > rc[i])
             {

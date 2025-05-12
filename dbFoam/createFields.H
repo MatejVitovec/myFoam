@@ -2,40 +2,40 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluidSystem(mesh);
+TwoFluidFoam::twoFluid fluid(mesh);
 
-twoFluidConservative& conservative = fluidSystem.conservative();
+twoFluidConservative& conservative = fluid.conservative();
 
 twoFluidConvectiveFlux twoFluidFlux
 (
-    fluidSystem.p(),
-    fluidSystem.alpha(),
-    fluidSystem.U1(),
-    fluidSystem.U2(),
-    fluidSystem.T1(),
-    fluidSystem.T2(),
-    fluidSystem.thermo1(),
-    fluidSystem.thermo2()
+    fluid.p(),
+    fluid.alpha(),
+    fluid.U1(),
+    fluid.U2(),
+    fluid.T1(),
+    fluid.T2(),
+    fluid.thermo1(),
+    fluid.thermo2()
 );
 
 
-volScalarField& p = fluidSystem.p();
-volScalarField& alpha = fluidSystem.alpha();
-volVectorField& U1 = fluidSystem.U1();
-volVectorField& U2 = fluidSystem.U2();
-volScalarField& T1 = fluidSystem.T1();
-volScalarField& T2 = fluidSystem.T2();
+volScalarField& p = fluid.p();
+volScalarField& alpha = fluid.alpha();
+volVectorField& U1 = fluid.U1();
+volVectorField& U2 = fluid.U2();
+volScalarField& T1 = fluid.T1();
+volScalarField& T2 = fluid.T2();
 
-rhoThermo& thermo1 = fluidSystem.thermo1();
-rhoThermo& thermo2 = fluidSystem.thermo2();
+rhoThermo& thermo1 = fluid.thermo1();
+rhoThermo& thermo2 = fluid.thermo2();
 
 surfaceScalarField amaxSf
 (
     "amaxSf",
-    fluidSystem.amaxSf()
+    fluid.amaxSf()
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem);
+autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
 TwoFluidFoam::dragModel& drag = pDrag();
 
 volScalarField d

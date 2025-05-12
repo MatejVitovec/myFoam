@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     {
         #include "readTimeControls.H"
 
-        amaxSf = fluidSystem.amaxSf();
+        amaxSf = fluid.amaxSf();
         #include "courantNo.H"
         #include "setDeltaT.H"
         ++runTime;
@@ -91,6 +91,10 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
+            volScalarField rho = alpha*rho1 + (1.0 - alpha)*rho2;
+            volVectorField virtualVelocity = (alpha*rho1*U1 + (1.0 - alpha)*rho2*U2)/rho;
+            volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());
+
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
@@ -102,29 +106,33 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
-                                          + drag.K(d)*(fluidSystem.U1() - fluidSystem.U2()));
+                                          - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
+                                          /*+ drag.K(d)*(fluid.U1() - fluid.U2())*/
+                                          + dragTerm);
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
-                                          + drag.K(d)*(fluidSystem.U2() - fluidSystem.U1()));
+                                          - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
+                                          /*+ drag.K(d)*(fluid.U2() - fluid.U1())*/
+                                          - dragTerm);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg()));
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                                    + (dragTerm & virtualVelocity));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                                    - (dragTerm & virtualVelocity));
 
-            fluidSystem.correct();
-            fluidSystem.blendVanishingFluid();
-            fluidSystem.correctBoundaryCondition();
-            fluidSystem.correctThermo();
-            if(i == 2) fluidSystem.correctInterfacialPressure();
-            fluidSystem.correctConservative();
+            fluid.correct();
+            fluid.blendVanishingFluid();
+            fluid.correctBoundaryCondition();
+            fluid.correctThermo();
+            if(i == 2) fluid.correctInterfacialPressure();
+            fluid.correctConservative();
         }
 
         /*twoFluidFlux.computeFlux();
@@ -135,21 +143,21 @@ int main(int argc, char *argv[])
 
         // --- Solve momentum
         solve(fvm::ddt(conservative.alphaRhoU1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-            - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf()));
+            - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf()));
 
         solve(fvm::ddt(conservative.alphaRhoU2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-            - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf()));
+            - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf()));
 
         // --- Solve energy
         solve(fvm::ddt(conservative.epsilon1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg()));
         solve(fvm::ddt(conservative.epsilon2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
 
-        fluidSystem.correct();
-        fluidSystem.blendVanishingFluid();
-        fluidSystem.correctBoundaryCondition();
-        fluidSystem.correctThermo();
-        fluidSystem.correctInterfacialPressure();
-        fluidSystem.correctConservative();*/
+        fluid.correct();
+        fluid.blendVanishingFluid();
+        fluid.correctBoundaryCondition();
+        fluid.correctThermo();
+        fluid.correctInterfacialPressure();
+        fluid.correctConservative();*/
 
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();

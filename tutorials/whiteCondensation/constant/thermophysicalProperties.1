@@ -19,9 +19,9 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       IAPWSIF97;
-    thermo          IAPWSIF97meta;
-    equationOfState IAPWSIF97metaGas;
+    transport       const;
+    thermo          eConst;
+    equationOfState perfectGas;
     specie          specie;
     energy          sensibleInternalEnergy;
 }
@@ -35,10 +35,10 @@ mixture
     }
     thermodynamics
     {
-        Cv          715.5;
+        Cv          1387.481736;
         Hf          0;
 	    Tref        0;
-        Eref        0;
+        Eref        1995917.326;
     }
     transport
     {

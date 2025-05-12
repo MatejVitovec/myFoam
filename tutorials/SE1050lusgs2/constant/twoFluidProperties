@@ -18,12 +18,12 @@ FoamFile
 
 epsilon         1.0e-10;
 epsilonMin      1.0e-11;
-epsilonMax      1.0e-8;
+epsilonMax      1.0e-7;
 
 drag
 {
     type        constantDrag;
-    dragCoeff   2.0;
+    dragCoeff   0.5;
 }
 
 // ************************************************************************* //

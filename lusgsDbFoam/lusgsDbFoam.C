@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
             volVectorField virtualVelocity = (alpha*rho1*U1 + (1.0 - alpha)*rho2*U2)/rho;
             volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());
 
-            volVectorField virtualMassTerm= 0.5*rho*alpha*(1.0 - alpha)*(DU2 - DU1);
+            volVectorField virtualMassTerm= -0.5*rho*alpha*(1.0 - alpha)*(DU2 - DU1);
 
             volScalarField dAlphaRho1(-dt*(
                 fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
                 //+ drag.K(d)*(fluid.U1() - fluid.U2())
                 + dragTerm
-                + virtualMassTerm
+                //+ virtualMassTerm
             ));
 
             volVectorField dAlphaRhoU2(-dt*(
@@ -123,21 +123,21 @@ int main(int argc, char *argv[])
                 - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
                 //+ drag.K(d)*(fluid.U2() - fluid.U1())
                 - dragTerm
-                - virtualMassTerm
+                //- virtualMassTerm
             ));
 
             volScalarField dEpsilon1(-dt*(
                 fvc::ddt(conservative.epsilon1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 //+ (dragTerm & U1)
-                + ((dragTerm + virtualMassTerm) & virtualVelocity)
+                + ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
             volScalarField dEpsilon2(-dt*(
                 fvc::ddt(conservative.epsilon2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 //- (dragTerm & U2)
-                - ((dragTerm + virtualMassTerm) & virtualVelocity)
+                - ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
             scalar rezAlphaRho1  = fvc::domainIntegrate(mag(dAlphaRho1) /dt).value();
@@ -172,7 +172,7 @@ int main(int argc, char *argv[])
             //fluid.bound();
             fluid.correctBoundaryCondition();
 
-            /*if (runTime.timeIndex() > 5590)
+            /*if (runTime.timeIndex() > 12570)
             {
                 Info << ">>> Forcing write , alpha: <<<" << alpha[15248] << endl;
                 runTime.writeNow();
