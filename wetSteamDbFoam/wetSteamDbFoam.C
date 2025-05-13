@@ -94,37 +94,48 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
-            //Info << "droplet d: " << endl;
-            //Info << condensation.dropletDiameter() << endl;
-            Info << drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2()) << endl; 
+            volVectorField Uint = (alpha*rho1*U1 + (1.0 - alpha)*rho2*U2)/(alpha*rho1 + alpha2*rho2);
+
+            volScalarField Hvint = saturation.hsv(T1) + (Uint & U1) + 0.5*magSqr(U1);
+            volScalarField Hlint = saturation.hsl(T2) + (Uint & U2) + 0.5*magSqr(U2);
+
+            volVectorField dragSource = drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2());
+            volScalarField condensationMassSource = -(condensation.nucleationRateMassSource() + condensation.growthRateMassSource());
+            volVectorField condensationMomentumSource = -Uint*condensation.growthRateMassSource();
+            volScalarField condensationEnergyVaporSource = -condensation.growthRateMassSource()*(Hvint - condensation.L());
+            volScalarField condensationEnergyLiquidSource = condensation.growthRateMassSource()*Hlint;
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
-                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
+                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
+                                        + condensationMassSource);
             
             conservative.alphaRho2() = coeff[i][0]*conservative.alphaRho2().oldTime()
                                      + coeff[i][1]*conservative.alphaRho2()
-                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
+                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+                                        - condensationMassSource);
 
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
-                                          + drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2()));
+                                          + dragSource + condensationMomentumSource);
           
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
-                                          + drag.K(condensation.dropletDiameter())*(fluidSystem.U2() - fluidSystem.U1()));
+                                          - dragSource - condensationMomentumSource);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg()));
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                                        + (dragSource & Uint) + condensationEnergyVaporSource);
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg()));
+                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                                        - (dragSource & Uint) + condensationEnergyLiquidSource);
 
             fluidSystem.correct();
 

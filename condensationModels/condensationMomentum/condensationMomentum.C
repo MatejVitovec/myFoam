@@ -181,7 +181,6 @@ void condensationMomentum::correct()
             )
         );*/
     
-    //const dimensionedScalar rMin("rMin", dimLength, 1e-20);
     const dimensionedScalar kg("kg", dimMass, 1.0);
     const dimensionedScalar wMin("wMin", dimless, 1.e-16);
 
@@ -214,9 +213,6 @@ void condensationMomentum::correct()
         mesh,
         dimensionedScalar("zero", dimLength, 0.0)
     );
-
-    Info << "COND OK1" << endl;
-
     
     forAll(J, i)
     {         
@@ -239,6 +235,7 @@ void condensationMomentum::correct()
             Kn = 1.5*eta*sqrt(Rg*T[i])/(2*r*p[i]);
         }
         
+        Kn_[i] = Kn;
 
         if (T[i] >= Ts[i])  // Evaporation
         {
@@ -280,10 +277,9 @@ void condensationMomentum::correct()
             J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rho_l[i]*
                 exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T[i]));
 
-            double gamma = Cp[i]/(Cp[i] - Rg);
-
             /*if (kantrowitz_)
             {
+                double gamma = Cp[i]/(Cp[i] - Rg);
                 scalar psi = 2*(gamma - 1)/(gamma + 1) *
                     L/(Rg*T[i])*(L/(Rg*T[i]) - 0.5);
                 
@@ -422,7 +418,7 @@ void condensationMomentum::correct()
 
 tmp<volScalarField> condensationMomentum::dropletDiameter() const
 {
-    return 2*max(sqrt(Q2_/(Q0_ + dimensionedScalar("small", Q0_.dimensions(), VSMALL))), rMin_);
+    return 2*max(sqrt(mag(Q2_)/(mag(Q0_ + dimensionedScalar("small", Q0_.dimensions(), SMALL)))), rMin_);
 }
 
 }

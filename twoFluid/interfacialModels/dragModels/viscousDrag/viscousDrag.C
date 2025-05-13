@@ -67,7 +67,7 @@ Foam::TwoFluidFoam::dragModels::viscousDrag::~viscousDrag()
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(const volScalarField& d) const
 {
-    const volScalarField& p = fluid_.p();
+    /*const volScalarField& p = fluid_.p();
     const volScalarField& T = fluid_.T2();
 
     const dimensionedScalar Rg("Rsteam", dimensionSet(0, 2, -2, -1, 0, 0, 0), 461.685);
@@ -85,11 +85,13 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(
             IOobject::NO_WRITE
         ),
         1.5*(eta)*sqrt(Rg*T)/(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20))*p)
-    );
+    );*/
+    const objectRegistry& db = fluid_.mesh();
+    const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
 
-    Info << "Kn: " << Kn << endl;
+    //Info << "Kn: " << Kn << endl;
 
-    return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn)))*Kn;
+    return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))))*Kn*0.0;
 }
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdRe() const

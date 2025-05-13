@@ -80,6 +80,8 @@ protected:
     autoPtr<saturationCurve> pSaturation_;
     const saturationCurve& saturation_;
 
+    volScalarField Kn_;
+
     volScalarField nucleationRateMassSource_;
     volScalarField growthRateMassSource_;
     
@@ -91,9 +93,6 @@ private:
 
     //- Disallow default bitwise assignment
     void operator=(const condensationModel&) = delete;
-
-    //Latent heat
-    tmp<volScalarField> L() const;
 
 
 public:
@@ -186,6 +185,9 @@ public:
     tmp<volScalarField> w() const;
 
     virtual tmp<volScalarField> dropletDiameter() const;
+
+    //Latent heat
+    tmp<volScalarField> L() const;
     
     // Check
     

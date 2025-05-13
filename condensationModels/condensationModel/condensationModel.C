@@ -97,6 +97,18 @@ condensationModel::condensationModel
     gasProps_(pGasProps_()),
     liquidProps_(liquidProps),
     saturation_(saturation),
+    Kn_(
+        IOobject
+        (
+            "Kn",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimless, 1.0)
+    ),
     nucleationRateMassSource_(
         IOobject
         (
@@ -129,14 +141,14 @@ tmp<volScalarField> condensationModel::L() const
     volScalarField Ts = saturation_.Ts(liquidThermo_.p());
 
     const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
-        { return gasProps_.rho(pp,TT); }; //TODO namam gasProps
+        { return gasProps_.rho(pp,TT); };
         
     volScalarField rhos = applyFunction2(f, liquidThermo_.p(), Ts, "rhos", dimDensity);
 
     return tmp<volScalarField>
         (
 	        //new volScalarField("L", saturation_.dpsdT(Ts)*Ts/rhos)
-            new volScalarField("L", gasThermo_.p()*(gasThermo_.T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
+            new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
         );
 
     /*const std::function<scalar(scalar)> f = [&](scalar TT)

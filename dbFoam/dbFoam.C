@@ -120,12 +120,12 @@ int main(int argc, char *argv[])
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                    + (dragTerm & virtualVelocity));
+                                        + (dragTerm & virtualVelocity));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                                    - (dragTerm & virtualVelocity));
+                                        - (dragTerm & virtualVelocity));
 
             fluid.correct();
             fluid.blendVanishingFluid();
