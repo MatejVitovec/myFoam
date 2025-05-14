@@ -155,26 +155,26 @@ void Foam::advectionSplitting::calculateFlux
                                               aLeft,    aRight,
                                               normalVector);
 
-    alphaRhoFlux1Left   = (leftMassFlux1*alphaLeft + rightMassFlux1*alphaRight)*magSf;
+    alphaRhoFlux1Left   = (leftMassFlux1*(1.0 - alphaLeft) + rightMassFlux1*(1.0 - alphaRight))*magSf;
     alphaRhoFlux1Right  = alphaRhoFlux1Left;
 
-    const vector alphaRhoUFlux1Aux = leftMassFlux1*alphaLeft*U1Left + rightMassFlux1*alphaRight*U1Right;
-    alphaRhoUFlux1Left  = (alphaRhoUFlux1Aux + pressureFlux1*alphaLeft *normalVector)*magSf;
-    alphaRhoUFlux1Right = (alphaRhoUFlux1Aux + pressureFlux1*alphaRight*normalVector)*magSf;
+    const vector alphaRhoUFlux1Aux = leftMassFlux1*(1.0 - alphaLeft)*U1Left + rightMassFlux1*(1.0 - alphaRight)*U1Right;
+    alphaRhoUFlux1Left  = (alphaRhoUFlux1Aux + pressureFlux1*(1.0 - alphaLeft) *normalVector)*magSf;
+    alphaRhoUFlux1Right = (alphaRhoUFlux1Aux + pressureFlux1*(1.0 - alphaRight)*normalVector)*magSf;
 
-    alphaRhoEFlux1Left  = (leftMassFlux1*alphaLeft*H1Left + rightMassFlux1*alphaRight*H1Right)*magSf;
+    alphaRhoEFlux1Left  = (leftMassFlux1*(1.0 - alphaLeft)*H1Left + rightMassFlux1*(1.0 - alphaRight)*H1Right)*magSf;
     alphaRhoEFlux1Right = alphaRhoEFlux1Left;
 
 
 
-    alphaRhoFlux2Left   = (leftMassFlux2*(1.0 - alphaLeft) + rightMassFlux2*(1.0 - alphaRight))*magSf;
+    alphaRhoFlux2Left   = (leftMassFlux2*alphaLeft + rightMassFlux2*alphaRight)*magSf;
     alphaRhoFlux2Right  = alphaRhoFlux2Left;
 
-    const vector alphaRhoUFlux2Aux = leftMassFlux2*(1.0 - alphaLeft)*U2Left + rightMassFlux2*(1.0 - alphaRight)*U2Right;
-    alphaRhoUFlux2Left  = (alphaRhoUFlux2Aux + pressureFlux2*(1.0 - alphaLeft) *normalVector)*magSf;
-    alphaRhoUFlux2Right = (alphaRhoUFlux2Aux + pressureFlux2*(1.0 - alphaRight)*normalVector)*magSf;
+    const vector alphaRhoUFlux2Aux = leftMassFlux2*alphaLeft*U2Left + rightMassFlux2*alphaRight*U2Right;
+    alphaRhoUFlux2Left  = (alphaRhoUFlux2Aux + pressureFlux2*alphaLeft *normalVector)*magSf;
+    alphaRhoUFlux2Right = (alphaRhoUFlux2Aux + pressureFlux2*alphaRight*normalVector)*magSf;
 
-    alphaRhoEFlux2Left  = (leftMassFlux2*(1.0 - alphaLeft)*H2Left + rightMassFlux2*(1.0 - alphaRight)*H2Right)*magSf;
+    alphaRhoEFlux2Left  = (leftMassFlux2*alphaLeft*H2Left + rightMassFlux2*alphaRight*H2Right)*magSf;
     alphaRhoEFlux2Right = alphaRhoEFlux2Left;
 }
 

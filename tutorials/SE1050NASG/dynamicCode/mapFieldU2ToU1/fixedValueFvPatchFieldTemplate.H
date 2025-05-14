@@ -49,7 +49,7 @@ namespace Foam
                          A templated FixedValueFvPatch
 \*---------------------------------------------------------------------------*/
 
-class mapFieldU2ToT1FixedValueFvPatchVectorField
+class mapFieldU2ToU1FixedValueFvPatchVectorField
 :
     public fixedValueFvPatchField<vector>,
     public dictionaryContent
@@ -72,20 +72,20 @@ public:
     static constexpr const char* const SHA1sum = "bf766773243118fdfeb54c6f9d87d057e8e10002";
 
     //- Runtime type information
-    TypeName("mapFieldU2ToT1");
+    TypeName("mapFieldU2ToU1");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        mapFieldU2ToT1FixedValueFvPatchVectorField
+        mapFieldU2ToU1FixedValueFvPatchVectorField
         (
             const fvPatch&,
             const DimensionedField<vector, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        mapFieldU2ToT1FixedValueFvPatchVectorField
+        mapFieldU2ToU1FixedValueFvPatchVectorField
         (
             const fvPatch&,
             const DimensionedField<vector, volMesh>&,
@@ -93,24 +93,24 @@ public:
         );
 
         //- Construct by mapping a copy onto a new patch
-        mapFieldU2ToT1FixedValueFvPatchVectorField
+        mapFieldU2ToU1FixedValueFvPatchVectorField
         (
-            const mapFieldU2ToT1FixedValueFvPatchVectorField&,
+            const mapFieldU2ToU1FixedValueFvPatchVectorField&,
             const fvPatch&,
             const DimensionedField<vector, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        mapFieldU2ToT1FixedValueFvPatchVectorField
+        mapFieldU2ToU1FixedValueFvPatchVectorField
         (
-            const mapFieldU2ToT1FixedValueFvPatchVectorField&
+            const mapFieldU2ToU1FixedValueFvPatchVectorField&
         );
 
         //- Construct as copy setting internal field reference
-        mapFieldU2ToT1FixedValueFvPatchVectorField
+        mapFieldU2ToU1FixedValueFvPatchVectorField
         (
-            const mapFieldU2ToT1FixedValueFvPatchVectorField&,
+            const mapFieldU2ToU1FixedValueFvPatchVectorField&,
             const DimensionedField<vector, volMesh>&
         );
 
@@ -131,7 +131,7 @@ public:
 
 
     //- Destructor
-    virtual ~mapFieldU2ToT1FixedValueFvPatchVectorField();
+    virtual ~mapFieldU2ToU1FixedValueFvPatchVectorField();
 
 
     // Member Functions

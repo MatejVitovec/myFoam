@@ -30,45 +30,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-/*Foam::TwoFluidFoam::twoFluid::twoFluid
-(
-    const volScalarField& p,
-    const volScalarField& alpha,
-    const volVectorField& U1,
-    const volVectorField& U2,
-    const volScalarField& T1,
-    const volScalarField& T2,
-    rhoThermo& thermo1,
-    rhoThermo& thermo2
-)
-:
-mesh_(mesh),
-p_(p),
-alpha_(alpha),
-U1_(U1),
-U2_(U2),
-T1_(T1),
-T2_(T2),
-thermo1_(thermo1),
-thermo2_(thermo2),
-gasProps1_(gasProperties::New(thermo1)),
-gasProps2_(gasProperties::New(thermo2)),
-pInt_
-(
-    IOobject
-    (
-        "pInt",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh_
-),
-twoFluidConservative_()
-{
-    
-}*/
+//TODO
 
 Foam::TwoFluidFoam::twoFluid::twoFluid(const fvMesh& mesh)
 :
@@ -96,7 +58,7 @@ pGasProps2_(gasProperties::New(thermo2_)),
 gasProps1_(pGasProps1_()),
 gasProps2_(pGasProps2_()),
 p_(thermo1_.p()),
-alpha_
+alpha2_
 (
     IOobject
     (
@@ -108,17 +70,17 @@ alpha_
     ),
     mesh_
 ),
-alpha2_
+alpha1_
 (
     IOobject
     (
-        "alpha2",
+        "alpha1",
         mesh_.time().timeName(),
         mesh_,
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    1.0 - alpha_
+    1.0 - alpha2_
 ),
 U1_
 (
@@ -187,7 +149,7 @@ pInt_
 conservative_
 (
     p_,
-    alpha_,
+    alpha2_,
     U1_,
     U2_,
     T1_,
@@ -306,51 +268,51 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     } //end Newton
 
     pRef = p;
-    alphaRef = alphaRho1/gasProps1_.rho(p, T1);
+    alphaRef = 1.0 - alphaRho1/gasProps1_.rho(p, T1);
     U1Ref = U1;
-    U2Ref = U2;    
+    U2Ref = U2;
     T1Ref = T1;
-    T2Ref = T2;    
+    T2Ref = T2;
 }
 
 
 void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
 (
-    scalar& alpha,
+    scalar& alpha2,
     vector& U1,
     vector& U2,
     scalar& T1,
     scalar& T2
 ) const
 {
-    if ((1.0 - alpha) <= epsilonMin_)
+    if ((1.0 - alpha2) <= epsilonMin_)
     {
-        alpha = 1.0 - epsilonMin_;
-        U2 = U1;
-        T2 = T1;
-    }
-    else if ((1.0 - alpha) < epsilonMax_)
-    {
-        const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-        const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
-            
-        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
-        T2 = gFunc*T2 + (1.0 - gFunc)*T1;
-    }
-        
-    if (alpha <= epsilonMin_)
-    {
-        alpha = epsilonMin_;
+        alpha2 = 1.0 - epsilonMin_;
         U1 = U2;
         T1 = T2;
     }
-    else if (alpha < epsilonMax_)
+    else if ((1.0 - alpha2) < epsilonMax_)
     {
-        const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-        const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
-
+        const scalar xi = ((1.0 - alpha2) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
+            
         U1 = gFunc*U1 + (1.0 - gFunc)*U2;
         T1 = gFunc*T1 + (1.0 - gFunc)*T2;
+    }
+        
+    if (alpha2 <= epsilonMin_)
+    {
+        alpha2 = epsilonMin_;
+        U2 = U1;
+        T2 = T1;
+    }
+    else if (alpha2 < epsilonMax_)
+    {
+        const double xi = (alpha2 - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
+
+        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
+        T2 = gFunc*T2 + (1.0 - gFunc)*T1;
     }
 }
 
@@ -375,7 +337,7 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
     const scalar T20
 ) const
 {
-    scalar p = p0;;
+    scalar p = p0;
     scalar alpha;
     vector U1;
     vector U2;
@@ -404,76 +366,76 @@ void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
     if ((1.0 - alpha) <= epsilonMin_)
     {
         alpha = 1.0 - epsilonMin_;
-        U2 = U1;
-        T2 = T1;
+        U1 = U2;
+        T1 = T2;
 
-        const scalar alpha2 = 1.0 - alpha;
-        const scalar rho2 = gasProps2_.rho(p, T2);
-        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
-        const scalar phi2 = U2 & Sf;
-        fluxAlphaRho2 = alpha2*rho2*phi2;
-        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
-        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
+        const scalar alpha1 = 1.0 - alpha;
+        const scalar rho1 = gasProps1_.rho(p, T1);
+        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alpha1*rho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha1*p*Sf;
+        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
     }
     else if ((1.0 - alpha) < epsilonMax_)
     {
         const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
         const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
             
-        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
-        T2 = gFunc*T2 + (1.0 - gFunc)*T1;
+        U1 = gFunc*U1 + (1.0 - gFunc)*U2;
+        T1 = gFunc*T1 + (1.0 - gFunc)*T2;
 
-        const scalar alpha2 = 1.0 - alpha;
-        const scalar rho2 = gasProps2_.rho(p, T2);
-        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
-        const scalar phi2 = U2 & Sf;
-        fluxAlphaRho2 = alpha2*rho2*phi2;
-        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
-        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
+        const scalar alpha1 = 1.0 - alpha;
+        const scalar rho1 = gasProps1_.rho(p, T1);
+        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alpha1*rho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha1*p*Sf;
+        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
     }
     else
     {
-        const scalar alpha2 = 1.0 - alpha;
-        const scalar phi2 = U2 & Sf;
-        fluxAlphaRho2 = alphaRho2*phi2;
-        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha2*p*Sf;
-        fluxAlphaRhoE2 = ((epsilon2 - alpha2*pIntOld) + alpha2*p)*phi2;
+        const scalar alpha1 = 1.0 - alpha;
+        const scalar phi1 = U1 & Sf;
+        fluxAlphaRho1 = alphaRho1*phi1;
+        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha1*p*Sf;
+        fluxAlphaRhoE1 = ((epsilon1 - alpha1*pIntOld) + alpha1*p)*phi1;
     }
         
     if (alpha <= epsilonMin_)
     {
         alpha = epsilonMin_;
-        U1 = U2;
-        T1 = T2;
+        U2 = U1;
+        T2 = T1;
 
-        const scalar rho1 = gasProps1_.rho(p, T1);
-        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
-        const scalar phi1 = U1 & Sf;
-        fluxAlphaRho1 = alpha*rho1*phi1;
-        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
-        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
+        const scalar rho2 = gasProps2_.rho(p, T2);
+        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alpha*rho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha*p*Sf;
+        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
     }
     else if (alpha < epsilonMax_)
     {
         const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
         const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
 
-        U1 = gFunc*U1 + (1.0 - gFunc)*U2;
-        T1 = gFunc*T1 + (1.0 - gFunc)*T2;
+        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
+        T2 = gFunc*T2 + (1.0 - gFunc)*T1;
 
-        const scalar rho1 = gasProps1_.rho(p, T1);
-        const scalar E1 = gasProps1_.Es(p, T1) + 0.5*magSqr(U1);
-        const scalar phi1 = U1 & Sf;
-        fluxAlphaRho1 = alpha*rho1*phi1;
-        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
-        fluxAlphaRhoE1 = fluxAlphaRho1*E1;
+        const scalar rho2 = gasProps2_.rho(p, T2);
+        const scalar E2 = gasProps2_.Es(p, T2) + 0.5*magSqr(U2);
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alpha*rho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha*p*Sf;
+        fluxAlphaRhoE2 = fluxAlphaRho2*E2;
     }
     else
     {
-        const scalar phi1 = U1 & Sf;
-        fluxAlphaRho1 = alphaRho1*phi1;
-        fluxAlphaRhoU1 = fluxAlphaRho1*U1 + alpha*p*Sf;
-        fluxAlphaRhoE1 = ((epsilon1 - alpha*pIntOld) + alpha*p)*phi1;
+        const scalar phi2 = U2 & Sf;
+        fluxAlphaRho2 = alphaRho2*phi2;
+        fluxAlphaRhoU2 = fluxAlphaRho2*U2 + alpha*p*Sf;
+        fluxAlphaRhoE2 = ((epsilon2 - alpha*pIntOld) + alpha*p)*phi2;
     }
 }
 
@@ -518,7 +480,7 @@ void Foam::TwoFluidFoam::twoFluid::correct()
         primitiveFromConservative
         (
             p_[celli],
-            alpha_[celli],
+            alpha2_[celli],
             U1_[celli],
             U2_[celli],
             T1_[celli],
@@ -533,7 +495,7 @@ void Foam::TwoFluidFoam::twoFluid::correct()
         );
     }
 
-    alpha2_ = 1.0 - alpha_;
+    alpha1_ = 1.0 - alpha2_;
 }
 
 void Foam::TwoFluidFoam::twoFluid::bound()
@@ -554,46 +516,47 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
 {
     forAll(mesh_.cells(), celli)
     {
-        const scalar alpha = alpha_[celli];
+        const scalar alpha2 = alpha2_[celli];
 
-        if ((1.0 - alpha) <= epsilonMin_)
+        if ((1.0 - alpha2) <= epsilonMin_)
         {
-            alpha_[celli] = 1.0 - epsilonMin_;
-            U2_[celli] = U1_[celli];
-            T2_[celli] = T1_[celli];
-        }
-        else if ((1.0 - alpha) < epsilonMax_)
-        {
-            const scalar xi = ((1.0 - alpha) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-            const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
-            
-            U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
-            T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T1_[celli];
-        }
-        
-        if (alpha <= epsilonMin_)
-        {
-            alpha_[celli] = epsilonMin_;
+            alpha2_[celli] = 1.0 - epsilonMin_;
             U1_[celli] = U2_[celli];
             T1_[celli] = T2_[celli];
         }
-        else if (alpha < epsilonMax_)
+        else if ((1.0 - alpha2) < epsilonMax_)
         {
-            const double xi = (alpha - epsilonMin_)/(epsilonMax_ - epsilonMin_);
-            const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
-
+            const scalar xi = ((1.0 - alpha2) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+            const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
+            
             U1_[celli] = gFunc*U1_[celli] + (1.0 - gFunc)*U2_[celli];
             T1_[celli] = gFunc*T1_[celli] + (1.0 - gFunc)*T2_[celli];
         }
+        
+        if (alpha2 <= epsilonMin_)
+        {
+            alpha2_[celli] = epsilonMin_;
+            U2_[celli] = U1_[celli];
+            T2_[celli] = T1_[celli];
+        }
+        else if (alpha2 < epsilonMax_)
+        {
+            const double xi = (alpha2 - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+            const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
+
+            U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
+            T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T1_[celli];
+        }
     }
     
-    alpha2_ = 1.0 - alpha_;
+    alpha1_ = 1.0 - alpha2_;
 }
 
 void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
 {
     p_.correctBoundaryConditions();
-    alpha_.correctBoundaryConditions();
+    alpha2_.correctBoundaryConditions();
+    alpha1_ = 1.0 - alpha2_;
     U1_.correctBoundaryConditions();
     U2_.correctBoundaryConditions();
     T1_.correctBoundaryConditions();
@@ -621,10 +584,10 @@ void Foam::TwoFluidFoam::twoFluid::correctInterfacialPressure()
     const auto& rho1 = thermo1_.rho();
     const auto& rho2 = thermo2_.rho();
 
-    pInt_ = p_ - min(sigma*((alpha_*rho1*(1.0 - alpha_)*rho2)/
-        (alpha_*rho2 + (1.0 - alpha_)*rho1))*magSqr(U2_ - U1_), epsilonP*p_);
+    pInt_ = p_ - min(sigma*((alpha1_*rho1*alpha2_*rho2)/
+        (alpha1_*rho2 + alpha2_*rho1))*magSqr(U2_ - U1_), epsilonP*p_);
 
-    //pInt_ = p_ - min(sigma*(1.0 - alpha_)*rho1*magSqr(U2_ - U1_), epsilonP*p_);
+    //pInt_ = p_ - min(sigma*alpha2_*rho1*magSqr(U2_ - U1_), epsilonP*p_);
 }
 
 void Foam::TwoFluidFoam::twoFluid::correctConservative()
@@ -635,20 +598,20 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
     const auto E1 = thermo1_.he() + 0.5*Foam::magSqr(U1_);
     const auto E2 = thermo2_.he() + 0.5*Foam::magSqr(U2_);
 
-    conservative_.alphaRho1() = alpha_*rho1;
-    conservative_.alphaRho2() = (1.0 - alpha_)*rho2;
+    conservative_.alphaRho1() = alpha1_*rho1;
+    conservative_.alphaRho2() = alpha2_*rho2;
     conservative_.alphaRhoU1() = conservative_.alphaRho1()*U1_;
     conservative_.alphaRhoU2() = conservative_.alphaRho2()*U2_;
-    conservative_.epsilon1() = alpha_*(rho1*E1 + pInt_);
-    conservative_.epsilon2() = (1.0 - alpha_)*(rho2*E2 + pInt_);
+    conservative_.epsilon1() = alpha1_*(rho1*E1 + pInt_);
+    conservative_.epsilon2() = alpha2_*(rho2*E2 + pInt_);
 
     //nejspise nepotrebuji konzervativní pole staci pouze jako INTERNAL FIELD
-    /*conservative_.alphaRho1().boundaryFieldRef() = alpha_.boundaryField()*rho1.boundaryField();
-    conservative_.alphaRho2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*rho2.boundaryField();
-    conservative_.alphaRhoU1().boundaryFieldRef() = alpha_.boundaryField()*rho1.boundaryField()*U1_.boundaryField();
-    conservative_.alphaRhoU2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*rho2.boundaryField()*U2_.boundaryField();
-    conservative_.epsilon1().boundaryFieldRef() = alpha_.boundaryField()*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
-    conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
+    /*conservative_.alphaRho1().boundaryFieldRef() = alpha1_.boundaryField()*rho1.boundaryField();
+    conservative_.alphaRho2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*rho2.boundaryField();
+    conservative_.alphaRhoU1().boundaryFieldRef() = alpha1_.boundaryField()*rho1.boundaryField()*U1_.boundaryField();
+    conservative_.alphaRhoU2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*rho2.boundaryField()*U2_.boundaryField();
+    conservative_.epsilon1().boundaryFieldRef() = alpha1_.boundaryField()*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
+    conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
 }
 
 tmp<surfaceScalarField> Foam::TwoFluidFoam::twoFluid::amaxSf() const

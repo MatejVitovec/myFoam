@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
-            volVectorField Uint = (alpha*rho1*U1 + (1.0 - alpha)*rho2*U2)/(alpha*rho1 + alpha2*rho2);
+            volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
             volScalarField Hvint = saturation.hsv(T1) + (Uint & U1) + 0.5*magSqr(U1);
             volScalarField Hlint = saturation.hsl(T2) + (Uint & U2) + 0.5*magSqr(U2);
@@ -118,13 +118,13 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                                           + dragSource + condensationMomentumSource);
           
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
+                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                                           - dragSource - condensationMomentumSource);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 
         alphaRhoPhi2 = fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2);
         condensation.correct();
-        Info << "condenstaion complete " <<endl;
+        Info << "condenstaion complete " << endl;
 
 
         rho1.ref() = thermo1.rho();

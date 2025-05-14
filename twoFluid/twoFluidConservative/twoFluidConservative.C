@@ -53,7 +53,7 @@ Foam::twoFluidConservative::twoFluidConservative
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        alpha*thermo1.rho()
+        (1.0 - alpha)*thermo1.rho()
     ),
     alphaRho2_
     (
@@ -65,7 +65,7 @@ Foam::twoFluidConservative::twoFluidConservative
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (1.0 - alpha)*thermo2.rho()
+        alpha*thermo2.rho()
     ),
     alphaRhoU1_
     (
@@ -101,7 +101,7 @@ Foam::twoFluidConservative::twoFluidConservative
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        alpha*(thermo1.rho()*(thermo1.he() + 0.5*Foam::magSqr(U1)) + pInt)
+        (1.0 - alpha)*(thermo1.rho()*(thermo1.he() + 0.5*Foam::magSqr(U1)) + pInt)
     ),
     epsilon2_
     (
@@ -113,7 +113,7 @@ Foam::twoFluidConservative::twoFluidConservative
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (1.0 - alpha)*(thermo2.rho()*(thermo2.he() + 0.5*Foam::magSqr(U2)) + pInt)
+        alpha*(thermo2.rho()*(thermo2.he() + 0.5*Foam::magSqr(U2)) + pInt)
     )
 {}
 

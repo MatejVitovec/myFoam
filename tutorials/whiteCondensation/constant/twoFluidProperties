@@ -16,7 +16,7 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-epsilon         1.0e-17;
+epsilon         1.0e-18;
 epsilonMin      1.0e-20;
 epsilonMax      1.0e-16;
 

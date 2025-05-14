@@ -148,6 +148,26 @@ public:
         return alpha_neg_;
     }
 
+    const surfaceScalarField& alpha1_pos() const
+    {
+        return (1.0 - alpha_pos_);
+    }
+
+    const surfaceScalarField& alpha1_neg() const
+    {
+        return (1.0 - alpha_neg_);
+    }
+
+    const surfaceScalarField& alpha2_pos() const
+    {
+        return alpha_pos_;
+    }
+
+    const surfaceScalarField& alpha2_neg() const
+    {
+        return alpha_neg_;
+    }
+
     const surfaceScalarField& alphaRhoFlux1_pos() const
     {
         return alphaRhoFlux1_pos_;

@@ -94,11 +94,11 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
-            volScalarField rho = alpha*rho1 + (1.0 - alpha)*rho2;
-            volVectorField virtualVelocity = (alpha*rho1*U1 + (1.0 - alpha)*rho2*U2)/rho;
+            volScalarField rho = alpha1*rho1 + alpha2*rho2;
+            volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
             volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());
 
-            volVectorField virtualMassTerm= -0.5*rho*alpha*(1.0 - alpha)*(DU2 - DU1);
+            volVectorField virtualMassTerm= -0.5*rho*alpha1*alpha2*(DU2 - DU1);
 
             volScalarField dAlphaRho1(-dt*(
                 fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
             volVectorField dAlphaRhoU1(-dt*(
                 fvc::ddt(conservative.alphaRhoU1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha_pos()*mesh.Sf(), twoFluidFlux.alpha_neg()*mesh.Sf())
+                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                 //+ drag.K(d)*(fluid.U1() - fluid.U2())
                 + dragTerm
                 //+ virtualMassTerm
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
             volVectorField dAlphaRhoU2(-dt*(
                 fvc::ddt(conservative.alphaRhoU2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha_neg())*mesh.Sf())
+                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 //+ drag.K(d)*(fluid.U2() - fluid.U1())
                 - dragTerm
                 //- virtualMassTerm

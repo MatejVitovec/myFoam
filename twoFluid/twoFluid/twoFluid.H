@@ -82,8 +82,8 @@ class twoFluid
     gasProperties& gasProps2_;
 
     volScalarField& p_;
-    volScalarField  alpha_;
-    volScalarField  alpha2_;
+    volScalarField  alpha2_; //main alpha (alpha2 = alpha)
+    volScalarField  alpha1_;
     volVectorField  U1_;
     volVectorField  U2_;
     volScalarField& T1_;
@@ -177,7 +177,7 @@ public:
 
     void blendVanishingFluid
     (
-        scalar& alpha,
+        scalar& alpha2,
         vector& U1,
         vector& U2,
         scalar& T1,
@@ -230,12 +230,17 @@ public:
 
     const volScalarField& alpha() const
     {
-        return alpha_;
+        return alpha2_;
     }
 
     volScalarField& alpha()
     {
-        return alpha_;
+        return alpha2_;
+    }
+
+    const volScalarField& alpha1() const
+    {
+        return alpha1_;
     }
 
     const volScalarField& alpha2() const
@@ -245,7 +250,7 @@ public:
 
     volScalarField& alpha2() 
     {
-        return alpha2_; //TODO predelat v condenzaci a pak odstranit
+        return alpha2_;
     }
 
     const volVectorField& U1() const

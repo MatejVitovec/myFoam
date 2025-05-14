@@ -84,7 +84,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        1.0 - alpha_pos_
+        alpha_pos_
     ),
     alphaRhoFlux1_pos_
     (
@@ -96,7 +96,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate(alpha_*thermo1_.rho()*U1_) & mesh_.Sf())
+        (linearInterpolate((1.0 - alpha_)*thermo1_.rho()*U1_) & mesh_.Sf())
     ),
     alphaRhoFlux1_neg_
     (
@@ -108,7 +108,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate(alpha_*thermo1_.rho()*U1_) & mesh_.Sf())
+        (linearInterpolate((1.0 - alpha_)*thermo1_.rho()*U1_) & mesh_.Sf())
     ),
     alphaRhoFlux2_pos_
     (
@@ -120,7 +120,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate((1.0 - alpha_)*thermo2_.rho()*U2_) & mesh_.Sf())
+        (linearInterpolate(alpha_*thermo2_.rho()*U2_) & mesh_.Sf())
     ),
     alphaRhoFlux2_neg_
     (
@@ -132,7 +132,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate((1.0 - alpha_)*thermo2_.rho()*U2_) & mesh_.Sf())
+        (linearInterpolate(alpha_*thermo2_.rho()*U2_) & mesh_.Sf())
     ),
     alphaRhoUFlux1_pos_
     (

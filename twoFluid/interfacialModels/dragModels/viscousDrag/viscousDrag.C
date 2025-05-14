@@ -123,7 +123,7 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Ki(
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::K(const volScalarField& d) const
 {
-    return Ki(d)*fluid_.alpha2();
+    return Ki(d)*fluid_.alpha();
 }
 
 

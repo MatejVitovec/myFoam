@@ -20,7 +20,8 @@ twoFluidConvectiveFlux twoFluidFlux
 
 
 volScalarField& p = fluidSystem.p();
-volScalarField& alpha = fluidSystem.alpha();
+const volScalarField& alpha1 = fluidSystem.alpha1();
+volScalarField& alpha2 = fluidSystem.alpha2();
 volVectorField& U1 = fluidSystem.U1();
 volVectorField& U2 = fluidSystem.U2();
 volScalarField& T1 = fluidSystem.T1();
@@ -29,7 +30,7 @@ volScalarField& T2 = fluidSystem.T2();
 rhoThermo& thermo1 = fluidSystem.thermo1();
 rhoThermo& thermo2 = fluidSystem.thermo2();
 
-volScalarField& alpha2 = fluidSystem.alpha2();
+
 
 surfaceScalarField amaxSf
 (

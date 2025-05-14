@@ -20,7 +20,8 @@ twoFluidConvectiveFlux twoFluidFlux
 
 
 volScalarField& p = fluid.p();
-volScalarField& alpha = fluid.alpha();
+const volScalarField& alpha1 = fluid.alpha1();
+volScalarField& alpha2 = fluid.alpha2();
 volVectorField& U1 = fluid.U1();
 volVectorField& U2 = fluid.U2();
 volScalarField& T1 = fluid.T1();

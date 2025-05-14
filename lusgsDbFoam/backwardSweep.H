@@ -74,10 +74,10 @@
                         T2[nei]
                     );
 
-                    const scalar alphaRhoE1_0 = epsilon1[nei] - alpha[nei]*fluid.pInt()[nei];
-                    const scalar alphaRhoE2_0 = epsilon2[nei] - (1.0 - alpha[nei])*fluid.pInt()[nei];
-                    const scalar alphaP1_0 = alpha[nei]*p[nei];
-                    const scalar alphaP2_0 = (1.0 - alpha[nei])*p[nei];
+                    const scalar alphaRhoE1_0 = epsilon1[nei] - alpha1[nei]*fluid.pInt()[nei];
+                    const scalar alphaRhoE2_0 = epsilon2[nei] - alpha2[nei]*fluid.pInt()[nei];
+                    const scalar alphaP1_0 = alpha1[nei]*p[nei];
+                    const scalar alphaP2_0 = alpha2[nei]*p[nei];
                     const scalar phi1_0 = U1[nei] & Sf[faceI];
                     const scalar phi2_0 = U2[nei] & Sf[faceI];
 
@@ -102,7 +102,7 @@
                     scalar T1_1 = T1[nei];
                     scalar T2_1 = T2[nei];
 
-                    scalar alpha1_1;
+                    scalar alpha2_1;
                     vector U1_1;
                     vector U2_1;
 
@@ -111,7 +111,7 @@
                     fluid.primitiveFromConservative
                     (
                         p_1,
-                        alpha1_1,
+                        alpha2_1,
                         U1_1,
                         U2_1,
                         T1_1,
@@ -127,15 +127,15 @@
 
                     //fluid.blendVanishingFluid(alpha1_1, U1_1, U2_1, T1_1, T2_1);
 
-                    const scalar alphaRhoE1_0 = epsilon1[nei] - alpha[nei]*pInt;
-                    const scalar alphaRhoE2_0 = epsilon2[nei] - (1.0 - alpha[nei])*pInt;
-                    const scalar alphaRhoE1_1 = epsilon1_1 - alpha1_1*pInt;
-                    const scalar alphaRhoE2_1 = epsilon2_1 - (1.0 - alpha1_1)*pInt;
+                    const scalar alphaRhoE1_0 = epsilon1[nei] - alpha1[nei]*pInt;
+                    const scalar alphaRhoE2_0 = epsilon2[nei] - alpha2[nei]*pInt;
+                    const scalar alphaRhoE1_1 = epsilon1_1 - (1.0 - alpha2_1)*pInt;
+                    const scalar alphaRhoE2_1 = epsilon2_1 - alpha2_1*pInt;
 
-                    const scalar alphaP1_0 = alpha[nei]*p[nei];
-                    const scalar alphaP2_0 = (1.0 - alpha[nei])*p[nei];
-                    const scalar alphaP1_1 = alpha1_1*p_1;
-                    const scalar alphaP2_1 = (1.0 - alpha1_1)*p_1;
+                    const scalar alphaP1_0 = alpha1[nei]*p[nei];
+                    const scalar alphaP2_0 = alpha2[nei]*p[nei];
+                    const scalar alphaP1_1 = (1.0 - alpha2_1)*p_1;
+                    const scalar alphaP2_1 = alpha2_1*p_1;
 
                     const scalar phi1_0 = U1[nei] & Sf[faceI];
                     const scalar phi2_0 = U2[nei] & Sf[faceI];
