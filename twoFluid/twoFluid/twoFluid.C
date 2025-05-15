@@ -268,7 +268,8 @@ void Foam::TwoFluidFoam::twoFluid::primitiveFromConservative
     } //end Newton
 
     pRef = p;
-    alphaRef = 1.0 - alphaRho1/gasProps1_.rho(p, T1);
+    //alphaRef = 1.0 - alphaRho1/gasProps1_.rho(p, T1);
+    alphaRef = alphaRho2/gasProps2_.rho(p, T2);
     U1Ref = U1;
     U2Ref = U2;
     T1Ref = T1;
@@ -557,6 +558,7 @@ void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
     p_.correctBoundaryConditions();
     alpha2_.correctBoundaryConditions();
     alpha1_ = 1.0 - alpha2_;
+    //alpha1_.boundaryFieldRef() = 1.0 - alpha2_.boundaryField();
     U1_.correctBoundaryConditions();
     U2_.correctBoundaryConditions();
     T1_.correctBoundaryConditions();

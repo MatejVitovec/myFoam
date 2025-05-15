@@ -84,7 +84,8 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
         ++runTime;
 
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info << "Iter = " << runTime.timeIndex() << endl;
+        Info << "Time = " << runTime.timeName() << endl;
 
         dimensionedScalar dt = runTime.deltaT();
 
@@ -100,9 +101,9 @@ int main(int argc, char *argv[])
             volScalarField Hlint = saturation.hsl(T2) + (Uint & U2) + 0.5*magSqr(U2);
 
             volVectorField dragSource = drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2());
-            volScalarField condensationMassSource = -(condensation.nucleationRateMassSource() + condensation.growthRateMassSource());
-            volVectorField condensationMomentumSource = -Uint*condensation.growthRateMassSource();
-            volScalarField condensationEnergyVaporSource = -condensation.growthRateMassSource()*(Hvint - condensation.L());
+            volScalarField condensationMassSource = condensation.nucleationRateMassSource() + condensation.growthRateMassSource();
+            volVectorField condensationMomentumSource = Uint*condensation.growthRateMassSource();
+            volScalarField condensationEnergyVaporSource = condensation.growthRateMassSource()*(Hvint - condensation.L());
             volScalarField condensationEnergyLiquidSource = condensation.growthRateMassSource()*Hlint;
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
@@ -135,7 +136,7 @@ int main(int argc, char *argv[])
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                                        - (dragSource & Uint) + condensationEnergyLiquidSource);
+                                        - (dragSource & Uint) - condensationEnergyLiquidSource);
 
             fluidSystem.correct();
 
@@ -151,6 +152,15 @@ int main(int argc, char *argv[])
         alphaRhoPhi2 = fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2);
         condensation.correct();
         Info << "condenstaion complete " << endl;
+
+        if (runTime.timeIndex() > 3950)
+        {
+            Info << ">>> Forcing write <<<" << endl;
+            runTime.writeNow();
+            runTime.write();
+        }
+
+        Info <<endl;
 
 
         rho1.ref() = thermo1.rho();

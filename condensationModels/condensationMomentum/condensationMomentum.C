@@ -162,7 +162,7 @@ void condensationMomentum::correct()
     tmp<volScalarField> tw = w();
     volScalarField& w = tw.ref();
     const volScalarField& p = liquidThermo_.p();
-    const volScalarField& T = liquidThermo_.T();     //liquid temperature
+    const volScalarField& T = gasThermo_.T();     //gas temperature
     const volScalarField Ts = saturation_.Ts(p);
     const volScalarField ps = saturation_.ps(T);
 
@@ -389,7 +389,7 @@ void condensationMomentum::correct()
     //mDotGL_ = 4.0/3.0*pi*pow3(rc)*J*rho_l + 4*pi*rho_*Q2_*rDot*rho_l;
 
     nucleationRateMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
-    growthRateMassSource_ = 4*pi*rho_*Q2_*rDot*rho_l;
+    growthRateMassSource_ = 4*pi*alpha_*rho_*Q2_*rDot*rho_l;
 
     // Explicitly constrain w & Q0 in dry steam region
     forAll(w, i)

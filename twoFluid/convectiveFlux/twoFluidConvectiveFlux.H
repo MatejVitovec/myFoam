@@ -148,14 +148,14 @@ public:
         return alpha_neg_;
     }
 
-    const surfaceScalarField& alpha1_pos() const
+    const tmp<surfaceScalarField> alpha1_pos() const
     {
-        return (1.0 - alpha_pos_);
+        return 1.0 - alpha_pos_;
     }
 
-    const surfaceScalarField& alpha1_neg() const
+    const tmp<surfaceScalarField> alpha1_neg() const
     {
-        return (1.0 - alpha_neg_);
+        return 1.0 - alpha_neg_;
     }
 
     const surfaceScalarField& alpha2_pos() const
