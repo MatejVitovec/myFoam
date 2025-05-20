@@ -22,8 +22,8 @@ solvers
     {
         solver      smoothSolver;
         smoother    symGaussSeidel;
-        tolerance   1e-7;
-        relTol      1e-5;
+        tolerance   1e-9;
+        relTol      1e-7;
         minIter     1;
     }
 
@@ -36,7 +36,7 @@ solvers
 
 PIMPLE
 {
-    nOuterCorrectors    5;
+    nOuterCorrectors    8;
     nCorrectors         1;
     nNonOrthogonalCorrectors 0;
     SIMPLErho           false;

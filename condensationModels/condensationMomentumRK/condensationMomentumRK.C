@@ -23,7 +23,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "condensationMomentum.H"
+#include "condensationMomentumRK.H"
 #include "addToRunTimeSelectionTable.H"
 #include "fvm.H"
 #include "physicoChemicalConstants.H"
@@ -38,10 +38,10 @@ namespace Foam
 namespace WetSteam
 {
 
-defineTypeNameAndDebug(condensationMomentum, 0);
-addToRunTimeSelectionTable(condensationModel, condensationMomentum, params);
+defineTypeNameAndDebug(condensationMomentumRK, 0);
+addToRunTimeSelectionTable(condensationModel, condensationMomentumRK, params);
 
-condensationMomentum::condensationMomentum
+condensationMomentumRK::condensationMomentumRK
 (
     volScalarField& alpha,
     const volScalarField& rho,
@@ -151,7 +151,7 @@ condensationMomentum::condensationMomentum
 }
 
 
-void condensationMomentum::correct()
+void condensationMomentumRK::correct()
 {
     const scalar pi = constant::mathematical::pi;
     const scalar kB = constant::physicoChemical::k.value();
@@ -223,7 +223,7 @@ void condensationMomentum::correct()
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        Ts
+        T_l
     );
     
     forAll(J, i)
@@ -318,8 +318,10 @@ void condensationMomentum::correct()
                 //rDot[i] = (lambda_g/(r*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*(gasProps_.Ha(p[i], T_g[i]) - h_l)));
                 rDot[i] = (lambda_g/(r*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L));
 #endif
-
+                //TlDiff[i] = T_l[i] - (Ts[i] - (Ts[i] - T_g[i])*rc[i]/r);
+                //rDot[i] = 0.0;
             }
+            TlDiff[i] = Ts[i];
         }
     }
 
@@ -342,81 +344,51 @@ void condensationMomentum::correct()
         )
     );
 
+    scalar coeff[3][3] = {{1.0, 0.0 , 1.0}, {3.0/4.0, 1.0/4.0, 1.0/4.0}, {1.0/3.0, 2.0/3.0, 2.0/3.0}};
 
-    // Solution of Q3/w in main conservative scheme via mass source term -> alpha ~ w
-    /*{
-        fvScalarMatrix wEqn
-        (
-            fvm::ddt(rho_, w) 
-            + mvConvection->fvmDiv(alphaRhoPhi_, w) 
-            - fvm::laplacian(Dt, w)
-            ==
-            4.0/3.0*pi*pow3(rc)*J*rho_l
-            - fvm::SuSp(-4*pi*rho_*Q2_*rDot*rho_l/(w+wMin), w)
-        );
-        
-        wEqn.relax();
-        wEqn.solve();
-    }*/
-
+    for (size_t i = 0; i < 3; i++)
     {
-        fvScalarMatrix Q2Eqn
-        (
-            fvm::ddt(alpha_, rho_, Q2_)
-            + mvConvection->fvmDiv(alphaRhoPhi_, Q2_)
-            //- fvm::laplacian(Dt, Q2_)
-            ==
-            sqr(rc)*J + 2*alpha_*rho_*Q1_*rDot
-        );
-
-        Q2Eqn.relax();
-        Q2Eqn.solve();
+        //TODO
     }
 
-    {
-        fvScalarMatrix Q1Eqn
-        (
-            fvm::ddt(alpha_, rho_, Q1_) 
-            + mvConvection->fvmDiv(alphaRhoPhi_, Q1_) 
-            //- fvm::laplacian(Dt, Q1_)
-            ==
-            rc*J + alpha_*rho_*Q0_*rDot
-        );
+    fvScalarMatrix Q2Eqn
+    (
+        fvm::ddt(alpha_, rho_, Q2_)
+        + mvConvection->fvmDiv(alphaRhoPhi_, Q2_)
+        ==
+        sqr(rc)*J + 2*alpha_*rho_*Q1_*rDot
+    );
 
-        Q1Eqn.relax();
-        Q1Eqn.solve();
-    }
 
-    {
-        fvScalarMatrix Q0Eqn
-        (
-            fvm::ddt(alpha_, rho_, Q0_) 
-            + mvConvection->fvmDiv(alphaRhoPhi_, Q0_) 
-            //- fvm::laplacian(Dt, Q0_)
-            ==
-            J
-        );
+    fvScalarMatrix Q1Eqn
+    (
+        fvm::ddt(alpha_, rho_, Q1_) 
+        + mvConvection->fvmDiv(alphaRhoPhi_, Q1_)
+        ==
+        rc*J + alpha_*rho_*Q0_*rDot
+    );
 
-        Q0Eqn.relax();
-        Q0Eqn.solve();
-    }
+
+    fvScalarMatrix Q0Eqn
+    (
+        fvm::ddt(alpha_, rho_, Q0_) 
+        + mvConvection->fvmDiv(alphaRhoPhi_, Q0_) 
+        ==
+        J
+    );
 
     nucleationRateMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
     growthRateMassSource_ = 4*pi*alpha_*rho_*Q2_*rDot*rho_l;
 
-    // Explicitly constrain w & Q0 in dry steam region
+    // Explicitly constrain in dry steam region
     forAll(alpha_, i)
     {
         if (alpha_[i] <= 1e-20 && J[i] <= 0)
         {
-            //w[i]   = 0.0;
-            //alpha_[i] = 0.0; //TODO - epsilon
             Q0_[i] = 0.0;
             Q1_[i] = 0.0;
             Q2_[i] = 0.0;
         }
-        //w[i]   = max(w[i], 0);
-        //alpha_[i] = max(alpha_[i], 0);
         Q0_[i] = max(Q0_[i], 0);
         Q1_[i] = max(Q1_[i], 0);
         Q2_[i] = max(Q2_[i], 0);
@@ -430,7 +402,7 @@ void condensationMomentum::correct()
     }
 }
 
-tmp<volScalarField> condensationMomentum::dropletDiameter() const
+tmp<volScalarField> condensationMomentumRK::dropletDiameter() const
 {
     return 2*max(sqrt(mag(Q2_)/(mag(Q0_ + dimensionedScalar("small", Q0_.dimensions(), SMALL)))), rMin_);
 }

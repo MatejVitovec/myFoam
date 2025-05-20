@@ -25,7 +25,6 @@ License
 
 #include "saturationIF97.H"
 #include "addToRunTimeSelectionTable.H"
-#include "../../IF97/IF97.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -56,7 +55,6 @@ scalar saturationIF97::dpsdT(scalar T) const
     scalar dpdbeta = 4*pow3(beta)*1e6;
 
     return dpdbeta*dbetadtheta*dthetadT;
-    //return IF97::reg4::dpsdT(T);
 }
 
 
@@ -70,7 +68,6 @@ scalar saturationIF97::ps(scalar T) const
     
     scalar p = pow4(2*C/(-B + sqrt(sqr(B) - 4*A*C)))*1e6;
     return p;
-    //return IF97::reg4::ps(T);
 }
 
 
@@ -87,43 +84,36 @@ scalar saturationIF97::Ts(scalar p) const
 
     scalar T = 0.5*(n10 + D - sqrt(sqr(n10 + D) - 4*(n9 + n10*D)));
     return T;
-    //return IF97::reg4::Ts(p);
 }
 
 scalar saturationIF97::rhosl(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg1::v(p, T);
+    return 0.0; //TODO
 }
 
 scalar saturationIF97::rhosv(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg2meta::v(p, T);
+    return 0.0; //TODO
 }
 
 scalar saturationIF97::hsl(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg1::h(p, T);
+    return 0.0; //TODO
 }
 
 scalar saturationIF97::hsv(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg2meta::h(p, T);
+    return 0.0; //TODO
 }
 
 scalar saturationIF97::esl(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg1::u(p, T);
+    return 0.0; //TODO
 }
 
 scalar saturationIF97::esv(scalar T) const
 {
-    const scalar p = ps(T);
-    return 1/IF97::reg2meta::u(p, T);
+    return 0.0; //TODO
 }
 
 

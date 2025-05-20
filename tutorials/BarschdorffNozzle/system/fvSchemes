@@ -32,7 +32,7 @@ divSchemes
     default             none;
     div(alphaRhoPhi2,w_Q)    Gauss multivariateIndependent
     {
-        "Q.*" Minmod 1;
+        "Q.*" upwind;
     };
 }
 

@@ -1,0 +1,135 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) 2019 OpenFOAM Foundation
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+Class
+    Foam::condensationModel
+
+Description
+
+SourceFiles
+    condensationModel.C
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef condensationMomentumRK_H
+#define condensationMomentumRK_H
+
+#include "condensationModel.H"
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace WetSteam
+{
+
+/*---------------------------------------------------------------------------* \
+                         Class condensationModel Declaration
+\*---------------------------------------------------------------------------*/
+
+class condensationMomentumRK
+:
+    public condensationModel
+{
+private:
+    // Private data
+
+    //- Disallow default bitwise copy construct
+    condensationMomentumRK(const condensationMomentumRK&) = delete;
+    
+    //- Disallow default bitwise assignment
+    void operator=(const condensationMomentumRK&) = delete;
+
+protected:
+    //- Number of droplets [-]
+    volScalarField Q0_; 
+
+    //- Sum of radii [m]
+    volScalarField Q1_;
+
+    //- Sum of radii squared [m2]
+    volScalarField Q2_;
+
+    //- Mass of single molecule
+    const dimensionedScalar m1_;
+
+    //- Surface tension correction coefficient
+    const dimensionedScalar beta_;
+
+    //- Turbulent schmidt number
+    const dimensionedScalar Sct_;
+
+    const dimensionedScalar rMin_;
+
+    //- Use Kantrowitz correction factor
+    Switch kantrowitz_;
+
+    //- Use Courtney correction factor
+    Switch courtney_;
+    
+public:
+
+    TypeName("momentum");
+        
+    // Constructors
+
+    //- Construct from components
+    condensationMomentumRK
+    (
+        volScalarField& alpha,
+        const volScalarField& rho,
+        const volVectorField& U,
+        const surfaceScalarField& alphaRhoPhi,
+        const fluidThermo& gasThermo,
+        const fluidThermo& liquidThermo,
+        const saturationCurve& saturation,
+        const liquidProperties& liquidProps
+    );
+    
+    //- Destructor
+    virtual ~condensationMomentumRK() {};
+    
+
+    // Member Functions
+
+    //- Main update/correction routine
+    virtual void correct();
+
+    virtual tmp<volScalarField> dropletDiameter() const;    
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+}
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

@@ -50,6 +50,11 @@ class saturationIF97
     public saturationCurve
 {
 private:
+
+    // Critical values
+    const scalar Tc = 647.096;
+    const scalar pc = 22.064e6;
+
     const scalar n1 =  0.11670521452767E+04;
     const scalar n2 = -0.72421316703206E+06;
     const scalar n3 = -0.17073846940092E+02;

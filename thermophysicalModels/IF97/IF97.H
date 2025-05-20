@@ -12,6 +12,7 @@ namespace IF97
 
     #include "reg1.H"
     #include "reg2meta.H"
+    #include "reg4.H"
     #include "viscosity.H"
     #include "conductivity.H"
 };

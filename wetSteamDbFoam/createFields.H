@@ -101,3 +101,16 @@ volScalarField rho2
     thermo2.rho()
 );
 
+volScalarField e2
+(
+    IOobject
+    (
+        "e2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    thermo2.he()
+);
+
