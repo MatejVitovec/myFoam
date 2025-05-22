@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     {
         #include "readTimeControls.H"
 
-        amaxSf = fluidSystem.amaxSf();
+        amaxSf = fluid.amaxSf();
         #include "courantNo.H"
         #include "setDeltaT.H"
         ++runTime;
@@ -97,11 +97,11 @@ int main(int argc, char *argv[])
 
             volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
-            volScalarField Ts = saturation.Ts(p);
-            volScalarField Hvint = saturation.hsv(Ts) + (Uint & U1) + 0.5*magSqr(U1);
-            volScalarField Hlint = saturation.hsl(Ts) + (Uint & U2) + 0.5*magSqr(U2);
+            volScalarField Ts = condensation.saturation().Ts(p);
+            volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) + 0.5*magSqr(U1);
+            volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) + 0.5*magSqr(U2);
 
-            volVectorField dragSource = drag.K(condensation.dropletDiameter())*(fluidSystem.U1() - fluidSystem.U2());
+            volVectorField dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
             volScalarField condensationMassSource = condensation.condensationRateMassSource();
             volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
@@ -121,13 +121,13 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
+                                          - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                                           + dragSource + condensationMomentumSource);
           
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                                          - fluidSystem.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
+                                          - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                                           - dragSource - condensationMomentumSource);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
@@ -140,22 +140,19 @@ int main(int argc, char *argv[])
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                                         - (dragSource & Uint) - condensationEnergyLiquidSource);
 
-            fluidSystem.correct();
+            fluid.correct();
 
-            fluidSystem.blendVanishingFluid();
-            fluidSystem.correctBoundaryCondition();
-            fluidSystem.correctThermo();
-            if(i == 2) fluidSystem.correctInterfacialPressure();
-            fluidSystem.correctConservative();
+            fluid.blendVanishingFluid();
+            fluid.correctBoundaryCondition();
+            fluid.correctThermo();
+            if(i == 2) fluid.correctInterfacialPressure();
+            fluid.correctConservative();
         }
-
-        //alphaRhoPhi2 = fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2);
         twoFluidFlux.computeFlux();
-        alphaRhoPhi2 = twoFluidFlux.alphaRhoFlux2_pos();
-        condensation.correct();
-        //Info << "condensation complete " << endl;
 
-        /*if (runTime.timeIndex() > 4130)
+        condensation.correct();
+
+        /*if (runTime.timeIndex() > 7380)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();

@@ -75,6 +75,7 @@ protected:
     autoPtr<gasProperties> pGasProps_;
     const gasProperties& gasProps_;
 
+    autoPtr<liquidProperties> pliquidProps_;
     const liquidProperties& liquidProps_;
 
     autoPtr<saturationCurve> pSaturation_;
@@ -112,10 +113,9 @@ public:
             const surfaceScalarField& alphaRhoPhi,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const saturationCurve& saturation,
-            const liquidProperties& liquidProps
+            const dictionary& dict
         ),
-        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps)
+        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, dict)
     );
 
     
@@ -130,8 +130,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
-        const saturationCurve& saturation,
-        const liquidProperties& liquidProps
+        const dictionary& dict
     );
        
 
@@ -146,8 +145,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
-        const saturationCurve& saturation,
-        const liquidProperties& liquidProps
+        const dictionary& dict
     );
     
 
@@ -180,6 +178,11 @@ public:
     const fvMesh& mesh() const
     {
         return mesh_;
+    }
+
+    const saturationCurve& saturation() const
+    {
+        return saturation_;
     }
 
     tmp<volScalarField> w() const;

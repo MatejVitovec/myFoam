@@ -105,25 +105,25 @@ scalar saturationIF97::rhosv(scalar T) const
 scalar saturationIF97::hsl(scalar T) const
 {
     const scalar p = ps(T);
-    return 1/IF97::reg1::h(p, T);
+    return IF97::reg1::h(p, T);
 }
 
 scalar saturationIF97::hsv(scalar T) const
 {
     const scalar p = ps(T);
-    return 1/IF97::reg2meta::h(p, T);
+    return IF97::reg2meta::h(p, T);
 }
 
 scalar saturationIF97::esl(scalar T) const
 {
     const scalar p = ps(T);
-    return 1/IF97::reg1::u(p, T);
+    return IF97::reg1::u(p, T);
 }
 
 scalar saturationIF97::esv(scalar T) const
 {
     const scalar p = ps(T);
-    return 1/IF97::reg2meta::u(p, T);
+    return IF97::reg2meta::u(p, T);
 }
 
 

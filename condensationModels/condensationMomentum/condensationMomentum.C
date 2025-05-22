@@ -49,11 +49,10 @@ condensationMomentum::condensationMomentum
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-    const saturationCurve& saturation,
-    const liquidProperties& liquidProps
+    const dictionary& dict
 )
 :
-    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps),
+    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, dict),
 
     Q0_(
         IOobject
@@ -225,16 +224,20 @@ void condensationMomentum::correct()
         ),
         Ts
     );
+
+    volScalarField Lheat = L();
     
     forAll(J, i)
     {         
         // Dynamic viscosity and thermal conductivity
         scalar eta = 1.823e-6*sqrt(T_g[i])/(1 + 673.0/T_g[i]);
         scalar lambda_g = 7.341e-3 - 1.013e-5*T_g[i] + 1.801e-7*sqr(T_g[i]) - 9.1e-11*pow3(T_g[i]);
-        scalar L = p[i]*(T_g[i] - Ts[i]) + saturation_.dpsdT(Ts[i])*Ts[i]/gasProps_.rho(p[i], Ts[i]);
+        //scalar L = p[i]*(T_g[i] - Ts[i]) + saturation_.dpsdT(Ts[i])*Ts[i]/gasProps_.rho(p[i], Ts[i]);
+        scalar L = Lheat[i];
 
         // Prandtl number
         scalar Pr = eta*Cp[i]/lambda_g;
+        Pr = 0.0;
             
         // Knudsen number
         scalar Kn = 0;
@@ -265,7 +268,7 @@ void condensationMomentum::correct()
             else    // No new droplets, only evaporation
             {
                 J[i] = 0;
-                rDot[i] = lambda_g*(Ts[i] - T_g[i])/(L*rho_l[i]*(1 + 3.18*Kn/Pr))/r;
+                rDot[i] = (lambda_g/(r*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L));
             }
         }
         else    // Condensation (T < Ts)
@@ -318,7 +321,7 @@ void condensationMomentum::correct()
                 //rDot[i] = (lambda_g/(r*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*(gasProps_.Ha(p[i], T_g[i]) - h_l)));
                 rDot[i] = (lambda_g/(r*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L));
 #endif
-
+                //rDot[i] = 0.0;
             }
         }
     }
@@ -326,7 +329,6 @@ void condensationMomentum::correct()
     //volScalarField Dt("Dt", alpha_*rho_*turbModel.nut()/Sct_);
     
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;
-    //fields.add(w);
     fields.add(Q0_);
     fields.add(Q1_);
     fields.add(Q2_);
@@ -341,23 +343,6 @@ void condensationMomentum::correct()
             mesh.divScheme("div(alphaRhoPhi2,w_Q)")
         )
     );
-
-
-    // Solution of Q3/w in main conservative scheme via mass source term -> alpha ~ w
-    /*{
-        fvScalarMatrix wEqn
-        (
-            fvm::ddt(rho_, w) 
-            + mvConvection->fvmDiv(alphaRhoPhi_, w) 
-            - fvm::laplacian(Dt, w)
-            ==
-            4.0/3.0*pi*pow3(rc)*J*rho_l
-            - fvm::SuSp(-4*pi*rho_*Q2_*rDot*rho_l/(w+wMin), w)
-        );
-        
-        wEqn.relax();
-        wEqn.solve();
-    }*/
 
     {
         fvScalarMatrix Q2Eqn
@@ -402,7 +387,8 @@ void condensationMomentum::correct()
     }
 
     nucleationRateMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
-    growthRateMassSource_ = 4*pi*alpha_*rho_*Q2_*rDot*rho_l;
+    growthRateMassSource_ = 4*pi*(alpha_*rho_*Q2_)*rDot*rho_l;
+    //growthRateMassSource_ = 4*pi*alpha_*(alpha_*rho_l + (1.0 - alpha_)*rho_g)*Q2_*rDot*rho_l;
 
     // Explicitly constrain w & Q0 in dry steam region
     forAll(alpha_, i)

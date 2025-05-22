@@ -45,13 +45,14 @@ condensationModel::New
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-    const saturationCurve& saturation,
-    const liquidProperties& liquidProps
+    const dictionary& dict
 )
 {
+    const dictionary& condensationDict = dict.subDict("condensation");
+
     word condensationModelName
     (
-        gasThermo.lookup("condensationModel")
+        condensationDict.lookup("condensationModel")
     );
 
     Info<< "Selecting condensation model "
@@ -69,7 +70,7 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, saturation, liquidProps));
+    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, condensationDict));
 }
 
 
@@ -81,8 +82,7 @@ condensationModel::condensationModel
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-    const saturationCurve& saturation,
-    const liquidProperties& liquidProps
+    const dictionary& dict
 )
 :
     mesh_(U.mesh()),
@@ -95,8 +95,10 @@ condensationModel::condensationModel
     liquidThermo_(liquidThermo),
     pGasProps_(gasProperties::New(gasThermo)),
     gasProps_(pGasProps_()),
-    liquidProps_(liquidProps),
-    saturation_(saturation),
+    pliquidProps_(liquidProperties::New(dict.lookupOrDefault<word>("liquidProperties", "H2O"))),
+    liquidProps_(pliquidProps_()),
+    pSaturation_(saturationCurve::New(dict)),
+    saturation_(pSaturation_()),
     Kn_(
         IOobject
         (
@@ -138,18 +140,64 @@ condensationModel::condensationModel
 
 tmp<volScalarField> condensationModel::L() const
 {
-    volScalarField Ts = saturation_.Ts(liquidThermo_.p());
+    volScalarField Ts = saturation_.Ts(gasThermo_.p());
 
-    const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
+    labelList cells = identity(mesh_.nCells());
+    scalarField pCells = gasThermo_.p().internalField();
+    scalarField TsCells = Ts.internalField();
+    scalarField rhosgCells = gasThermo_.rhoEoS(pCells, TsCells, cells);
+    scalarField rhoslCells = liquidThermo_.rhoEoS(pCells, TsCells, cells);
+    
+    volScalarField rhosg
+    (
+        IOobject
+        (
+            "rhosg",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        gasThermo_.rho()
+    );
+
+    volScalarField rhosl
+    (
+        IOobject
+        (
+            "rhosl",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        liquidThermo_.rho()
+    );
+
+    forAll(Ts, i)
+    {
+        rhosg[i] = rhosgCells[i];
+        rhosl[i] = rhoslCells[i];
+    }
+
+    return tmp<volScalarField>
+        (
+            new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + (1/rhosg - 1/rhosl)*Ts*saturation_.dpsdT(Ts))
+        );
+
+
+    /*const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
         { return gasProps_.rho(pp,TT); };
         
     volScalarField rhos = applyFunction2(f, liquidThermo_.p(), Ts, "rhos", dimDensity);
 
     return tmp<volScalarField>
         (
-	        //new volScalarField("L", saturation_.dpsdT(Ts)*Ts/rhos)
+            //new volScalarField("L", saturation_.dpsdT(Ts)*Ts/rhos)
             new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + saturation_.dpsdT(Ts)*Ts/rhos)
-        );
+        );*/
+
+    /////END
 
     /*const std::function<scalar(scalar)> f = [&](scalar TT)
         {return 461.52*(-2.7246e-2*sqr(TT) + 2*1.6853e-5*pow(TT,3) + 2.4576*TT + 6094.4642);};

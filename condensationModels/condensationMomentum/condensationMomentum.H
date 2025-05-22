@@ -102,8 +102,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
-        const saturationCurve& saturation,
-        const liquidProperties& liquidProps
+        const dictionary& dict
     );
     
     //- Destructor

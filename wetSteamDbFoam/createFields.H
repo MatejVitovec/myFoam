@@ -2,74 +2,55 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluidSystem(mesh);
+TwoFluidFoam::twoFluid fluid(mesh);
 
-twoFluidConservative& conservative = fluidSystem.conservative();
+twoFluidConservative& conservative = fluid.conservative();
 
 twoFluidConvectiveFlux twoFluidFlux
 (
-    fluidSystem.p(),
-    fluidSystem.alpha(),
-    fluidSystem.U1(),
-    fluidSystem.U2(),
-    fluidSystem.T1(),
-    fluidSystem.T2(),
-    fluidSystem.thermo1(),
-    fluidSystem.thermo2()
+    fluid.p(),
+    fluid.alpha(),
+    fluid.U1(),
+    fluid.U2(),
+    fluid.T1(),
+    fluid.T2(),
+    fluid.thermo1(),
+    fluid.thermo2()
 );
 
 
-volScalarField& p = fluidSystem.p();
-const volScalarField& alpha1 = fluidSystem.alpha1();
-volScalarField& alpha2 = fluidSystem.alpha2();
-volVectorField& U1 = fluidSystem.U1();
-volVectorField& U2 = fluidSystem.U2();
-volScalarField& T1 = fluidSystem.T1();
-volScalarField& T2 = fluidSystem.T2();
+volScalarField& p = fluid.p();
+const volScalarField& alpha1 = fluid.alpha1();
+volScalarField& alpha2 = fluid.alpha2();
+volVectorField& U1 = fluid.U1();
+volVectorField& U2 = fluid.U2();
+volScalarField& T1 = fluid.T1();
+volScalarField& T2 = fluid.T2();
 
-rhoThermo& thermo1 = fluidSystem.thermo1();
-rhoThermo& thermo2 = fluidSystem.thermo2();
-
-
+rhoThermo& thermo1 = fluid.thermo1();
+rhoThermo& thermo2 = fluid.thermo2();
 
 surfaceScalarField amaxSf
 (
     "amaxSf",
-    fluidSystem.amaxSf()
+    fluid.amaxSf()
 );
 
-surfaceScalarField alphaRhoPhi2
-(
-    IOobject
-    (
-        "alphaRhoPhi2",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    fvc::interpolate(thermo2.rho())*fvc::interpolate(alpha2)*fvc::flux(U2)
-);
+const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();
+const surfaceScalarField& alphaRhoPhi2 = twoFluidFlux.alphaRhoFlux2_pos();
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluidSystem);
+autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
 TwoFluidFoam::dragModel& drag = pDrag();
-
-autoPtr<liquidProperties> pLiquidProps = liquidProperties::New(fluidSystem.thermo2().lookupOrDefault<word>("liquidProperties", "H2O"));
-liquidProperties& liquidProps = pLiquidProps();
-autoPtr<saturationCurve> pSaturation = saturationCurve::New(fluidSystem);
-saturationCurve& saturation = pSaturation();
-
 
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
-    fluidSystem.alpha2(),
-    fluidSystem.thermo2().rho(),
-    fluidSystem.U2(),
+    fluid.alpha2(),
+    fluid.thermo2().rho(),
+    fluid.U2(),
     alphaRhoPhi2,
-    fluidSystem.thermo1(),
-    fluidSystem.thermo2(),
-    saturation,
-    liquidProps
+    fluid.thermo1(),
+    fluid.thermo2(),
+    fluid
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();
 
