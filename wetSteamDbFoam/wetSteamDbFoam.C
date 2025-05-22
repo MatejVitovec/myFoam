@@ -152,12 +152,12 @@ int main(int argc, char *argv[])
 
         condensation.correct();
 
-        /*if (runTime.timeIndex() > 7380)
+        if (runTime.timeIndex() > 7370)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
-        }*/
+        }
 
         Info <<endl;
 

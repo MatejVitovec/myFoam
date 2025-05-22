@@ -186,11 +186,12 @@ public:
     }
 
     tmp<volScalarField> w() const;
+    
 
     virtual tmp<volScalarField> dropletDiameter() const;
 
-    //Latent heat
-    tmp<volScalarField> L() const;
+
+    virtual tmp<volScalarField> L() const;
     
     // Check
     

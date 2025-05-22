@@ -93,19 +93,19 @@ condensationMomentum::condensationMomentum
     m1_(
         "m1",
         dimMass,
-        gasThermo_.lookupOrDefault<scalar>("molecularMass", 2.99046e-26)
+        dict.lookupOrDefault<scalar>("molecularMass", 2.99046e-26)
     ),
 
     beta_(
         "beta",
         dimless,
-        gasThermo_.lookupOrDefault<scalar>("surfaceTensionCorrection", 1.0)
+        dict.lookupOrDefault<scalar>("surfaceTensionCorrection", 1.0)
     ),
 
     Sct_(
         "Sct",
         dimless,
-        gasThermo_.lookupOrDefault<scalar>("SchmidtNumber", 0.9)
+        dict.lookupOrDefault<scalar>("SchmidtNumber", 0.9)
     ),
 
     rMin_(
@@ -117,21 +117,21 @@ condensationMomentum::condensationMomentum
 #if (OPENFOAM >= 1912)    
     kantrowitz_(
         "Kantrowitz",
-        gasThermo_,
+        dict,
         false
     ),
 
     courtney_(
         "Courtney",
-        gasThermo_,
+        dict,
         false
     )
 #else
     kantrowitz_(
-        gasThermo_.lookupOrDefault<bool>("Kantrowitz", false)
+        dict.lookupOrDefault<bool>("Kantrowitz", false)
     ),
     courtney_(
-        gasThermo_.lookupOrDefault<bool>("Courtney", false)
+        dict.lookupOrDefault<bool>("Courtney", false)
     )
 #endif
 

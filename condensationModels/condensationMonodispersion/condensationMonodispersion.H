@@ -62,10 +62,11 @@ private:
 
 protected:
     //- Number of droplets
-    volScalarField Q0_;
+    volScalarField n_;
 
-    //- Mass flux through gas-liquid interface [kg/(s m3)]
-    volScalarField mDotGL_;
+    volScalarField r_;
+
+    volScalarField L_;
     
     //- Mass of single molecule
     const dimensionedScalar m1_;
@@ -76,6 +77,8 @@ protected:
     //- Schmidt number (turbulent diffusion of w and Q0)
     const dimensionedScalar Sct_;
 
+    const dimensionedScalar rMin_;
+
 public:
 
     TypeName("monodispersion");
@@ -83,11 +86,15 @@ public:
     // Constructors
 
     //- Construct from components
-    condensationMonodispersion(
-            const volScalarField& rho,
-            const volVectorField& U,
-            const surfaceScalarField& phi,
-            wetSteamSystem& steam
+    condensationMonodispersion
+    (
+        volScalarField& alpha,
+        const volScalarField& rho,
+        const volVectorField& U,
+        const surfaceScalarField& alphaRhoPhi,
+        const fluidThermo& gasThermo,
+        const fluidThermo& liquidThermo,
+        const dictionary& dict
     );
     
     //- Destructor
@@ -98,7 +105,11 @@ public:
 
     //- Main update/correction routine
     virtual void correct();
-    
+
+    virtual tmp<volScalarField> dropletDiameter() const;
+
+    virtual tmp<volScalarField> L() const;
+
 };
 
 
