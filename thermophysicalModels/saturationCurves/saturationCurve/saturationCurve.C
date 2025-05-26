@@ -119,5 +119,11 @@ tmp<volScalarField> saturationCurve::esv(const volScalarField& T) const
     return applyFunction1(f, T, "eSatVapor", dimEnergy/dimMass);
 }
 
+tmp<volScalarField> saturationCurve::L(const volScalarField& T) const
+{
+    const std::function<scalar(scalar)> f = [&](scalar x){ return hsv(x) - hsl(x); };
+    return applyFunction1(f, T, "latentHeatFromSatC", dimEnergy/dimMass);
+}
+
 }
 

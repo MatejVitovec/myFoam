@@ -140,7 +140,8 @@ condensationModel::condensationModel
 
 tmp<volScalarField> condensationModel::L() const
 {
-    volScalarField Ts = saturation_.Ts(gasThermo_.p());
+    /*const volScalarField Ts = saturation_.Ts(gasThermo_.p());
+    const volScalarField p = gasThermo_.p();
 
     labelList cells = identity(mesh_.nCells());
     scalarField pCells = gasThermo_.p().internalField();
@@ -178,11 +179,14 @@ tmp<volScalarField> condensationModel::L() const
     {
         rhosg[i] = rhosgCells[i];
         rhosl[i] = rhoslCells[i];
-    }
+    }*/
+   
+    const volScalarField p = gasThermo_.p();
 
     return tmp<volScalarField>
         (
-            new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + (1/rhosg - 1/rhosl)*Ts*saturation_.dpsdT(Ts))
+            //new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + (1/rhosg - 1/rhosl)*Ts*saturation_.dpsdT(Ts))
+            new volScalarField("L", (gasThermo_.he() + p/gasThermo_.rho()) - saturation_.hsl(saturation_.Ts(p)))
         );
 
 

@@ -29,7 +29,6 @@ License
 #include "physicoChemicalConstants.H"
 #include "fundamentalConstants.H"
 #include "mathematicalConstants.H"
-#include "turbulentWetSteamModel.H"
 
 namespace Foam
 {
@@ -40,8 +39,8 @@ defineTypeNameAndDebug(condensationMonodispersion, 0);
 addToRunTimeSelectionTable(condensationModel, condensationMonodispersion, params);
 
 
-
-condensationMonodispersion::condensationMonodispersion(
+condensationMonodispersion::condensationMonodispersion
+(
     volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
@@ -49,7 +48,8 @@ condensationMonodispersion::condensationMonodispersion(
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
     const dictionary& dict
-) :
+)
+:
     condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, dict),
 
     n_(
@@ -71,9 +71,23 @@ condensationMonodispersion::condensationMonodispersion(
             U.mesh().time().timeName(),
             U.mesh(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
-        U.mesh()
+        U.mesh(),
+        dimensionedScalar("zeroLenght", dimLength, 0.0)
+    ),
+
+    L_(
+        IOobject
+        (
+            "latentHeat",
+            U.mesh().time().timeName(),
+            U.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        U.mesh(),
+        dimensionedScalar("zeroLenght", gasThermo_.he().dimensions(), 0.0)
     ),
 
     m1_(
@@ -92,6 +106,12 @@ condensationMonodispersion::condensationMonodispersion(
         "Sct",
         dimless,
         dict.lookupOrDefault<scalar>("SchmidtNumber", 0.9)
+    ),
+
+    rMin_(
+        "rMin",
+        dimLength,
+        dict.lookupOrDefault<scalar>("rMin", 1e-12)
     )
 {
 }
@@ -115,12 +135,17 @@ void condensationMonodispersion::correct()
     const volScalarField ps = saturation_.ps(T_g);
     const volScalarField Cp = gasThermo_.Cp();
 
-    const scalar rMin = 1e-12;
-
     // Droplet nucleation rate [m^-3 s^-1]
     volScalarField J
     (
-        IOobject("J", mesh.time()),
+        IOobject
+        (
+            "J",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
         mesh,
         dimensionedScalar("zero", dimless/dimTime/dimVolume, 0.0)
     );
@@ -128,7 +153,14 @@ void condensationMonodispersion::correct()
     // Droplet growth rate [m/s]
     volScalarField rDot
     (
-        IOobject("rDot", mesh.time()),
+        IOobject
+        (
+            "rDot",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
         mesh,
         dimensionedScalar("zero", dimLength/dimTime, 0.0)
     );
@@ -136,7 +168,14 @@ void condensationMonodispersion::correct()
     // Droplet critical radius [m]
     volScalarField rc
     (
-        IOobject("rc", mesh.time()),
+        IOobject
+        (
+            "rc",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
         mesh,
         dimensionedScalar("zero", dimLength, 0.0)
     );
@@ -152,22 +191,24 @@ void condensationMonodispersion::correct()
 
         // Prandtl number
         //scalar Pr = eta*Cp[i]/lambda_g;
-        scalar Pr = 0.0;
+        scalar Pr = 1.0;
 
         // Knudsen number
         scalar Kn = 0;
         
         // Average droplet radius
-        r[i] = 0;
-        if (alpha_[i] > 1e-22 && n_[i] > 0)
+        r_[i] = 0;
+        if (alpha_[i] > 1e-28 && n_[i] > 0)
         {
-            r[i] = pow((3*alpha_[i])/(4*n_[i]*pi), 1/3);
-            Kn = 1.5*eta*sqrt(Rg*T_g[i])/(2*r[i]*p[i]);
+            r_[i] = pow((3.0*alpha_[i])/(4*pi*rho_[i]*(n_[i] + SMALL)), 1.0/3.0);
+            Kn = 1.5*eta*sqrt(Rg*T_g[i])/(2*r_[i]*p[i]);
         }
+
+        Kn_[i] = Kn;
 
         if (T_g[i] >= Ts[i])    // Evaporation
         {
-            if (r[i] <= rMin)   // Complete evaporation
+            if (r_[i] <= rMin_.value())   // Complete evaporation
             {
                 n_[i] = 0;
                 J[i] = 0;
@@ -181,50 +222,74 @@ void condensationMonodispersion::correct()
         }
         else                    // Condensation (T < Ts)
         {
-            scalar sigma = liquidProps_.sigma(p[i], T_g[i]);
+            //scalar sigma = liquidProps_.sigma(p[i], T_g[i]);
+            const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
+            const scalar sigma = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
 
             scalar dH = gasProps_.Ha(p[i], T_g[i]) - gasProps_.Ha(ps[i], T_g[i]);
             scalar ds = gasProps_.S( p[i], T_g[i]) - gasProps_.S( ps[i], T_g[i]);
             scalar dG = dH - T_g[i]*ds;
             rc[i] = 2*sigma/(rho_l[i]*dG);
 
-            J[i] = sqrt(2*sigma[i]/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rho_l[i]*
-                exp(-beta_.value()*4*pi*sqr(rc[i])*sigma[i]/(3*kB*T_g[i]));
+            J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rho_l[i]*
+                exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T_g[i]));
 
-            if (r > rc[i])
+            if (r_[i] > rc[i])
+            //if (alpha_[i] > 1e-28)
             {
                 rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L_[i]));
             }
         }
+
+        //rDot[i] = 0;
     }
     
     {
-        fvScalarMatrix nEqn
+        /*fvScalarMatrix nEqn
         (
             fvm::ddt(alpha_, rho_, n_)
             + fvm::div(alphaRhoPhi_, n_)
             ==
-            alpha_*rho_*J
+            J
+        );*/
+
+        fvScalarMatrix nEqn
+        (
+            fvm::ddt(rho_, n_)
+            + fvm::div(alphaRhoPhi_, n_)
+            ==
+            J
         );
 
 	    nEqn.relax();
         nEqn.solve();
     }
 
-    r_ = pow((3*alpha_)/(4*n_*pi), 1/3);
+    //r_ = pow((3*alpha_)/(4*pi*(n_ + dimensionedScalar("smallN", dimensionSet(0, -3, 0, 0, 0, 0, 0), SMALL))), 1/3);
+    r_ = pow((3.0*alpha_)/(4*pi*rho_*(n_ + dimensionedScalar("smallN", dimensionSet(-1, 0, 0, 0, 0, 0, 0), 1))), 1.0/3.0);
 
     nucleationRateMassSource_ = 4.0/3.0*pi*pow3(rc)*J*rho_l;
-    growthRateMassSource_ = 4*pi*(alpha_*rho_*n_)*sqr(r_)*rDot*rho_l;
+    //growthRateMassSource_ = 4*pi*(alpha_*rho_*n_)*sqr(r_)*rDot*rho_l;
+    growthRateMassSource_ = 4*pi*rho_*n_*sqr(r_)*rDot*rho_l;
 
     // Explicitly constrain n in dry steam region
     forAll(alpha_, i)
     {
-        if (alpha_[i] <= 1e-24 && J[i] <= 0)
+        if (alpha_[i] <= 1e-29 && J[i] <= 0)
         {
             n_[i] = 0;
         }
         
         n_[i] = max(n_[i], 0);
+    }
+
+    if (mesh.time().outputTime() /*|| mesh.time().timeIndex() > 7300*/)
+    {
+        Ts.write();
+        J.write();
+        r_.write();
+        rc.write();
+        rDot.write();
     }
 }
 

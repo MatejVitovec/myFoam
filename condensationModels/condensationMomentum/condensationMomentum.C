@@ -41,6 +41,7 @@ namespace WetSteam
 defineTypeNameAndDebug(condensationMomentum, 0);
 addToRunTimeSelectionTable(condensationModel, condensationMomentum, params);
 
+
 condensationMomentum::condensationMomentum
 (
     volScalarField& alpha,
@@ -237,7 +238,7 @@ void condensationMomentum::correct()
 
         // Prandtl number
         scalar Pr = eta*Cp[i]/lambda_g;
-        Pr = 0.0;
+        Pr = 1.0;
             
         // Knudsen number
         scalar Kn = 0;

@@ -36,8 +36,17 @@ surfaceScalarField amaxSf
     fluid.amaxSf()
 );
 
-const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();
-const surfaceScalarField& alphaRhoPhi2 = twoFluidFlux.alphaRhoFlux2_pos();
+volScalarField rho
+(
+    "rho",
+    fluid.rho()
+);
+
+surfaceScalarField rhoMPhi2
+(
+    "rhoMPhi2",
+    linearInterpolate(rho*U2) & mesh.Sf()
+);
 
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
 TwoFluidFoam::dragModel& drag = pDrag();
@@ -47,7 +56,7 @@ autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::conde
     fluid.alpha2(),
     fluid.thermo2().rho(),
     fluid.U2(),
-    alphaRhoPhi2,
+    rhoMPhi2,
     fluid.thermo1(),
     fluid.thermo2(),
     fluid

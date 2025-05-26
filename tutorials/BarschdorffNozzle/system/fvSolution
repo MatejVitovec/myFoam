@@ -17,7 +17,6 @@ FoamFile
 
 solvers
 {
-
     "(Q.*)"
     {
         solver      smoothSolver;
@@ -28,6 +27,21 @@ solvers
     }
 
     "(Q.*)Final"
+    {
+        $U;
+        relTol 0.0;
+    }
+
+    n
+    {
+        solver      smoothSolver;
+        smoother    symGaussSeidel;
+        tolerance   1e-9;
+        relTol      1e-7;
+        minIter     1;
+    }
+
+    nFinal
     {
         $U;
         relTol 0.0;
@@ -44,7 +58,7 @@ PIMPLE
     consistent          yes;
     residualControl
     {
-        "(Q.*)" 
+        n 
         {
             tolerance   1.e-5;
             relTol      1.e-4;
@@ -57,6 +71,7 @@ relaxationFactors
     equations
     {
         "(Q.*).*"       0.5;
+	n       	0.5;
     }
 }
 

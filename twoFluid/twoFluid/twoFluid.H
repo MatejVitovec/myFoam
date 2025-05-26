@@ -333,6 +333,11 @@ public:
         return thermo2_;
     }
 
+    tmp<volScalarField> rho() const
+    {
+        return alpha1_*thermo1_.rho() + alpha2_*thermo2_.rho();
+    }
+
     const gasProperties& gasProps1() const
     {
         return gasProps1_;
@@ -356,6 +361,8 @@ public:
     void correct();
 
     void blendVanishingFluid();
+
+    void blendVanishingFluid(const volScalarField& T2blend);
 
     void bound();
 

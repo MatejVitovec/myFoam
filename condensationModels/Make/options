@@ -12,6 +12,7 @@ EXE_INC = \
     -I../thermophysicalModels/lnInclude \
     -I./condensationModel \
     -I./condensationMomentum \
+    -I./condensationMonodispersion \
     -I./../applyFunctions
 
 

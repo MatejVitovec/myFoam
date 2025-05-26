@@ -98,8 +98,8 @@ int main(int argc, char *argv[])
             volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
             volScalarField Ts = condensation.saturation().Ts(p);
-            volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) + 0.5*magSqr(U1);
-            volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) + 0.5*magSqr(U2);
+            volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
+            volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
 
             volVectorField dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
@@ -142,21 +142,42 @@ int main(int argc, char *argv[])
 
             fluid.correct();
 
-            fluid.blendVanishingFluid();
+            fluid.blendVanishingFluid(/*condensation.saturation().Ts(p)*/);
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             if(i == 2) fluid.correctInterfacialPressure();
             fluid.correctConservative();
         }
-        twoFluidFlux.computeFlux();
-
+        
+        rho = fluid.rho();
+        rhoMPhi2 = linearInterpolate(rho*U2) & mesh.Sf();
         condensation.correct();
 
-        if (runTime.timeIndex() > 7370)
+        /*if (runTime.timeIndex() > 7300)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
+        }*/
+
+        if (mesh.time().outputTime())
+        {
+            //volScalarField LfromSatC = condensation.saturation().L(condensation.saturation().Ts(p));
+
+            volScalarField LFromEnthalpy
+            (
+                IOobject
+                (
+                    "LFromEnthalpy",
+                    mesh.time().timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                (thermo1.he() + p/thermo1.rho()) - condensation.saturation().hsl(condensation.saturation().Ts(p))
+            );
+
+            LFromEnthalpy.write();
         }
 
         Info <<endl;

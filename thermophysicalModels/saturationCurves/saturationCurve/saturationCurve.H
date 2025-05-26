@@ -107,6 +107,8 @@ public:
 
     virtual scalar esv(scalar T) const = 0;
     virtual tmp<volScalarField> esv(const volScalarField& T) const;
+
+    virtual tmp<volScalarField> L(const volScalarField& T) const;
 };
 
 

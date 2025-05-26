@@ -77,6 +77,7 @@ protected:
     //- Schmidt number (turbulent diffusion of w and Q0)
     const dimensionedScalar Sct_;
 
+    
     const dimensionedScalar rMin_;
 
 public:

@@ -553,6 +553,47 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
     alpha1_ = 1.0 - alpha2_;
 }
 
+void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid(const volScalarField& T2blend)
+{
+        forAll(mesh_.cells(), celli)
+    {
+        const scalar alpha2 = alpha2_[celli];
+
+        if ((1.0 - alpha2) <= epsilonMin_)
+        {
+            alpha2_[celli] = 1.0 - epsilonMin_;
+            U1_[celli] = U2_[celli];
+            T1_[celli] = T2_[celli];
+        }
+        else if ((1.0 - alpha2) < epsilonMax_)
+        {
+            const scalar xi = ((1.0 - alpha2) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+            const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
+            
+            U1_[celli] = gFunc*U1_[celli] + (1.0 - gFunc)*U2_[celli];
+            T1_[celli] = gFunc*T1_[celli] + (1.0 - gFunc)*T2_[celli];
+        }
+        
+        if (alpha2 <= epsilonMin_)
+        {
+            alpha2_[celli] = epsilonMin_;
+            U2_[celli] = U1_[celli];
+            T2_[celli] = T2blend[celli];
+        }
+        else if (alpha2 < epsilonMax_)
+        {
+            const double xi = (alpha2 - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+            const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
+
+            U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
+            T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T2blend[celli];
+        }
+    }
+    
+    alpha1_ = 1.0 - alpha2_;
+}
+
+
 void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
 {
     p_.correctBoundaryConditions();

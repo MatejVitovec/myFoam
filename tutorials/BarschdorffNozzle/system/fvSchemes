@@ -34,6 +34,8 @@ divSchemes
     {
         "Q.*" upwind;
     };
+
+    div(rhoMPhi2,n)	Gauss upwind;
 }
 
 laplacianSchemes
@@ -46,7 +48,7 @@ interpolationSchemes
     default         linear;
 
     reconstruct(p)      linearUpwind  venkatakrishnan;
-    reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    reconstruct(alpha)  upwind;
     reconstruct(U.1)    linearUpwindV venkatakrishnan;
     reconstruct(U.2)    linearUpwindV venkatakrishnan;
     reconstruct(T.1)    linearUpwind  venkatakrishnan;

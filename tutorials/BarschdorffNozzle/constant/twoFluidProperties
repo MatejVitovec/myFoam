@@ -16,9 +16,9 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-epsilon         1.0e-24;
-epsilonMin      1.0e-25;
-epsilonMax      1.0e-22;
+epsilon         1.0e-29;
+epsilonMin      1.0e-34;
+epsilonMax      1.0e-26;
 
 drag
 {
@@ -27,7 +27,7 @@ drag
 
 condensation
 {
-    condensationModel momentum;
+    condensationModel monodispersion;
     saturationCurve IF97;
     liquidProperties H2O_IAPWS97reg1;
 
