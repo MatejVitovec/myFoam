@@ -51,6 +51,7 @@ License
 #include "constTransport.H"
 #include "sutherlandTransport.H"
 #include "IAPWSIF97Transport.H"
+#include "sutherlandPolynomialTransport.H"
 
 #include "icoPolynomial.H"
 #include "hPolynomialThermo.H"
@@ -124,6 +125,31 @@ makeThermos
     sensibleInternalEnergy,
     eConstThermo,
     IAPWSIF97reg1,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    sutherlandPolynomialTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    IAPWSIF97reg1,
+    specie
+);
+
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
+    sutherlandPolynomialTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    perfectGas,
     specie
 );
 

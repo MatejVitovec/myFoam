@@ -133,7 +133,11 @@ void condensationMonodispersion::correct()
 
     const volScalarField Ts = saturation_.Ts(p);
     const volScalarField ps = saturation_.ps(T_g);
-    const volScalarField Cp = gasThermo_.Cp();
+    const volScalarField Cp_g = gasThermo_.Cp();
+    const volScalarField mu_g = gasThermo_.mu();
+    const volScalarField kappa_g = gasThermo_.kappa();
+    
+    //const volScalarField Pr = mu_g*Cp_g/kappa_g;
 
     // Droplet nucleation rate [m^-3 s^-1]
     volScalarField J
@@ -182,15 +186,21 @@ void condensationMonodispersion::correct()
 
     L_ = condensationModel::L();
 
+    //r_ = pow((3.0*alpha_)/(4*pi*rho_*(n_ + SMALL)), 1.0/3.0)*pos(alpha_ - 1e-28)*pos(n_);
+    //Kn_ = 1.5*kappa_g*sqrt(Rg*T_g)/(2*r_*p)*pos(alpha_ - 1e-28)*pos(n_);
+
     forAll(J, i)
     {
         // Dynamic viscosity and thermal conductivity
-        scalar eta = 1.823e-6*sqrt(T_g[i])/(1 + 673.0/T_g[i]);
-        scalar lambda_g = 7.341e-3 - 1.013e-5*T_g[i] + 1.801e-7*sqr(T_g[i]) - 9.1e-11*pow3(T_g[i]);
+        //scalar eta = 1.823e-6*sqrt(T_g[i])/(1 + 673.0/T_g[i]);
+        //scalar lambda_g = 7.341e-3 - 1.013e-5*T_g[i] + 1.801e-7*sqr(T_g[i]) - 9.1e-11*pow3(T_g[i]);
+        scalar eta = mu_g[i];
+        scalar lambda_g = kappa_g[i];
+        
         //L[i] = p[i]*(T_g[i] - Ts[i]) + saturation_.dpsdT(Ts[i])*Ts[i]/gasProps_.rho(p[i], Ts[i]);
 
         // Prandtl number
-        //scalar Pr = eta*Cp[i]/lambda_g;
+        //scalar Pr = eta*Cp_g[i]/lambda_g;
         scalar Pr = 1.0;
 
         // Knudsen number
@@ -243,6 +253,8 @@ void condensationMonodispersion::correct()
 
         //rDot[i] = 0;
     }
+
+    /////////////////////////
     
     {
         /*fvScalarMatrix nEqn

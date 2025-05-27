@@ -23,6 +23,7 @@ EXE_INC = \
     -I./specie/equationOfState/IAPWSIF97reg1 \
     -I./thermo/IAPWSIF97meta \
     -I./transport/IAPWSIF97Transport \
+    -I./transport/sutherlandPolynomial \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \

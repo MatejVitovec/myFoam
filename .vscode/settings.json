@@ -189,7 +189,12 @@
         "boundMinMax.C": "cpp",
         "condensationMomentumRK.C": "cpp",
         "fvcFluxTemplates.C": "cpp",
-        "fvcFlux.C": "cpp"
+        "fvcFlux.C": "cpp",
+        "sutherlandPolynomial.C": "cpp",
+        "sutherlandPolynomialTransport.C": "cpp",
+        "noThermo.C": "cpp",
+        "liquidFilmThermo.C": "cpp",
+        "HrenyaSinclairConductivity.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

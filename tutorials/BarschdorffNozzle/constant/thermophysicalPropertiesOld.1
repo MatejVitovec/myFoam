@@ -31,14 +31,14 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   18.0153;
+        molWeight   18.21551552;
     }
     thermodynamics
     {
-        Cv          1387.481736;
+        Cv          1673.57;
         Hf          0;
-	    Tref        0;
-        Eref        1995917.326;
+        Tref        0;
+        Eref        1886950;
     }
     transport
     {
@@ -46,16 +46,5 @@ mixture
         Pr           0.72;
     }
 }
-
-saturationCurve IF97;
-
-condensationModel momentum;
-
-//surfaceTensionCorrection 1.194;
-Kantrowitz on;
-
-Courtney on;
-
-liquidProperties H2O_IAPWS97reg1;
 
 // ************************************************************************* //

@@ -46,6 +46,7 @@ License
 #include "constTransport.H"
 #include "sutherlandTransport.H"
 #include "IAPWSIF97Transport.H"
+#include "sutherlandPolynomialTransport.H"
 
 #include "hPolynomialThermo.H"
 #include "hTabulatedThermo.H"
@@ -81,6 +82,22 @@ makeGasProperties(
     sensibleInternalEnergy,
     eConstThermo,
     NASG,
+    specie
+);
+
+makeGasProperties(
+    sutherlandPolynomialTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    perfectGas,
+    specie
+);
+
+makeGasProperties(
+    sutherlandPolynomialTransport,
+    sensibleInternalEnergy,
+    IAPWSIF97metaThermo,
+    IAPWSIF97metaGas,
     specie
 );
 
