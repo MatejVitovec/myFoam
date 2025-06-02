@@ -91,6 +91,14 @@ int main(int argc, char *argv[])
 
         scalar coeff[3][3] = {{1.0, 0.0 , 1.0}, {3.0/4.0, 1.0/4.0, 1.0/4.0}, {1.0/3.0, 2.0/3.0, 2.0/3.0}};
 
+        volVectorField dragSource
+        (
+            "dragS",
+            drag.K(condensation.dropletDiameter())*(U1 - U2)
+        );
+
+        //volScalarField dragCoeff = drag.K(condensation.dropletDiameter());
+
         for (size_t i = 0; i < 3; i++)
         {
             twoFluidFlux.computeFlux();
@@ -101,7 +109,7 @@ int main(int argc, char *argv[])
             volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
             volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
 
-            volVectorField dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
+            dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
             volScalarField condensationMassSource = condensation.condensationRateMassSource();
             volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
@@ -142,7 +150,7 @@ int main(int argc, char *argv[])
 
             fluid.correct();
 
-            fluid.blendVanishingFluid(/*condensation.saturation().Ts(p)*/);
+            fluid.blendVanishingFluid(condensation.saturation().Ts(p));
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             if(i == 2) fluid.correctInterfacialPressure();
@@ -153,31 +161,16 @@ int main(int argc, char *argv[])
         rhoMPhi2 = linearInterpolate(rho*U2) & mesh.Sf();
         condensation.correct();
 
-        /*if (runTime.timeIndex() > 7300)
+        /*if (runTime.timeIndex() > 14900)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
         }*/
 
-        if (mesh.time().outputTime())
+        if (mesh.time().outputTime() /*|| mesh.time().timeIndex() > 14900*/)
         {
-            //volScalarField LfromSatC = condensation.saturation().L(condensation.saturation().Ts(p));
-
-            volScalarField LFromEnthalpy
-            (
-                IOobject
-                (
-                    "LFromEnthalpy",
-                    mesh.time().timeName(),
-                    mesh,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                ),
-                (thermo1.he() + p/thermo1.rho()) - condensation.saturation().hsl(condensation.saturation().Ts(p))
-            );
-
-            LFromEnthalpy.write();
+            dragSource.write();
         }
 
         Info <<endl;

@@ -42,10 +42,10 @@ vertices
 
 blocks
 (
-    hex (0 1 4 3 6 7 10 9)   (50 100 1)
+    hex (0 1 4 3 6 7 10 9)   (40 80 1)
     //simpleGrading (1 ((10 30 100) (80 40 1) (10 30 0.01)) 1)
     simpleGrading (1 1 1)
-    hex (1 2 5 4 7 8 11 10)  (100 100 1)
+    hex (1 2 5 4 7 8 11 10)  (200 80 1)
     //simpleGrading (1 ((10 30 100) (80 40 1) (10 30 0.01)) 1)
     simpleGrading (1 1 1)
 );

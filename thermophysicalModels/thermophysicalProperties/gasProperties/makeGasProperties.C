@@ -70,6 +70,14 @@ makeGasProperties(
 );
 
 makeGasProperties(
+    sutherlandTransport,
+    sensibleInternalEnergy,
+    eConstThermo,
+    perfectGas,
+    specie
+);
+
+makeGasProperties(
     constTransport,
     sensibleInternalEnergy,
     eConstThermo,

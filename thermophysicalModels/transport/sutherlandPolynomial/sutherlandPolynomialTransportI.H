@@ -143,7 +143,6 @@ inline Foam::scalar Foam::sutherlandPolynomialTransport<Thermo, PolySize>::alpha
     const scalar T
 ) const
 {
-
     return kappa(p, T)/this->Cp(p, T);
 }
 

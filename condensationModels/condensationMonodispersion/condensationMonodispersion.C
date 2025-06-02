@@ -111,7 +111,7 @@ condensationMonodispersion::condensationMonodispersion
     rMin_(
         "rMin",
         dimLength,
-        dict.lookupOrDefault<scalar>("rMin", 1e-12)
+        dict.lookupOrDefault<scalar>("rMin", 1e-9)
     )
 {
 }
@@ -121,21 +121,29 @@ void condensationMonodispersion::correct()
 {
     const scalar pi = constant::mathematical::pi;
     const scalar kB = constant::physicoChemical::k.value();
-    const scalar M  = constant::physicoChemical::NA.value()*m1_.value();
-    const scalar Rg = constant::physicoChemical::R.value()/M;
+    //const scalar M  = constant::physicoChemical::NA.value()*m1_.value();
+    //const scalar Rg = constant::physicoChemical::R.value()/M;
+
+    const dimensionedScalar Rg
+    (
+        "SpecificGasConstant",
+        dimEnergy/dimMass/dimTemperature,
+        constant::physicoChemical::R.value()/(constant::physicoChemical::NA.value()*m1_.value())
+    );
 
     const fvMesh& mesh = mesh_;
     const volScalarField& p = liquidThermo_.p();
-    const volScalarField& T_g = gasThermo_.T();     //gas temperature
-    const volScalarField& T_l = liquidThermo_.T();  //liquid temperature
-    const volScalarField& rho_l = liquidThermo_.rho();
+    const volScalarField& T_g = gasThermo_.T();
+    const volScalarField& T_l = liquidThermo_.T();
     const volScalarField& rho_g = gasThermo_.rho();
+    const volScalarField& rho_l = liquidThermo_.rho();
 
     const volScalarField Ts = saturation_.Ts(p);
     const volScalarField ps = saturation_.ps(T_g);
+    const volScalarField rhos_l = saturation_.rhosl(Ts);
     const volScalarField Cp_g = gasThermo_.Cp();
-    const volScalarField mu_g = gasThermo_.mu();
-    const volScalarField kappa_g = gasThermo_.kappa();
+    //const volScalarField mu_g = gasThermo_.mu();
+    //const volScalarField kappa_g = gasThermo_.kappa();
     
     //const volScalarField Pr = mu_g*Cp_g/kappa_g;
 
@@ -186,16 +194,22 @@ void condensationMonodispersion::correct()
 
     L_ = condensationModel::L();
 
-    //r_ = pow((3.0*alpha_)/(4*pi*rho_*(n_ + SMALL)), 1.0/3.0)*pos(alpha_ - 1e-28)*pos(n_);
-    //Kn_ = 1.5*kappa_g*sqrt(Rg*T_g)/(2*r_*p)*pos(alpha_ - 1e-28)*pos(n_);
+    /*r_ = max(pow((3.0*alpha_)/(4*pi*rho_*(n_ + dimensionedScalar("smallN", dimensionSet(-1, 0, 0, 0, 0, 0, 0), SMALL))), 1.0/3.0), rMin_);
+
+    volScalarField auxKn = 1.5*kappa_g*sqrt(Rg*T_g)/(2*r_*p);
+    
+    forAll(Kn_, i)
+    {
+        Kn_[i] = auxKn[i];
+    }*/
+
 
     forAll(J, i)
     {
         // Dynamic viscosity and thermal conductivity
-        //scalar eta = 1.823e-6*sqrt(T_g[i])/(1 + 673.0/T_g[i]);
-        //scalar lambda_g = 7.341e-3 - 1.013e-5*T_g[i] + 1.801e-7*sqr(T_g[i]) - 9.1e-11*pow3(T_g[i]);
-        scalar eta = mu_g[i];
-        scalar lambda_g = kappa_g[i];
+        scalar eta = 1.823e-6*sqrt(T_g[i])/(1 + 673.0/T_g[i]);
+        scalar lambda_g = 7.341e-3 - 1.013e-5*T_g[i] + 1.801e-7*sqr(T_g[i]) - 9.1e-11*pow3(T_g[i]);
+        //scalar lambda_g = kappa_g[i];
         
         //L[i] = p[i]*(T_g[i] - Ts[i]) + saturation_.dpsdT(Ts[i])*Ts[i]/gasProps_.rho(p[i], Ts[i]);
 
@@ -204,17 +218,24 @@ void condensationMonodispersion::correct()
         scalar Pr = 1.0;
 
         // Knudsen number
-        scalar Kn = 0;
+        scalar Kn = 0.0;
         
         // Average droplet radius
         r_[i] = 0;
         if (alpha_[i] > 1e-28 && n_[i] > 0)
         {
             r_[i] = pow((3.0*alpha_[i])/(4*pi*rho_[i]*(n_[i] + SMALL)), 1.0/3.0);
-            Kn = 1.5*eta*sqrt(Rg*T_g[i])/(2*r_[i]*p[i]);
+            Kn = 1.5*eta*sqrt(Rg.value()*T_g[i])/(2*r_[i]*p[i]);
         }
-
         Kn_[i] = Kn;
+
+        const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
+        const scalar sigma = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
+
+        scalar dH = gasProps_.Ha(p[i], T_g[i]) - gasProps_.Ha(ps[i], T_g[i]);
+        scalar ds = gasProps_.S( p[i], T_g[i]) - gasProps_.S( ps[i], T_g[i]);
+        scalar dG = dH - T_g[i]*ds;
+        rc[i] = 2*sigma/(rhos_l[i]*dG);
 
         if (T_g[i] >= Ts[i])    // Evaporation
         {
@@ -233,25 +254,23 @@ void condensationMonodispersion::correct()
         else                    // Condensation (T < Ts)
         {
             //scalar sigma = liquidProps_.sigma(p[i], T_g[i]);
-            const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
+            /*const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
             const scalar sigma = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
 
             scalar dH = gasProps_.Ha(p[i], T_g[i]) - gasProps_.Ha(ps[i], T_g[i]);
             scalar ds = gasProps_.S( p[i], T_g[i]) - gasProps_.S( ps[i], T_g[i]);
             scalar dG = dH - T_g[i]*ds;
-            rc[i] = 2*sigma/(rho_l[i]*dG);
+            rc[i] = 2*sigma/(rhos_l[i]*dG);*/
 
-            J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rho_l[i]*
+            J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rhos_l[i]*
                 exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T_g[i]));
 
-            if (r_[i] > rc[i])
-            //if (alpha_[i] > 1e-28)
+            //if (r_[i] > rc[i])
+            if (r_[i] > rMin_.value())
             {
                 rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L_[i]));
             }
         }
-
-        //rDot[i] = 0;
     }
 
     /////////////////////////
@@ -295,7 +314,9 @@ void condensationMonodispersion::correct()
         n_[i] = max(n_[i], 0);
     }
 
-    if (mesh.time().outputTime() /*|| mesh.time().timeIndex() > 7300*/)
+    //r_ = max(r_, rc);
+
+    if (mesh.time().outputTime() /*|| mesh.time().timeIndex() > 7150*/)
     {
         Ts.write();
         J.write();

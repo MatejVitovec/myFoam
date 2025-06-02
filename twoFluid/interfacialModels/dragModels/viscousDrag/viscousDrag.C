@@ -67,28 +67,13 @@ Foam::TwoFluidFoam::dragModels::viscousDrag::~viscousDrag()
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(const volScalarField& d) const
 {
-    /*const volScalarField& p = fluid_.p();
-    const volScalarField& T = fluid_.T2();
-    const volScalarField R = fluid_.thermo1().R();
-    const volScalarField mu = fluid_.thermo1().mu();
-    
-    volScalarField Kn = volScalarField //todo prez databazi z condensation
-    (
-        IOobject
-        (
-            "Kn",
-            fluid_.mesh().time().timeName(),
-            fluid_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        1.5*mu*sqrt(R*T)/(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20))*p)*pos(d)
-    );*/
+    //const volScalarField Kn = 1.5*fluid_.thermo1().mu()*sqrt(fluid_.thermo1().R()*fluid_.T1())/(d*fluid_.p());
 
     const objectRegistry& db = fluid_.mesh();
     const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
 
     return 1.0 + 2*Kn*(1.257 + 0.4*exp(-1.1)/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL)));
+    //return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))))*Kn*0.0;
 }
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdRe() const
@@ -114,13 +99,14 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdR
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Ki(const volScalarField& d) const
 {
-    return (9.0/2.0)*fluid_.thermo1().mu()/(sqr(d)*Cc(d))*mag(fluid_.U1() - fluid_.U2());
+    return ((9.0/2.0)*fluid_.thermo1().mu()/(sqr(d/2)*Cc(d)));//*pos(fluid_.alpha() - 1e-26);
+    //return 18*fluid_.thermo1().mu()/(sqr(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20)))*Cc(d));
 }
 
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::K(const volScalarField& d) const
 {
-    return Ki(d)*fluid_.alpha();
+    return Ki(d)*fluid_.alpha();//*pos(fluid_.alpha() - 1e-26);
 }
 
 
