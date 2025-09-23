@@ -18,6 +18,8 @@
     // Correct thermodynamics
     thermo.correct();
 
+    h = e + p/thermo.rho();
+
     // Update boundary field of rho
     //rho.boundaryFieldRef() = thermo.rho()().boundaryField();
     rho.boundaryFieldRef() = thermo.psi().boundaryField()*p.boundaryField();

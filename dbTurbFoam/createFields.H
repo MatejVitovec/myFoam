@@ -12,6 +12,8 @@ volScalarField& p = thermo.p();
 volScalarField& T = thermo.T();
 volScalarField& e = thermo.he();
 
+volScalarField h = e + p/thermo.rho();
+
 volVectorField U
 (
     IOobject
@@ -74,7 +76,8 @@ volScalarField a
         IOobject::NO_READ,
         IOobject::NO_WRITE
     ),
-    rho
+    mesh,
+    dimensionedScalar("a", dimVelocity, 0.0)
 );
 
 forAll(a, cell)
@@ -95,4 +98,18 @@ surfaceScalarField amaxSf
 (
     "amaxSf",
     mag(fvc::interpolate(U) & mesh.Sf()) + mesh.magSf()*fvc::interpolate(a)
+);
+
+const surfaceScalarField& phi = flux.rhoFlux();
+
+Info<< "Creating turbulence model\n" << endl;
+autoPtr<compressible::turbulenceModel> turbulence
+(
+    compressible::turbulenceModel::New
+    (
+        rho,
+        U,
+        phi,
+        thermo
+    )
 );

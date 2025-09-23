@@ -196,7 +196,8 @@
         "liquidFilmThermo.C": "cpp",
         "HrenyaSinclairConductivity.C": "cpp",
         "wetSteamLusgsFoam.C": "cpp",
-        "dbTurbFoam.C": "cpp"
+        "dbTurbFoam.C": "cpp",
+        "string.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

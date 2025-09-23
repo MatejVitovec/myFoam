@@ -46,7 +46,8 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(p, iF),
-    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    fluidName_(this->internalField().group()),
     pName_("p"),
     TName_(IOobject::groupName("T", fluidName_)),
     hasInletDir_(false),
@@ -93,7 +94,8 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(p, iF),
-    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    fluidName_(this->internalField().group()),
     pName_("p"),
     TName_(IOobject::groupName("T", fluidName_)),
     hasInletDir_(false),

@@ -44,8 +44,8 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
-    //fluidName_(this->internalField().name().component(1, ".")),
+    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    fluidName_(this->internalField().group()),
     pName_("p"),
     UName_(IOobject::groupName("U", fluidName_)),
     phiName_(IOobject::groupName("phi", fluidName_)),
@@ -79,7 +79,8 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 )
 :
     fixedValueFvPatchScalarField(p, iF, dict, false),
-    fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
+    fluidName_(this->internalField().group()),
     pName_("p"),
     UName_(IOobject::groupName("U", fluidName_)),
     phiName_(IOobject::groupName("phi", fluidName_)),

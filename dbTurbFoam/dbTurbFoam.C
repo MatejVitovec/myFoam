@@ -37,6 +37,7 @@ Description
 
 #include "fvCFD.H"
 #include "localEulerDdtScheme.H"
+#include "turbulentFluidThermoModel.H"
 #include "fvcSmooth.H"
 
 #include "convectiveFlux.H"
@@ -79,6 +80,7 @@ int main(int argc, char *argv[])
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info<< "Iteration = " << runTime.timeIndex() << nl << endl;
 
         dimensionedScalar dt = runTime.deltaT();
 
@@ -90,18 +92,22 @@ int main(int argc, char *argv[])
 
             rho = coeff[i][0]*rho.oldTime()
                 + coeff[i][1]*rho
-                - coeff[i][2]*dt*(fvc::div(flux.rhoFlux()));
+                - coeff[i][2]*dt*fvc::div(flux.rhoFlux());
 
-            U = coeff[i][0]*U.oldTime()
-              + coeff[i][1]*U
-              - coeff[i][2]*dt*fvc::div(flux.rhoUFlux());
-            
+            rhoU = coeff[i][0]*rhoU.oldTime()
+                 + coeff[i][1]*rhoU
+                 - coeff[i][2]*dt*(fvc::div(flux.rhoUFlux()) + fvc::div(turbulence->devRhoReff()));
+
             rhoE = coeff[i][0]*rhoE.oldTime()
                  + coeff[i][1]*rhoE
-                 - coeff[i][2]*dt*fvc::div(flux.rhoEFlux());
-            
+                 - coeff[i][2]*dt*(fvc::div(flux.rhoEFlux()) + fvc::div(turbulence->devRhoReff() & U)
+                                                             - fvc::laplacian(turbulence->alphaEff(), h));
+                                                             //- fvc::laplacian(turbulence->kappaEff(), T)); // za pokus to stoji lepsi konzistence s odvozenim
+
             #include "updateFields.H"
         }
+
+        turbulence->correct();
 
         runTime.write();
 
