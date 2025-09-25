@@ -197,7 +197,8 @@
         "HrenyaSinclairConductivity.C": "cpp",
         "wetSteamLusgsFoam.C": "cpp",
         "dbTurbFoam.C": "cpp",
-        "string.C": "cpp"
+        "string.C": "cpp",
+        "blockLusgsFoam.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
