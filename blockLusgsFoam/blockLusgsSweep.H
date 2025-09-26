@@ -14,6 +14,6 @@
     Field<vector> dRhoUStar(dRhoU);
     Field<scalar> dRhoEStar(dRhoE);
     
-    #include "forwardSweep.H"
-    #include "backwardSweep.H"
+    #include "blockForwardSweep.H"
+    #include "blockBackwardSweep.H"
 }

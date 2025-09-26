@@ -37,7 +37,7 @@
                     
                     rRho  += ac*dRho[nei]  - 0.5*(rho1*phi1 - rho[nei]*phi0); 
                     rRhoU += ac*dRhoU[nei] - 0.5*((rhoU1*phi1 - rhoU[nei]*phi0) + (p1 - p[nei])*Sf[faceI]);
-                    rRhoE += ac*dRhoE[nei] - 0.5 * ((rhoE1*phi1 + p1*phi1) - (rhoE[nei]*phi0 + p[nei]*phi0)); 
+                    rRhoE += ac*dRhoE[nei] - 0.5*((rhoE1*phi1 + p1*phi1) - (rhoE[nei]*phi0 + p[nei]*phi0)); 
                 }
             }
         }

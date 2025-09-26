@@ -8,7 +8,6 @@
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
         const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
-        const scalarField& pMeshPhi = meshPhi.boundaryField()[patchi];
 
         forAll(mesh.boundary()[patchi], facei)
         {

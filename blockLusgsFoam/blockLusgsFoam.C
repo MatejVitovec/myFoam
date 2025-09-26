@@ -75,10 +75,10 @@ int main(int argc, char *argv[])
         amaxSf = mag(fvc::interpolate(U) & mesh.Sf()) + mesh.magSf()*fvc::interpolate(a);
         #include "courantNo.H"
         #include "setDeltaT.H"
-        /*if (LTS)
-        {
-            #include "setRDeltaTau.H"
-        }*/
+        //if (LTS)
+        //{
+        //    #include "setRDeltaTau.H"
+        //}
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl;
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
                 initialRezRhoE = rezRhoE;
             }
 
-            #include "lusgsSweep.H"
+            #include "blockLusgsSweep.H"
 
             rho  += dRho;
             rhoU += dRhoU;
