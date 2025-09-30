@@ -9,7 +9,7 @@ EXE_INC = \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I../thermophysicalModels/lnInclude \
-    -I../lnInclude \
+    -I../bound/lnInclude \
     -ItwoFluid \
     -ItwoFluidConservative \
     -IconvectiveFlux \
@@ -17,9 +17,9 @@ EXE_INC = \
     -IconvectiveFlux/riemannSolver/advectionSplitting \
     -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
     -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
-    -I../twoFluid/interfacialModels/dragModels/dragModel \
-    -I../twoFluid/interfacialModels/dragModels/constantDrag \
-    -I../twoFluid/interfacialModels/dragModels/viscousDrag
+    -IinterfacialModels/dragModels/dragModel \
+    -IinterfacialModels/dragModels/constantDrag \
+    -IinterfacialModels/dragModels/viscousDrag
 
 
 EXE_LIBS = \

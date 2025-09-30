@@ -45,19 +45,19 @@ laplacianSchemes
 interpolationSchemes
 {
     default        linear;
-    //reconstruct(p)      upwind;
-    //reconstruct(alpha)  upwind;
-    //reconstruct(U.1)    upwind;
-    //reconstruct(U.2)    upwind;
-    //reconstruct(T.1)    upwind;
-    //reconstruct(T.2)    upwind;
+    reconstruct(p)      upwind;
+    reconstruct(alpha)  upwind;
+    reconstruct(U.1)    upwind;
+    reconstruct(U.2)    upwind;
+    reconstruct(T.1)    upwind;
+    reconstruct(T.2)    upwind;
 
-    reconstruct(p)      linearUpwind  venkatakrishnan;
-    reconstruct(alpha)  linearUpwind  venkatakrishnan;
-    reconstruct(U.1)    linearUpwindV venkatakrishnan;
-    reconstruct(U.2)    linearUpwindV venkatakrishnan;
-    reconstruct(T.1)    linearUpwind  venkatakrishnan;
-    reconstruct(T.2)    linearUpwind  venkatakrishnan;
+    //reconstruct(p)      linearUpwind  venkatakrishnan;
+    //reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    //reconstruct(U.1)    linearUpwindV venkatakrishnan;
+    //reconstruct(U.2)    linearUpwindV venkatakrishnan;
+    //reconstruct(T.1)    linearUpwind  venkatakrishnan;
+    //reconstruct(T.2)    linearUpwind  venkatakrishnan;
 }
 
 snGradSchemes

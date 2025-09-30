@@ -4,7 +4,7 @@
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-    forAll(mesh.boundary(), patchi)
+    /*forAll(mesh.boundary(), patchi)
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
         const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
@@ -15,7 +15,7 @@
             scalar ac = 0.5*lusgsOmega*(mag(U[ci] & pSf[facei]) + a[ci]*mag(pSf[facei]));
             D[ci] += ac;
         }
-    }
+    }*/
 
     forAll(mesh.cells(), cellI)
     {
@@ -35,10 +35,10 @@
                 label own = owner[faceI];
                 label nei = neighbour[faceI];
 
-                scalar ac = 0.5*lusgsOmega
+                /*scalar ac = 0.5*lusgsOmega
                     *(mag(U[cellI] & Sf[faceI]) + a[cellI]*magSf[faceI]);
 
-                D[cellI] += ac;
+                D[cellI] += ac;*/
 
                 // we use the mesh ordering property: own < nei
                 if (own != cellI)  // then data[own] belongs to lower triangle
@@ -46,7 +46,7 @@
                      // Calculate L based on A+
                     scalar ac = 0.5*lusgsOmega*( 
                         mag(U[own] & Sf[faceI]) + a[own]*magSf[faceI]);
-                    
+
                     scalar rho1  = rho[own]  + dRhoStar[own];
                     vector rhoU1 = rhoU[own] + dRhoUStar[own];
                     scalar rhoE1 = rhoE[own] + dRhoEStar[own];

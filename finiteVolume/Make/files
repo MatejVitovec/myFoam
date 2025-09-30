@@ -1,0 +1,6 @@
+fields/fvPatchFields/derived/isentropicInletVelocity/isentropicInletVelocityFvPatchVectorField.C
+fields/fvPatchFields/derived/isentropicTemperature/isentropicTemperatureFvPatchScalarField.C
+
+ddtSchemes = finiteVolume/finiteVolume/ddtSchemes
+
+LIB = $(FOAM_USER_LIBBIN)/libmyFiniteVolumeFoam

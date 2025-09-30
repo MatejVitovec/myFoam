@@ -1,12 +1,12 @@
-twoFluid/twoFluid.C
-twoFluidConservative/twoFluidConservative.C
-convectiveFlux/twoFluidConvectiveFlux.C
-convectiveFlux/riemannSolver/riemannSolver.C
-convectiveFlux/riemannSolver/advectionSplitting/advectionSplitting.C
-convectiveFlux/riemannSolver/advectionSplitting/slau2/slau2.C
-convectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
-interfacialModels/dragModels/dragModel/dragModel.C
-interfacialModels/dragModels/constantDrag/constantDrag.C
-interfacialModels/dragModels/viscousDrag/viscousDrag.C
+./twoFluid/twoFluid.C
+./twoFluidConservative/twoFluidConservative.C
+./convectiveFlux/twoFluidConvectiveFlux.C
+./convectiveFlux/riemannSolver/riemannSolver.C
+./convectiveFlux/riemannSolver/advectionSplitting/advectionSplitting.C
+./convectiveFlux/riemannSolver/advectionSplitting/slau2/slau2.C
+./convectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
+./interfacialModels/dragModels/dragModel/dragModel.C
+./interfacialModels/dragModels/constantDrag/constantDrag.C
+./interfacialModels/dragModels/viscousDrag/viscousDrag.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyTwoFluid

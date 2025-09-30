@@ -162,8 +162,15 @@
         
         dAlphaRho1[cellI]  = dAlphaRho1Star[cellI]  + rAlphaRho1  / D[cellI];
         dAlphaRho2[cellI]  = dAlphaRho2Star[cellI]  + rAlphaRho2  / D[cellI];
-        dAlphaRhoU1[cellI] = dAlphaRhoU1Star[cellI] + rAlphaRhoU1 / D[cellI];
-        dAlphaRhoU2[cellI] = dAlphaRhoU2Star[cellI] + rAlphaRhoU2 / D[cellI];
+
+        dAlphaRhoU1[cellI].x() = dAlphaRhoU1Star[cellI].x() + rAlphaRhoU1.x() / (D[cellI] + dragSourceD1[cellI].x());
+        dAlphaRhoU1[cellI].y() = dAlphaRhoU1Star[cellI].y() + rAlphaRhoU1.y() / (D[cellI] + dragSourceD1[cellI].y());
+        dAlphaRhoU1[cellI].z() = dAlphaRhoU1Star[cellI].z() + rAlphaRhoU1.z() / (D[cellI] + dragSourceD1[cellI].z());
+        
+        dAlphaRhoU2[cellI].x() = dAlphaRhoU2Star[cellI].x() + rAlphaRhoU2.x() / (D[cellI] + dragSourceD2[cellI].x());
+        dAlphaRhoU2[cellI].y() = dAlphaRhoU2Star[cellI].y() + rAlphaRhoU2.y() / (D[cellI] + dragSourceD2[cellI].y());
+        dAlphaRhoU2[cellI].z() = dAlphaRhoU2Star[cellI].z() + rAlphaRhoU2.z() / (D[cellI] + dragSourceD2[cellI].z());
+
         dEpsilon1[cellI]   = dEpsilon1Star[cellI]   + rEpsilon1   / D[cellI];
         dEpsilon2[cellI]   = dEpsilon2Star[cellI]   + rEpsilon2   / D[cellI];
     }

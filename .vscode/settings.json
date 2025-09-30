@@ -198,7 +198,11 @@
         "wetSteamLusgsFoam.C": "cpp",
         "dbTurbFoam.C": "cpp",
         "string.C": "cpp",
-        "blockLusgsFoam.C": "cpp"
+        "blockLusgsFoam.C": "cpp",
+        "mag.C": "cpp",
+        "dimensionSet.C": "cpp",
+        "FieldFieldFunctions.C": "cpp",
+        "dense": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,4 +1,5 @@
 EXE_INC = \
+    -I$(PWD) \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/finiteVolume/cfdTools \
     -I$(LIB_SRC)/meshTools/lnInclude \
@@ -10,8 +11,12 @@ EXE_INC = \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I../thermophysicalModels/lnInclude \
-    -I../twoFluid/lnInclude \
-    -I../condensationModels/lnInclude
+    -IconvectiveFlux \
+    -IconvectiveFlux/riemannSolver \
+    -IconvectiveFlux/riemannSolver/hllc \
+    -IconvectiveFlux/riemannSolver/advectionSplitting \
+    -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
+    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp
 
 EXE_LIBS = \
     -lfiniteVolume \
@@ -20,12 +25,9 @@ EXE_LIBS = \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
     -lspecie \
-    -lturbulenceModels \
-    -lcompressibleTurbulenceModels \
     -lthermoTools \
     -ldynamicFvMesh \
     -ltopoChangerFvMesh \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
-    -lmyTwoFluid \
-    -lmyCondensationModels
+    -lmyFoam

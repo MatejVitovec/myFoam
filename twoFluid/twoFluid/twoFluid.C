@@ -25,7 +25,7 @@ License
 
 #include "fvCFD.H"
 #include "twoFluid.H"
-#include "boundMinMax.H"
+//#include "boundMinMax.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -501,7 +501,7 @@ void Foam::TwoFluidFoam::twoFluid::correct()
 
 void Foam::TwoFluidFoam::twoFluid::bound()
 {
-    const dimensionedScalar pMin = dimensionedScalar("pMin", dimPressure, 1e3);
+    /*const dimensionedScalar pMin = dimensionedScalar("pMin", dimPressure, 1e3);
     const dimensionedScalar pMax = dimensionedScalar("pMax", dimPressure, 1e12);
     const dimensionedScalar T1Min = dimensionedScalar("T1Min", dimTemperature, 50);
     const dimensionedScalar T1Max = dimensionedScalar("T1Max", dimTemperature, 1000);
@@ -510,7 +510,7 @@ void Foam::TwoFluidFoam::twoFluid::bound()
 
     boundMinMax(p_, pMin, pMax);
     boundMinMax(T1_, T1Min, T1Max);
-    boundMinMax(T2_, T2Min, T2Max);
+    boundMinMax(T2_, T2Min, T2Max);*/
 }
 
 void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()

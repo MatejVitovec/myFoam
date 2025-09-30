@@ -1,9 +1,2 @@
-bocos = finiteVolume/fields/fvPatchFields/derived
-$(bocos)/isentropicInletVelocity/isentropicInletVelocityFvPatchVectorField.C
-$(bocos)/isentropicTemperature/isentropicTemperatureFvPatchScalarField.C
-
-bound/boundMinMax.C
-
-ddtSchemes = finiteVolume/finiteVolume/ddtSchemes
 
 LIB = $(FOAM_USER_LIBBIN)/libmyFoam

@@ -42,6 +42,8 @@ Author
 
 #include "convectiveFlux.H"
 
+//#include <eigen3/Eigen/Dense>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])

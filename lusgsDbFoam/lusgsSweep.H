@@ -10,16 +10,15 @@
     const volScalarField& a2 = fluid.a2();
 
     Field<scalar> D(mesh.V()/dt);
+
+    volVectorField::Internal diffU = fluid.U1() - fluid.U2();
+
+    Field<vector> dragSourceD1 = (dragK*2*cmptMag(diffU))/(fluid.alpha1()*fluid.thermo1().rho());
+    Field<vector> dragSourceD2 = (dragK*2*cmptMag(diffU))/(fluid.alpha2()*fluid.thermo2().rho());
     /*if (LTS)
     {
         D *= dt * trDeltaTau();
     }*/
-    
-    /*const volScalarField nuMax( "nuMax", max(
-        4./3.0 * turbulence->nuEff(),
-        thermo.Cp()/thermo.Cv() * turbulence->alphaEff()/rho
-    ));*/
-
 
     Field<scalar> dAlphaRho1Star (dAlphaRho1);
     Field<scalar> dAlphaRho2Star (dAlphaRho2);
