@@ -32,7 +32,7 @@ deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   2000;
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 20;
+maxCo 10;
 
 rDeltaTSmoothingCoeff 0.15;
 

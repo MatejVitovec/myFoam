@@ -4,80 +4,49 @@
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-    /*forAll(mesh.boundary(), patchi)
-    {
-        const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
-        const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
-
-        forAll(mesh.boundary()[patchi], facei)
-        {
-            label ci = pFaceCells[facei];
-            scalar ac = 0.5*lusgsOmega*(mag(U[ci] & pSf[facei]) + a[ci]*mag(pSf[facei]));
-            D[ci] += ac;
-        }
-    }*/
-
     forAll(mesh.cells(), cellI)
     {
-        const labelList& cellFaces = mesh.cells()[cellI];    // list of faces enclosing cellI
+        const labelList& cellFaces = mesh.cells()[cellI];
 
-        scalar rRho  = mesh.V()[cellI]/dt.value()*dRho[cellI];
-        vector rRhoU = mesh.V()[cellI]/dt.value()*dRhoU[cellI];
-        scalar rRhoE = mesh.V()[cellI]/dt.value()*dRhoE[cellI];
+        scalar rRho  = mesh.V()[cellI]/dt.value()*resRho[cellI];
+        vector rRhoU = mesh.V()[cellI]/dt.value()*resRhoU[cellI];
+        scalar rRhoE = mesh.V()[cellI]/dt.value()*resRhoE[cellI];
 
         forAll(cellFaces, i)
         {
-            label faceI = cellFaces[i];                      // face index
+            label faceI = cellFaces[i];
 
             if (mesh.isInternalFace(faceI))
             {
-                // Calculate D
                 label own = owner[faceI];
-                label nei = neighbour[faceI];
-
-                /*scalar ac = 0.5*lusgsOmega
-                    *(mag(U[cellI] & Sf[faceI]) + a[cellI]*magSf[faceI]);
-
-                D[cellI] += ac;*/
 
                 // we use the mesh ordering property: own < nei
                 if (own != cellI)  // then data[own] belongs to lower triangle
                 {
-                     // Calculate L based on A+
                     scalar ac = 0.5*lusgsOmega*( 
                         mag(U[own] & Sf[faceI]) + a[own]*magSf[faceI]);
 
-                    scalar rho1  = rho[own]  + dRhoStar[own];
-                    vector rhoU1 = rhoU[own] + dRhoUStar[own];
-                    scalar rhoE1 = rhoE[own] + dRhoEStar[own];
+                    scalar rhoE = rho[own]*(e[own] + 0.5*magSqr(U[own]));
 
                     scalar p1 = p[own] + dpStar[own];
                     vector U1 = U[own] + dUStar[own];
                     scalar T1 = T[own] + dTStar[own];
-
-                    scalar e11 = gasProps.Es(p1, T1);
                     
-                    scalar e1 = rhoE1/rho1 - 0.5*magSqr(rhoU1)/sqr(rho1);
-                    scalar p1 = gasProps.pEs(e1, rho1, p[own]);
+                    scalar rho1 = gasProps.rho(p1, T1);
+                    scalar rhoE1 = rho1*(gasProps.Es(p1, T1) + 0.5*magSqr(U1));
 
                     scalar phi0 = U[own] & Sf[faceI];
-                    scalar phi11 = U1[own] & Sf[faceI];
+                    scalar phi1 = U1 & Sf[faceI];
 
-                    scalar phi1 = (rhoU1/rho1) & Sf[faceI];
-
-                    rRho  += ac*dRhoStar[own]  + 0.5*(rho1*phi1 - rho[own]*phi0); 
-                    rRhoU += ac*dRhoUStar[own] + 0.5*((rhoU1*phi1 - rhoU[own]*phi0) + (p1 - p[own])*Sf[faceI]);
-                    rRhoE += ac*dRhoEStar[own] + 0.5*(rhoE1*phi1 + p1*phi1 - (rhoE[own]*phi0 + p[own]*phi0)); 
+                    rRho  += ac*(rho1 - rho[own])           - 0.5*(rho1*phi1 - rho[own]*phi0); 
+                    rRhoU += ac*(rho1*U1 - rho[own]*U[own]) - 0.5*((rho1*U1*phi1 - rho[own]*U[own]*phi0) + (p1 - p[own])*Sf[faceI]);
+                    rRhoE += ac*(rhoE1 - rhoE)         - 0.5*(rhoE1*phi1 + p1*phi1 - (rhoE*phi0 + p[own]*phi0)); 
                 }
             }
         }
 
-        dRhoStar[cellI]  = rRho  / D[cellI];
-        dRhoUStar[cellI] = rRhoU / D[cellI];
-        dRhoEStar[cellI] = rRhoE / D[cellI];
-
-        dpStar[cellI] = rRho  / D[cellI];
-        dUStar[cellI] = rRhoU / D[cellI];
-        dTStar[cellI] = rRhoE / D[cellI];
+        dpStar[cellI] = Dinv_p_rho[cellI]*rRho + (Dinv_p_rhoU[cellI] & rRhoU) + Dinv_p_rhoE[cellI]*rRhoE;
+        dUStar[cellI] = Dinv_U_rho[cellI]*rRho + (Dinv_U_rhoU[cellI] & rRhoU) + Dinv_U_rhoE[cellI]*rRhoE;
+        dTStar[cellI] = Dinv_T_rho[cellI]*rRho + (Dinv_T_rhoU[cellI] & rRhoU) + Dinv_T_rhoE[cellI]*rRhoE;
     }
 }

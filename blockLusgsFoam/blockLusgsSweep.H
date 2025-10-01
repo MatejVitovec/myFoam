@@ -18,27 +18,20 @@
     Field<vector> Dinv_T_rhoU(mesh.nCells());
     Field<scalar> Dinv_T_rhoE(mesh.nCells());
 
-    //Field<scalar> D(mesh.V()/dt);
-    /*if (LTS) {
-        D *= dt * trDeltaTau();
-    }*/
-
-    Field<scalar> a(mesh.cells().size());
+    
+    /*Field<scalar> a(mesh.cells().size());
     forAll (mesh.cells(), celli)
     {
         a[celli] = gasProps.c(p[celli], T[celli]);
-    }
+    }*/
 
-    //#include "calculateDinv.H"
+    #include "calculateDinv.H"
 
-    Field<scalar> dRhoStar (dRho);
-    Field<vector> dRhoUStar(dRhoU);
-    Field<scalar> dRhoEStar(dRhoE);
 
-    Field<scalar> dpStar(dp);
-    Field<vector> dUStar(dU);
-    Field<scalar> dTStar(dT);
-    
+    Field<scalar> dpStar(mesh.nCells());
+    Field<vector> dUStar(mesh.nCells());
+    Field<scalar> dTStar(mesh.nCells());
+
     #include "blockForwardSweep.H"
     #include "blockBackwardSweep.H"
 }

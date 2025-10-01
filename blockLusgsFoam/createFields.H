@@ -40,7 +40,7 @@ volScalarField rho
     thermo.rho()
 );
 
-volVectorField rhoU
+/*volVectorField rhoU
 (
     IOobject
     (
@@ -64,7 +64,7 @@ volScalarField rhoE
         IOobject::NO_WRITE
     ),
     rho*(e + 0.5*magSqr(U))
-);
+);*/
 
 volScalarField a
 (

@@ -43,6 +43,7 @@ Author
 #include "convectiveFlux.H"
 
 #include <eigen3/Eigen/Dense>
+#include <iostream>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -96,19 +97,19 @@ int main(int argc, char *argv[])
             
             dimensionedScalar dt = runTime.deltaT();
             
-            volScalarField dRho(
-                -dt*(fvc::ddt(rho) + fvc::div(flux.rhoFlux()))
+            volScalarField resRho(
+                -dt*(/*fvc::ddt(rho) +*/ fvc::div(flux.rhoFlux()))
             );
             
-            volVectorField dRhoU(
-                -dt*(fvc::ddt(rhoU) + fvc::div(flux.rhoUFlux()))
+            volVectorField resRhoU(
+                -dt*(/*fvc::ddt(rhoU) +*/ fvc::div(flux.rhoUFlux()))
             ); 
 
-            volScalarField dRhoE(
-                -dt*(fvc::ddt(rhoE) + fvc::div(flux.rhoEFlux()))
+            volScalarField resRhoE(
+                -dt*(/*fvc::ddt(rhoE) +*/ fvc::div(flux.rhoEFlux()))
             );
             
-            scalar rezRho  = fvc::domainIntegrate(mag(dRho) /dt).value();
+            /*scalar rezRho  = fvc::domainIntegrate(mag(dRho) /dt).value();
             scalar rezRhoU = fvc::domainIntegrate(mag(dRhoU)/dt).value();
             scalar rezRhoE = fvc::domainIntegrate(mag(dRhoE)/dt).value();
 
@@ -117,31 +118,36 @@ int main(int argc, char *argv[])
                 initialRezRho  = rezRho;
                 initialRezRhoU = rezRhoU;
                 initialRezRhoE = rezRhoE;
-            }
+            }*/
+
+            volScalarField dp(p);
+            volVectorField dU(U);
+            volScalarField dT(T);
 
             #include "blockLusgsSweep.H"
 
-            rho  += dRho;
-            rhoU += dRhoU;
-            rhoE += dRhoE;
+            p += dp;
+            U += dU;
+            T += dT;
             
             #include "updateFields.H"
 
-            scalar finalRezRho  = fvc::domainIntegrate(mag(dRho) /dt).value();
-            scalar finalRezRhoU = fvc::domainIntegrate(mag(dRhoU)/dt).value();
-            scalar finalRezRhoE = fvc::domainIntegrate(mag(dRhoE)/dt).value();
 
-            Info << "LUSGS:  Solving for rho,  " 
-                 << "Initial residual = " << rezRho << ", "
-                 << "Final residual = " << finalRezRho << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for rhoU, " 
-                 << "Initial residual = " << rezRhoU << ", "
-                 << "Final residual = " << finalRezRhoU << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for rhoE, " 
-                 << "Initial residual = " << rezRhoE << ", "
-                 << "Final residual = " << finalRezRhoE << ", No Iterations 1" << nl;
+            scalar finalRezp = fvc::domainIntegrate(mag(dp)/dt).value();
+            scalar finalRezU = fvc::domainIntegrate(mag(dU)/dt).value();
+            scalar finalRezT = fvc::domainIntegrate(mag(dT)/dt).value();
 
-            bool lastIteration = ( intIter + 1 == lusgsIntIters );
+            Info << "LUSGS:  Solving for p, " 
+                 //<< "Initial residual = " << rezRho << ", "
+                 << "Final residual = " << finalRezp << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for U, " 
+                 //<< "Initial residual = " << rezRhoU << ", "
+                 << "Final residual = " << finalRezU << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for T, " 
+                 //<< "Initial residual = " << rezRhoE << ", "
+                 << "Final residual = " << finalRezT << ", No Iterations 1" << nl;
+
+            /*bool lastIteration = ( intIter + 1 == lusgsIntIters );
 
             lastIteration = lastIteration || ( 
                 (finalRezRho  < lusgsRelTol*initialRezRho) && 
@@ -157,7 +163,7 @@ int main(int argc, char *argv[])
             {
                 Info << "LUSGS: converged in " << intIter + 1 << " iterations." << nl;
                 break;
-            }
+            }*/
         }
 	
         runTime.write();
