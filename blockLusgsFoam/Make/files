@@ -1,6 +1,3 @@
-convectiveFlux/convectiveFlux.C
-convectiveFlux/riemannSolver/riemannSolver.C
-convectiveFlux/riemannSolver/hllc/hllc.C
 
 blockLusgsFoam.C
 

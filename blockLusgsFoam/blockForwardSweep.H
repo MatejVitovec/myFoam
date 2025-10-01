@@ -25,7 +25,7 @@
         vector rRhoU = mesh.V()[cellI]/dt.value()*dRhoU[cellI];
         scalar rRhoE = mesh.V()[cellI]/dt.value()*dRhoE[cellI];
 
-        forAll(cellFaces,i)
+        forAll(cellFaces, i)
         {
             label faceI = cellFaces[i];                      // face index
 
@@ -50,11 +50,19 @@
                     scalar rho1  = rho[own]  + dRhoStar[own];
                     vector rhoU1 = rhoU[own] + dRhoUStar[own];
                     scalar rhoE1 = rhoE[own] + dRhoEStar[own];
+
+                    scalar p1 = p[own] + dpStar[own];
+                    vector U1 = U[own] + dUStar[own];
+                    scalar T1 = T[own] + dTStar[own];
+
+                    scalar e11 = gasProps.Es(p1, T1);
                     
                     scalar e1 = rhoE1/rho1 - 0.5*magSqr(rhoU1)/sqr(rho1);
                     scalar p1 = gasProps.pEs(e1, rho1, p[own]);
 
                     scalar phi0 = U[own] & Sf[faceI];
+                    scalar phi11 = U1[own] & Sf[faceI];
+
                     scalar phi1 = (rhoU1/rho1) & Sf[faceI];
 
                     rRho  += ac*dRhoStar[own]  + 0.5*(rho1*phi1 - rho[own]*phi0); 
@@ -67,5 +75,9 @@
         dRhoStar[cellI]  = rRho  / D[cellI];
         dRhoUStar[cellI] = rRhoU / D[cellI];
         dRhoEStar[cellI] = rRhoE / D[cellI];
+
+        dpStar[cellI] = rRho  / D[cellI];
+        dUStar[cellI] = rRhoU / D[cellI];
+        dTStar[cellI] = rRhoE / D[cellI];
     }
 }

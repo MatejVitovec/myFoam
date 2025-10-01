@@ -202,7 +202,8 @@
         "mag.C": "cpp",
         "dimensionSet.C": "cpp",
         "FieldFieldFunctions.C": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "core": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

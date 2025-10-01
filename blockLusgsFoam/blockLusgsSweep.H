@@ -1,27 +1,22 @@
 {
-    volScalarField::Internal D = mesh.V()/dt;
-
     const labelUList& owner = mesh.owner();
     const labelUList& neighbour = mesh.neighbour();
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
+    volScalarField::Internal D = mesh.V()/dt;
 
-    forAll(owner, faceI)
-    {
-        D[owner[faceI]]     += 0.5*lusgsOmega*(mag(U[owner[faceI]]     & Sf[faceI]) + a[owner[faceI]]    *magSf[faceI]);
-        D[neighbour[faceI]] += 0.5*lusgsOmega*(mag(U[neighbour[faceI]] & Sf[faceI]) + a[neighbour[faceI]]*magSf[faceI]);
-    }
-    forAll(mesh.boundary(), patchi)
-    {
-        const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
+    Field<scalar> Dinv_p_rho (mesh.nCells());
+    Field<vector> Dinv_p_rhoU(mesh.nCells());
+    Field<scalar> Dinv_p_rhoE(mesh.nCells());
 
-        forAll(mesh.boundary()[patchi], faceI)
-        {
-            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U[pFaceCells[faceI]] & Sf[faceI]) + a[pFaceCells[faceI]]*magSf[faceI]);
-        }
-    }
-
+    Field<vector> Dinv_U_rho (mesh.nCells());
+    Field<tensor> Dinv_U_rhoU(mesh.nCells());
+    Field<vector> Dinv_U_rhoE(mesh.nCells());
+    
+    Field<scalar> Dinv_T_rho (mesh.nCells());
+    Field<vector> Dinv_T_rhoU(mesh.nCells());
+    Field<scalar> Dinv_T_rhoE(mesh.nCells());
 
     //Field<scalar> D(mesh.V()/dt);
     /*if (LTS) {
@@ -34,9 +29,15 @@
         a[celli] = gasProps.c(p[celli], T[celli]);
     }
 
+    //#include "calculateDinv.H"
+
     Field<scalar> dRhoStar (dRho);
     Field<vector> dRhoUStar(dRhoU);
     Field<scalar> dRhoEStar(dRhoE);
+
+    Field<scalar> dpStar(dp);
+    Field<vector> dUStar(dU);
+    Field<scalar> dTStar(dT);
     
     #include "blockForwardSweep.H"
     #include "blockBackwardSweep.H"
