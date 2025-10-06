@@ -78,10 +78,7 @@ int main(int argc, char *argv[])
         amaxSf = mag(fvc::interpolate(U) & mesh.Sf()) + mesh.magSf()*fvc::interpolate(a);
         #include "courantNo.H"
         #include "setDeltaT.H"
-        //if (LTS)
-        //{
-        //    #include "setRDeltaTau.H"
-        //}
+
         ++runTime;
 
         Info<< "Time = " << runTime.timeName() << nl;
@@ -89,7 +86,7 @@ int main(int argc, char *argv[])
         
         scalar initialRezRho = 0, initialRezRhoU = 0, initialRezRhoE = 0;
 
-        for (int intIter = 0; intIter < lusgsIntIters; intIter++)
+        for (int intIter = 0; intIter < 1; intIter++)
         {
             Info << "LUSGS: iteration " << intIter + 1 << nl;
             
@@ -120,9 +117,51 @@ int main(int argc, char *argv[])
                 initialRezRhoE = rezRhoE;
             }*/
 
-            volScalarField dp(p);
-            volVectorField dU(U);
-            volScalarField dT(T);
+            //volScalarField dp(p);
+            //volVectorField dU(U);
+            //volScalarField dT(T);
+
+            volScalarField dp
+            (
+                IOobject
+                (
+                    "dp",
+                    runTime.timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh,
+                dimensionedScalar("dp", dimPressure, 0.0)
+            );
+
+            volVectorField dU
+            (
+                IOobject
+                (
+                    "dU",
+                    runTime.timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh,
+                dimensionedVector("dU", dimVelocity, vector(0, 0, 0))
+            );
+
+            volScalarField dT
+            (
+                IOobject
+                (
+                    "dT",
+                    runTime.timeName(),
+                    mesh,
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                mesh,
+                dimensionedScalar("dT", dimTemperature, 0.0)
+            );
 
             #include "blockLusgsSweep.H"
 
@@ -131,7 +170,6 @@ int main(int argc, char *argv[])
             T += dT;
             
             #include "updateFields.H"
-
 
             scalar finalRezp = fvc::domainIntegrate(mag(dp)/dt).value();
             scalar finalRezU = fvc::domainIntegrate(mag(dU)/dt).value();
@@ -169,6 +207,11 @@ int main(int argc, char *argv[])
         runTime.write();
 	
         Info << "ExecutionTime = " << runTime.elapsedCpuTime() << " s\n" << endl;
+
+        /*if(runTime.timeIndex() > 1000)
+        {
+            std::cin.ignore();
+        }*/
     }
 
     Info << "\n end \n";

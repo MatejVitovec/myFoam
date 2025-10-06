@@ -18,8 +18,8 @@
 
     forAll(mesh.cells(), celli)
     {
-        const scalar drhodp = gasProps.beta_T(p[celli], T[celli]);
-        const scalar drhodT = gasProps.beta_p(p[celli], T[celli]);
+        const scalar drhodp =  rho[celli]*gasProps.beta_T(p[celli], T[celli]);
+        const scalar drhodT = -rho[celli]*gasProps.beta_p(p[celli], T[celli]);
 
         const scalar H = e[celli] + 0.5*magSqr(U[celli]) + p[celli]/rho[celli];
 
@@ -39,14 +39,14 @@
         J(4, 3) += rho[celli]*U[celli].z();
 
         J(0, 4) += drhodT;
-        J(1, 4) += drhodT*U[celli].x();;
-        J(2, 4) += drhodT*U[celli].z();;
-        J(3, 4) += drhodT*U[celli].y();;
+        J(1, 4) += drhodT*U[celli].x();
+        J(2, 4) += drhodT*U[celli].y();
+        J(3, 4) += drhodT*U[celli].z();
         J(4, 4) += drhodT*H + rho[celli]*gasProps.Cp(p[celli], T[celli]);
 
         //Eigen::Matrix<double, 5, 5> A = ((D[celli]*Eigen::Matrix<double, 5, 5>::Identity())*J);
         
-        Eigen::Matrix<double, 5, 5> A = ((D[celli]*Eigen::Matrix<double, 5, 5>::Identity())*J).inverse();
+        Eigen::Matrix<double, 5, 5> A = (((D[celli]*Eigen::Matrix<double, 5, 5>::Identity())) * J).inverse();
         
         Dinv_p_rho[celli]  = A(0, 0);
         Dinv_p_rhoU[celli] = vector(A(0, 1), A(0, 2), A(0, 3));
@@ -59,5 +59,19 @@
         Dinv_T_rho[celli]  = A(4, 0);
         Dinv_T_rhoU[celli] = vector(A(4, 1), A(4, 2), A(4, 3));
         Dinv_T_rhoE[celli] = A(4, 4);
+
+
+        /*pCond_rho_p[celli]  = J(0, 0);
+        pCond_rho_U[celli] = vector(J(0, 1), J(0, 2), J(0, 3));
+        pCond_rho_T[celli] = J(0, 4);
+
+        pCond_rhoU_p[celli]  = vector(J(1, 0), J(2, 0), J(3, 0));
+        pCond_rhoU_U[celli] = tensor(J(1, 1), J(1, 2), J(1, 3), J(2, 1), J(2, 2), J(2, 3), J(3, 1), J(3, 2), J(3, 3));
+        pCond_rhoU_T[celli] = vector(J(1, 4), J(2, 4), J(3, 4));
+        
+        pCond_rhoE_p[celli]  = J(4, 0);
+        pCond_rhoE_U[celli] = vector(J(4, 1), J(4, 2), J(4, 3));
+        pCond_rhoE_T[celli] = J(4, 4);*/
+        
     }
 }

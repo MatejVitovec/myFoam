@@ -38,7 +38,7 @@ LUSGS
 {
     internalIterations 1;
     localTimestepping false;
-    omega 1.4;
+    omega 1.2;
 }
 
 

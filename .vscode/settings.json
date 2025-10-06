@@ -203,7 +203,8 @@
         "dimensionSet.C": "cpp",
         "FieldFieldFunctions.C": "cpp",
         "dense": "cpp",
-        "core": "cpp"
+        "core": "cpp",
+        "ReynoldsAnalogy.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

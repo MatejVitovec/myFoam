@@ -49,6 +49,8 @@ interpolationSchemes
 {
     default        linear;
     //reconstruct(p)      upwind;
+    //reconstruct(U)      upwind;
+    //reconstruct(T)      upwind;
 
     reconstruct(p)      linearUpwind  venkatakrishnan;
     reconstruct(U)      linearUpwindV venkatakrishnan;
