@@ -36,7 +36,7 @@ solvers
 
 LUSGS
 {
-    internalIterations 1;
+    internalIterations 3;
     localTimestepping false;
     omega 1.2;
 }

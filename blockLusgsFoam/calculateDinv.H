@@ -18,18 +18,13 @@
 
     forAll(mesh.cells(), celli)
     {
-        const scalar drhodp =  rho[celli]*gasProps.beta_T(p[celli], T[celli]);
-        const scalar drhodT = -rho[celli]*gasProps.beta_p(p[celli], T[celli]);
-
-        const scalar H = e[celli] + 0.5*magSqr(U[celli]) + p[celli]/rho[celli];
-
         Eigen::Matrix<double, 5, 5> J = Eigen::Matrix<double, 5, 5>::Zero();
 
-        J(0, 0) += drhodp;
-        J(1, 0) += drhodp*U[celli].x();
-        J(2, 0) += drhodp*U[celli].y();
-        J(3, 0) += drhodp*U[celli].z();
-        J(4, 0) += drhodp*H + drhodT*T[celli]/rho[celli];
+        J(0, 0) += drhodp[celli];
+        J(1, 0) += drhodp[celli]*U[celli].x();
+        J(2, 0) += drhodp[celli]*U[celli].y();
+        J(3, 0) += drhodp[celli]*U[celli].z();
+        J(4, 0) += drhodp[celli]*H[celli] + drhodT[celli]*T[celli]/rho[celli];
 
         J(1, 1) += rho[celli];
         J(4, 1) += rho[celli]*U[celli].x();
@@ -38,11 +33,11 @@
         J(3, 3) += rho[celli];
         J(4, 3) += rho[celli]*U[celli].z();
 
-        J(0, 4) += drhodT;
-        J(1, 4) += drhodT*U[celli].x();
-        J(2, 4) += drhodT*U[celli].y();
-        J(3, 4) += drhodT*U[celli].z();
-        J(4, 4) += drhodT*H + rho[celli]*gasProps.Cp(p[celli], T[celli]);
+        J(0, 4) += drhodT[celli];
+        J(1, 4) += drhodT[celli]*U[celli].x();
+        J(2, 4) += drhodT[celli]*U[celli].y();
+        J(3, 4) += drhodT[celli]*U[celli].z();
+        J(4, 4) += drhodT[celli]*H[celli] + rho[celli]*gasProps.Cp(p[celli], T[celli]);
 
         //Eigen::Matrix<double, 5, 5> A = ((D[celli]*Eigen::Matrix<double, 5, 5>::Identity())*J);
         

@@ -16,7 +16,18 @@
     Field<vector> Dinv_T_rhoU(mesh.nCells());
     Field<scalar> Dinv_T_rhoE(mesh.nCells());
 
-    
+    Field<scalar> drhodp(mesh.nCells());
+    Field<scalar> drhodT(mesh.nCells());
+    Field<scalar> H(mesh.nCells());
+    Field<scalar> cp(mesh.nCells());
+    forAll(a, celli)
+    {
+        drhodp[celli] =  rho[celli]*gasProps.beta_T(p[celli], T[celli]);
+        drhodT[celli] = -rho[celli]*gasProps.beta_p(p[celli], T[celli]);
+        H[celli]  = e[celli] + 0.5*magSqr(U[celli]) + p[celli]/rho[celli];
+        cp[celli] = gasProps.Cp(p[celli], T[celli]);
+    }      
+
     /*Field<scalar> pCond_rho_p(mesh.nCells());
     Field<vector> pCond_rho_U(mesh.nCells());
     Field<scalar> pCond_rho_T(mesh.nCells());
