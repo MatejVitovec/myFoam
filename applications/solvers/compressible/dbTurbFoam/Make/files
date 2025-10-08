@@ -1,0 +1,7 @@
+convectiveFlux/convectiveFlux.C
+convectiveFlux/riemannSolver/riemannSolver.C
+convectiveFlux/riemannSolver/hllc/hllc.C
+
+dbTurbFoam.C
+
+EXE = $(FOAM_USER_APPBIN)/dbTurbFoam

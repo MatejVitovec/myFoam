@@ -10,10 +10,8 @@ EXE_INC = \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I../thermophysicalModels/lnInclude \
-    -IconvectiveFlux \
-    -IconvectiveFlux/lnInclude \
-    -IconvectiveFlux/riemannSolver \
-    -IconvectiveFlux/riemannSolver/hllc
+    -I../twoFluid/lnInclude \
+    -I../condensationModels/lnInclude
 
 EXE_LIBS = \
     -lfiniteVolume \
@@ -29,4 +27,5 @@ EXE_LIBS = \
     -ltopoChangerFvMesh \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
-    -lmyFoam
+    -lmyTwoFluid \
+    -lmyCondensationModels

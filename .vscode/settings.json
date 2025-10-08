@@ -204,7 +204,8 @@
         "FieldFieldFunctions.C": "cpp",
         "dense": "cpp",
         "core": "cpp",
-        "ReynoldsAnalogy.C": "cpp"
+        "ReynoldsAnalogy.C": "cpp",
+        "lusgsTwoFluidFoam.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
