@@ -44,6 +44,8 @@ Description
 #include "twoFluidFvc.H"
 #include "dragModel.H"
 
+#include <eigen3/Eigen/Dense>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -100,11 +102,11 @@ int main(int argc, char *argv[])
             //volVectorField virtualMassTerm= -0.5*rho*alpha1*alpha2*(DU2 - DU1);
 
             volScalarField rezAlphaRho1(-dt*(
-                /*fvc::ddt(conservative.alphaRho1())*/ + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
+                /*fvc::ddt(conservative.alphaRho1()) +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
             ));
 
             volScalarField rezAlphaRho2(-dt*(
-                /*fvc::ddt(conservative.alphaRho2())*/ + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+                /*fvc::ddt(conservative.alphaRho2()) +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
             ));
 
             volVectorField rezAlphaRhoU1(-dt*(
@@ -139,7 +141,7 @@ int main(int argc, char *argv[])
                 //- ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
-#           include "lusgsSweep.H"
+            #include "lusgsSweep.H"
 
             p     += dp;
             alpha += dalpha;
@@ -147,7 +149,6 @@ int main(int argc, char *argv[])
             U2    += dU2;
             T1    += dT1;
             T2    += dT2;
-
 
             //fluid.correct();
             fluid.blendVanishingFluid();
@@ -165,8 +166,8 @@ int main(int argc, char *argv[])
             fluid.correctInterfacialPressure();
             //fluid.correctConservative();
 
-            DU1 = fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1);
-            DU2 = fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2);
+            //DU1 = fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1);
+            //DU2 = fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2);
 
             scalar finalRezp     = fvc::domainIntegrate(mag(dp)    /dt).value();
             scalar finalRezalpha = fvc::domainIntegrate(mag(dalpha)/dt).value();

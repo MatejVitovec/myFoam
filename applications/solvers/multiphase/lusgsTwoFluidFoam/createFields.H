@@ -22,6 +22,7 @@ twoFluidConvectiveFlux twoFluidFlux
 volScalarField& p = fluid.p();
 const volScalarField& alpha1 = fluid.alpha1();
 volScalarField& alpha2 = fluid.alpha2();
+volScalarField& alpha = alpha2;
 volVectorField& U1 = fluid.U1();
 volVectorField& U2 = fluid.U2();
 volScalarField& T1 = fluid.T1();
@@ -29,6 +30,12 @@ volScalarField& T2 = fluid.T2();
 
 rhoThermo& thermo1 = fluid.thermo1();
 rhoThermo& thermo2 = fluid.thermo2();
+
+const volScalarField& a1 = fluid.a1();
+const volScalarField& a2 = fluid.a2();
+
+const volScalarField& e1 = thermo1.he();
+const volScalarField& e2 = thermo2.he();
 
 surfaceScalarField amaxSf
 (
@@ -133,7 +140,7 @@ volScalarField dalpha
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("dalpha", dimLess, 0.0)
+    dimensionedScalar("dalpha", dimless, 0.0)
 );
 
 volVectorField dU1

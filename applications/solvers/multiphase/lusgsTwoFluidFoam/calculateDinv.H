@@ -27,68 +27,55 @@
     {
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
 
-        J(0, 0) += alpha1*drhodp1[celli];
-        J(1, 0) += alpha1*drhodp1[celli]*U1[celli].x();
-        J(2, 0) += alpha1*drhodp1[celli]*U1[celli].y();
-        J(3, 0) += alpha1*drhodp1[celli]*U1[celli].z();
-        J(4, 0) += alpha1*drhodp1[celli]*H1[celli] + alpha1*drhodT1[celli]*T1[celli]/rho1[celli];
-        J(5, 0) += alpha2*drhodp2[celli];
-        J(6, 0) += alpha2*drhodp2[celli]*U2[celli].x();
-        J(7, 0) += alpha2*drhodp2[celli]*U2[celli].y();
-        J(8, 0) += alpha2*drhodp2[celli]*U2[celli].z();
-        J(9, 0) += alpha2*drhodp2[celli]*H2[celli] + alpha2*drhodT2[celli]*T2[celli]/rho2[celli];
+        J(0, 0) += alpha1[celli]*drhodp1[celli];
+        J(1, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].x();
+        J(2, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].y();
+        J(3, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].z();
+        J(4, 0) += alpha1[celli]*drhodp1[celli]*H1[celli] + alpha1[celli]*drhodT1[celli]*T1[celli]/rho1[celli];
+        J(5, 0) += alpha2[celli]*drhodp2[celli];
+        J(6, 0) += alpha2[celli]*drhodp2[celli]*U2[celli].x();
+        J(7, 0) += alpha2[celli]*drhodp2[celli]*U2[celli].y();
+        J(8, 0) += alpha2[celli]*drhodp2[celli]*U2[celli].z();
+        J(9, 0) += alpha2[celli]*drhodp2[celli]*H2[celli] + alpha2[celli]*drhodT2[celli]*T2[celli]/rho2[celli];
 
         J(0, 1) += -rho1[celli];
         J(1, 1) += -rho1[celli]*U1[celli].x();
         J(2, 1) += -rho1[celli]*U1[celli].y();
         J(3, 1) += -rho1[celli]*U1[celli].z();
-        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli])) - pInt[celli];
-        J(5, 1) +=  rho2[celli]
+        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli])) - fluid.pInt()[celli];
+        J(5, 1) +=  rho2[celli];
         J(6, 1) +=  rho2[celli]*U2[celli].x();
         J(7, 1) +=  rho2[celli]*U2[celli].y();
         J(8, 1) +=  rho2[celli]*U2[celli].z();
-        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli])) + pInt[celli];
+        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli])) + fluid.pInt()[celli];
 
-        J(1, 2) += alpha1*rho1[celli];
-        J(4, 2) += alpha1*rho1[celli]*U1[celli].x();
-        J(2, 3) += alpha1*rho1[celli];
-        J(4, 3) += alpha1*rho1[celli]*U1[celli].y();
-        J(3, 4) += alpha1*rho1[celli];
-        J(4, 4) += alpha1*rho1[celli]*U1[celli].z();
+        J(1, 2) += alpha1[celli]*rho1[celli];
+        J(4, 2) += alpha1[celli]*rho1[celli]*U1[celli].x();
+        J(2, 3) += alpha1[celli]*rho1[celli];
+        J(4, 3) += alpha1[celli]*rho1[celli]*U1[celli].y();
+        J(3, 4) += alpha1[celli]*rho1[celli];
+        J(4, 4) += alpha1[celli]*rho1[celli]*U1[celli].z();
 
-        J(6, 5) += alpha2*rho2[celli];
-        J(9, 5) += alpha2*rho2[celli]*U2[celli].x();
-        J(7, 6) += alpha2*rho2[celli];
-        J(9, 6) += alpha2*rho2[celli]*U2[celli].y();
-        J(8, 7) += alpha2*rho2[celli];
-        J(9, 7) += alpha2*rho2[celli]*U2[celli].z();
+        J(6, 5) += alpha2[celli]*rho2[celli];
+        J(9, 5) += alpha2[celli]*rho2[celli]*U2[celli].x();
+        J(7, 6) += alpha2[celli]*rho2[celli];
+        J(9, 6) += alpha2[celli]*rho2[celli]*U2[celli].y();
+        J(8, 7) += alpha2[celli]*rho2[celli];
+        J(9, 7) += alpha2[celli]*rho2[celli]*U2[celli].z();
 
-        J(0, 8) += alpha1*drhodT1[celli];
-        J(1, 8) += alpha1*drhodT1[celli]*U1[celli].x();
-        J(2, 8) += alpha1*drhodT1[celli]*U1[celli].y();
-        J(3, 8) += alpha1*drhodT1[celli]*U1[celli].z();
-        J(4, 8) += alpha1*drhodT1[celli]*H1[celli] + alpha1*rho1[celli]*gasProps1.Cp(p[celli], T1[celli]);
+        J(0, 8) += alpha1[celli]*drhodT1[celli];
+        J(1, 8) += alpha1[celli]*drhodT1[celli]*U1[celli].x();
+        J(2, 8) += alpha1[celli]*drhodT1[celli]*U1[celli].y();
+        J(3, 8) += alpha1[celli]*drhodT1[celli]*U1[celli].z();
+        J(4, 8) += alpha1[celli]*drhodT1[celli]*H1[celli] + alpha1[celli]*rho1[celli]*gasProps1.Cp(p[celli], T1[celli]);
 
-        J(5, 9) += alpha2*drhodT2[celli];
-        J(6, 9) += alpha2*drhodT2[celli]*U2[celli].x();
-        J(7, 9) += alpha2*drhodT2[celli]*U2[celli].y();
-        J(8, 9) += alpha2*drhodT2[celli]*U2[celli].z();
-        J(9, 9) += alpha2*drhodT2[celli]*H2[celli] + alpha2*rho2[celli]*gasProps2.Cp(p[celli], T2[celli]);
+        J(5, 9) += alpha2[celli]*drhodT2[celli];
+        J(6, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].x();
+        J(7, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].y();
+        J(8, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].z();
+        J(9, 9) += alpha2[celli]*drhodT2[celli]*H2[celli] + alpha2[celli]*rho2[celli]*gasProps2.Cp(p[celli], T2[celli]);
         
         Eigen::Matrix<double, 10, 10> A = (((D[celli]*Eigen::Matrix<double, 10, 10>::Identity())) * J).inverse();
-        
-        Dinv_p_rho[celli]  = A(0, 0);
-        Dinv_p_rhoU[celli] = vector(A(0, 1), A(0, 2), A(0, 3));
-        Dinv_p_rhoE[celli] = A(0, 4);
-
-        Dinv_U_rho[celli]  = vector(A(1, 0), A(2, 0), A(3, 0));
-        Dinv_U_rhoU[celli] = tensor(A(1, 1), A(1, 2), A(1, 3), A(2, 1), A(2, 2), A(2, 3), A(3, 1), A(3, 2), A(3, 3));
-        Dinv_U_rhoE[celli] = vector(A(1, 4), A(2, 4), A(3, 4));
-        
-        Dinv_T_rho[celli]  = A(4, 0);
-        Dinv_T_rhoU[celli] = vector(A(4, 1), A(4, 2), A(4, 3));
-        Dinv_T_rhoE[celli] = A(4, 4);       
-
 
         Dinv_p_alphaRho1  = A(0, 0);
         Dinv_p_alphaRhoU1 = vector(A(0, 1), A(0, 2), A(0, 3));

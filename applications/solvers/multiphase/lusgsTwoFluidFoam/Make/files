@@ -1,4 +1,4 @@
 
-lusgsDbFoam.C
+lusgsTwoFluidFoam.C
 
-EXE = $(FOAM_USER_APPBIN)/lusgsDbFoam
+EXE = $(FOAM_USER_APPBIN)/lusgsTwoFluidFoam

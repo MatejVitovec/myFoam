@@ -4,6 +4,9 @@
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
+    const gasProperties& gasProps1 = fluid.gas1();
+    const gasProperties& gasProps2 = fluid.gas2();
+
     Field<scalar> drhodp1(mesh.nCells());
     Field<scalar> drhodp2(mesh.nCells());
     Field<scalar> drhodT1(mesh.nCells());
@@ -12,7 +15,7 @@
     Field<scalar> H2(mesh.nCells());
     Field<scalar> cp1(mesh.nCells());
     Field<scalar> cp2(mesh.nCells());
-    forAll(a, celli)
+    forAll(a1, celli)
     {
         drhodp1[celli] =  rho1[celli]*gasProps1.beta_T(p[celli], T1[celli]);
         drhodp2[celli] =  rho2[celli]*gasProps2.beta_T(p[celli], T2[celli]);
