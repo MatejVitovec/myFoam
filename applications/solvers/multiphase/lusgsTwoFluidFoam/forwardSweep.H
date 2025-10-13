@@ -17,51 +17,60 @@
 
         forAll(cellFaces,i)
         {
-            label faceI = cellFaces[i];
+            label facei = cellFaces[i];
 
-            if (mesh.isInternalFace(faceI))
+            if (mesh.isInternalFace(facei))
             {
-                label own = owner[faceI];
-                label nei = neighbour[faceI];
+                label own = owner[facei];
+                label nei = neighbour[facei];
 
                 if (own != celli)
                 {
                     /*const scalar ac = lusgsOmega*( 
-                        max(max(mag(U1[own] & Sf[faceI]) + a1[own]*magSf[faceI],
-                                mag(U2[own] & Sf[faceI]) + a2[own]*magSf[faceI]),
-                            max(mag(U1[nei] & Sf[faceI]) + a1[nei]*magSf[faceI],
-                                mag(U2[nei] & Sf[faceI]) + a2[nei]*magSf[faceI])));*/
+                        max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
+                                mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
+                            max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
+                                mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
 
                     const scalar ac = lusgsOmega*(
-                        max(mag(U1[own] & Sf[faceI]), mag(U2[own] & Sf[faceI])) 
-                      + max(a1[own] * magSf[faceI], a2[own] * magSf[faceI]));
-
-                    const scalar rhoE1 = rho1[own]*(e1[own] + 0.5*magSqr(U1[own]));
-                    const scalar rhoE2 = rho2[own]*(e2[own] + 0.5*magSqr(U2[own]));
+                        max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) 
+                      + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
                     
-                    const scalar p_1     = p[own]     + dpStar[own];
-                    const scalar alpha_1 = alpha[own] + dalphaStar[own];
-                    const vector U1_1    = U1[own]    + dU1Star[own];
-                    const vector U2_1    = U2[own]    + dU2Star[own];
-                    const scalar T1_1    = T1[own]    + dT1Star[own];
-                    const scalar T2_1    = T2[own]    + dT2Star[own];
+                    const scalar p_1    = p[own]     + dpStar[own];
+                    scalar alpha_1      = alpha[own] + dalphaStar[own];
+                    vector U1_1         = U1[own]    + dU1Star[own];
+                    vector U2_1         = U2[own]    + dU2Star[own];
+                    scalar T1_1         = T1[own]    + dT1Star[own];
+                    scalar T2_1         = T2[own]    + dT2Star[own];
 
+                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+
+                    const scalar alpha1_1 = 1.0 - alpha_1;
+                    const scalar alpha2_1 = alpha_1;
                     const scalar rho1_1 = gasProps1.rho(p_1, T1_1);
                     const scalar rho2_1 = gasProps2.rho(p_1, T2_1);
+
+                    const scalar E1   = e1[own]                 + 0.5*magSqr(U1[own]);
+                    const scalar E2   = e2[own]                 + 0.5*magSqr(U2[own]);
+                    const scalar E1_1 = gasProps1.Es(p_1, T1_1) + 0.5*magSqr(U1_1);
+                    const scalar E2_1 = gasProps2.Es(p_1, T2_1) + 0.5*magSqr(U2_1);
+
+                    /*const scalar rhoE1   = rho1[own]*(e1[own]              + 0.5*magSqr(U1[own]));
+                    const scalar rhoE2   = rho2[own]*(e2[own]              + 0.5*magSqr(U2[own]));
                     const scalar rhoE1_1 = rho1_1*(gasProps1.Es(p_1, T1_1) + 0.5*magSqr(U1_1));
-                    const scalar rhoE2_1 = rho2_1*(gasProps2.Es(p_1, T2_1) + 0.5*magSqr(U2_1));
+                    const scalar rhoE2_1 = rho2_1*(gasProps2.Es(p_1, T2_1) + 0.5*magSqr(U2_1));*/
 
-                    const scalar phi1 = U1[own] & Sf[faceI];
-                    const scalar phi2 = U2[own] & Sf[faceI];
-                    const scalar phi1_1 = U1_1 & Sf[faceI];
-                    const scalar phi2_1 = U2_1 & Sf[faceI];
+                    const scalar alphaRhoPhi1   = alpha1[own]*rho1[own]*(U1[own] & Sf[facei]);
+                    const scalar alphaRhoPhi2   = alpha2[own]*rho2[own]*(U2[own] & Sf[facei]);
+                    const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
+                    const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac*(rho1_1      - rho1[own])         + 0.5*(rho1_1*phi1_1 - rho1[own]*phi1);
-                    rAlphaRho2  += 0.5*ac*(rho2_1      - rho2[own])         + 0.5*(rho2_1*phi2_1 - rho2[own]*phi2); 
-                    rAlphaRhoU1 += 0.5*ac*(rho1_1*U1_1 - rho1[own]*U1[own]) + 0.5*((rho1_1*U1_1*phi1_1 - rho1[own]*U1[own]*phi1) + (p_1 - p[own])*Sf[faceI]);
-                    rAlphaRhoU2 += 0.5*ac*(rho2_1*U2_1 - rho2[own]*U2[own]) + 0.5*((rho2_1*U2_1*phi2_1 - rho2[own]*U2[own]*phi2) + (p_1 - p[own])*Sf[faceI]);
-                    rEpsilon1   += 0.5*ac*(rhoE1_1     - rhoE1)             + 0.5*(rhoE1_1*phi1_1 + p_1*phi1_1 - (rhoE1*phi1 + p[own]*phi1));
-                    rEpsilon2   += 0.5*ac*(rhoE2_1     - rhoE2)             + 0.5*(rhoE2_1*phi2_1 + p_1*phi2_1 - (rhoE2*phi2 + p[own]*phi2));
+                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                - alpha1[own]*rho1[own])           - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                - alpha2[own]*rho2[own])           - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1           - alpha1[own]*rho1[own]*U1[own])   - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1           - alpha2[own]*rho2[own]*U2[own])   - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)  - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
+                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)  - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
             }
         }

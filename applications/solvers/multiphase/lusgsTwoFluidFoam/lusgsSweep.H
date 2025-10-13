@@ -4,8 +4,8 @@
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-    const gasProperties& gasProps1 = fluid.gas1();
-    const gasProperties& gasProps2 = fluid.gas2();
+    const gasProperties& gasProps1 = fluid.gasProps1();
+    const gasProperties& gasProps2 = fluid.gasProps1();
 
     Field<scalar> drhodp1(mesh.nCells());
     Field<scalar> drhodp2(mesh.nCells());

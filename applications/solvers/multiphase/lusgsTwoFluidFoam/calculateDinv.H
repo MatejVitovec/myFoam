@@ -3,14 +3,14 @@
 
     forAll(owner, faceI)
     {
-        const scalar ac = 0.5*lusgsOmega*( 
-                            max(max(mag(U1[owner[faceI]] & Sf[faceI]) + a1[owner[faceI]]*magSf[faceI],
-                                mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]),
-                            max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI],
-                                mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI])));
+        /*const scalar ac = 0.5*lusgsOmega*( 
+                            max(max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],
+                                    mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]),
+                                max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI],
+                                    mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI])));*/
 
-        D[owner[faceI]]     += ac;
-        D[neighbour[faceI]] += ac;
+        D[owner[faceI]]     += 0.5*lusgsOmega*max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],     mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]);
+        D[neighbour[faceI]] += 0.5*lusgsOmega*max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI], mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
     }
     forAll(mesh.boundary(), patchi)
     {
@@ -18,8 +18,7 @@
 
         forAll(mesh.boundary()[patchi], faceI)
         {
-            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI],
-                                                        mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]));
+            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI], mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]));
         }
     }
 
@@ -95,14 +94,14 @@
         Dinv_U1_alphaRhoU1 = tensor(A(2, 1), A(2, 2), A(2, 3), A(3, 1), A(3, 2), A(3, 3), A(4, 1), A(4, 2), A(4, 3));
         Dinv_U1_alphaRhoE1 = vector(A(2, 4), A(3, 4), A(4, 4));
         Dinv_U1_alphaRho2  = vector(A(2, 5), A(3, 5), A(4, 5));
-        Dinv_U1_alphaRhoU2 = tensor(A(2, 6), A(2, 7), A(2, 7), A(3, 6), A(3, 7), A(3, 8), A(4, 6), A(4, 7), A(4, 8));
+        Dinv_U1_alphaRhoU2 = tensor(A(2, 6), A(2, 7), A(2, 8), A(3, 6), A(3, 7), A(3, 8), A(4, 6), A(4, 7), A(4, 8));
         Dinv_U1_alphaRhoE2 = vector(A(2, 9), A(3, 9), A(4, 9));
 
         Dinv_U2_alphaRho1  = vector(A(5, 0), A(6, 0), A(7, 0));
         Dinv_U2_alphaRhoU1 = tensor(A(5, 1), A(5, 2), A(5, 3), A(6, 1), A(6, 2), A(6, 3), A(7, 1), A(7, 2), A(7, 3));
         Dinv_U2_alphaRhoE1 = vector(A(5, 4), A(6, 4), A(7, 4));
         Dinv_U2_alphaRho2  = vector(A(5, 5), A(6, 5), A(7, 5));
-        Dinv_U2_alphaRhoU2 = tensor(A(5, 6), A(5, 7), A(5, 7), A(6, 6), A(6, 7), A(6, 8), A(7, 6), A(7, 7), A(7, 8));
+        Dinv_U2_alphaRhoU2 = tensor(A(5, 6), A(5, 7), A(5, 8), A(6, 6), A(6, 7), A(6, 8), A(7, 6), A(7, 7), A(7, 8));
         Dinv_U2_alphaRhoE2 = vector(A(5, 9), A(6, 9), A(7, 9));
         
         Dinv_T1_alphaRho1  = A(8, 0);
