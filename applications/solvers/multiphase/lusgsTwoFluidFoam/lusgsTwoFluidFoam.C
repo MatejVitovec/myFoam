@@ -176,12 +176,12 @@ int main(int argc, char *argv[])
             scalar finalRezT1    = fvc::domainIntegrate(mag(dT1)   /dt).value();
             scalar finalRezT2    = fvc::domainIntegrate(mag(dT2)   /dt).value();
 
-            Info << "LUSGS:  Solving for p,        " << "Final residual = " << finalRezp     << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alpha,    " << "Final residual = " << finalRezalpha << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alphaU1,  " << "Final residual = " << finalRezU1    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alphaU2,  " << "Final residual = " << finalRezU2    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for T1,       " << "Final residual = " << finalRezT1    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for T2,       " << "Final residual = " << finalRezT2    << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for p,     " << "Final residual = " << finalRezp     << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for alpha, " << "Final residual = " << finalRezalpha << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for U1,    " << "Final residual = " << finalRezU1    << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving forU2,     " << "Final residual = " << finalRezU2    << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for T1,    " << "Final residual = " << finalRezT1    << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for T2,    " << "Final residual = " << finalRezT2    << ", No Iterations 1" << nl;
 
             bool lastIteration = ((intIter + 1) == lusgsIntIters);
 

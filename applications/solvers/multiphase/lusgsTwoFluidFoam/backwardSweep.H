@@ -22,7 +22,7 @@
             if (mesh.isInternalFace(facei))
             {
                 label nei = neighbour[facei];
-                label own = owner[facei];
+                //label own = owner[facei];
 
                 if (nei != celli)
                 {
@@ -36,12 +36,12 @@
                         max(mag(U1[nei] & Sf[facei]), mag(U2[nei] & Sf[facei])) 
                       + max(a1[nei] * magSf[facei], a2[nei] * magSf[facei]));
 
-                    const scalar p_1     = p[nei]     + dp[nei];
-                    scalar alpha_1 = alpha[nei] + dalpha[nei];
-                    vector U1_1    = U1[nei]    + dU1[nei];
-                    vector U2_1    = U2[nei]    + dU2[nei];
-                    scalar T1_1    = T1[nei]    + dT1[nei];
-                    scalar T2_1    = T2[nei]    + dT2[nei];
+                    const scalar p_1 = p[nei]     + dp[nei];
+                    scalar alpha_1   = alpha[nei] + dalpha[nei];
+                    vector U1_1      = U1[nei]    + dU1[nei];
+                    vector U2_1      = U2[nei]    + dU2[nei];
+                    scalar T1_1      = T1[nei]    + dT1[nei];
+                    scalar T2_1      = T2[nei]    + dT2[nei];
 
                     fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
 
@@ -65,12 +65,12 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                    - alpha1[nei]*rho1[nei])         + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                    - alpha2[nei]*rho2[nei])         + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1               - alpha1[nei]*rho1[nei]*U1[nei]) + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1               - alpha2[nei]*rho2[nei]*U2[nei]) + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[nei]) - alpha1[nei]*(rho1[nei]*E1 + pInt[nei])) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)    - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
-                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[nei]) - alpha2[nei]*(rho2[nei]*E2 + pInt[nei])) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)    - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
+                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                    - alpha1[nei]*rho1[nei])                  + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                    - alpha2[nei]*rho2[nei])                  + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1               - alpha1[nei]*rho1[nei]*U1[nei])          + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1               - alpha2[nei]*rho2[nei]*U2[nei])          + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[nei]) - alpha1[nei]*(rho1[nei]*E1 + pInt[nei])) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
+                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[nei]) - alpha2[nei]*(rho2[nei]*E2 + pInt[nei])) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
             }
         }

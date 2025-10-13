@@ -22,7 +22,7 @@
             if (mesh.isInternalFace(facei))
             {
                 label own = owner[facei];
-                label nei = neighbour[facei];
+                //label nei = neighbour[facei];
 
                 if (own != celli)
                 {
@@ -36,12 +36,12 @@
                         max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) 
                       + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
                     
-                    const scalar p_1    = p[own]     + dpStar[own];
-                    scalar alpha_1      = alpha[own] + dalphaStar[own];
-                    vector U1_1         = U1[own]    + dU1Star[own];
-                    vector U2_1         = U2[own]    + dU2Star[own];
-                    scalar T1_1         = T1[own]    + dT1Star[own];
-                    scalar T2_1         = T2[own]    + dT2Star[own];
+                    const scalar p_1 = p[own]     + dpStar[own];
+                    scalar alpha_1   = alpha[own] + dalphaStar[own];
+                    vector U1_1      = U1[own]    + dU1Star[own];
+                    vector U2_1      = U2[own]    + dU2Star[own];
+                    scalar T1_1      = T1[own]    + dT1Star[own];
+                    scalar T2_1      = T2[own]    + dT2Star[own];
 
                     fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
 
@@ -65,12 +65,12 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                - alpha1[own]*rho1[own])           - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                - alpha2[own]*rho2[own])           - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1           - alpha1[own]*rho1[own]*U1[own])   - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1           - alpha2[own]*rho2[own]*U2[own])   - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)  - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
-                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)  - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
+                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                    - alpha1[own]*rho1[own])                  - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                    - alpha2[own]*rho2[own])                  - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1               - alpha1[own]*rho1[own]*U1[own])          - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
+                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
             }
         }
