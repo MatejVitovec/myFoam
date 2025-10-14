@@ -73,8 +73,8 @@
         J(7, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].y();
         J(8, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].z();
         J(9, 9) += alpha2[celli]*drhodT2[celli]*H2[celli] + alpha2[celli]*rho2[celli]*gasProps2.Cp(p[celli], T2[celli]);
-        
-        Eigen::Matrix<double, 10, 10> A = (((D[celli]*Eigen::Matrix<double, 10, 10>::Identity())) * J).inverse();
+
+        /*Eigen::Matrix<double, 10, 10> A = (((D[celli]*Eigen::Matrix<double, 10, 10>::Identity())) * J).inverse();
 
         Dinv_p_alphaRho1  = A(0, 0);
         Dinv_p_alphaRhoU1 = vector(A(0, 1), A(0, 2), A(0, 3));
@@ -116,6 +116,11 @@
         Dinv_T2_alphaRhoE1 = A(9, 4);
         Dinv_T2_alphaRho2  = A(9, 5);
         Dinv_T2_alphaRhoU2 = vector(A(9, 6), A(9, 7), A(9, 8));
-        Dinv_T2_alphaRhoE2 = A(9, 9);
+        Dinv_T2_alphaRhoE2 = A(9, 9);*/
+
+        Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
+        D_inv[celli].compute(A);
+        
+        //D_inv[celli].compute((D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J);
     }
 }

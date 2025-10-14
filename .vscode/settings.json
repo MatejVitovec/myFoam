@@ -205,7 +205,16 @@
         "dense": "cpp",
         "core": "cpp",
         "ReynoldsAnalogy.C": "cpp",
-        "lusgsTwoFluidFoam.C": "cpp"
+        "lusgsTwoFluidFoam.C": "cpp",
+        "twoFluidLocalMatrix.C": "cpp",
+        "twoFluidLusgsMatrix.C": "cpp",
+        "charconv": "cpp",
+        "source_location": "cpp",
+        "format": "cpp",
+        "shared_mutex": "cpp",
+        "span": "cpp",
+        "stdfloat": "cpp",
+        "text_encoding": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -1,0 +1,10 @@
+
+lusgsTwoFluidFoam:47840 terminated with signal 11 at PC=77f76fca49bc SP=7fff0d4b3ad0.  Backtrace:
+/lib/x86_64-linux-gnu/libc.so.6(pthread_kill+0x11c) [0x77f76fca49bc]
+/lib/x86_64-linux-gnu/libc.so.6(gsignal+0x1e) [0x77f76fc4579e]
+/lib/x86_64-linux-gnu/libc.so.6(+0x458d0) [0x77f76fc458d0]
+lusgsTwoFluidFoam(+0x2d344) [0x5f61fc09c344]
+lusgsTwoFluidFoam(+0x266d2) [0x5f61fc0956d2]
+/lib/x86_64-linux-gnu/libc.so.6(+0x2a578) [0x77f76fc2a578]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x8b) [0x77f76fc2a63b]
+lusgsTwoFluidFoam(+0x27b45) [0x5f61fc096b45]

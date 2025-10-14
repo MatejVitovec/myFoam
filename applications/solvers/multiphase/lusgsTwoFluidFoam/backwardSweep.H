@@ -43,7 +43,7 @@
                     scalar T1_1      = T1[nei]    + dT1[nei];
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
-                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
                     const scalar alpha2_1 = alpha_1;
@@ -75,11 +75,25 @@
             }
         }
 
-        dp[celli]     = dpStar[celli]     + Dinv_p_alphaRho1[celli]    *rAlphaRho1 + (Dinv_p_alphaRhoU1[celli]     & rAlphaRhoU1) + Dinv_p_alphaRhoE1[celli]    *rEpsilon1 + Dinv_p_alphaRho2[celli]    *rAlphaRho2 + (Dinv_p_alphaRhoU2[celli]     & rAlphaRhoU2) + Dinv_p_alphaRhoE2[celli]    *rEpsilon2;
+        /*dp[celli]     = dpStar[celli]     + Dinv_p_alphaRho1[celli]    *rAlphaRho1 + (Dinv_p_alphaRhoU1[celli]     & rAlphaRhoU1) + Dinv_p_alphaRhoE1[celli]    *rEpsilon1 + Dinv_p_alphaRho2[celli]    *rAlphaRho2 + (Dinv_p_alphaRhoU2[celli]     & rAlphaRhoU2) + Dinv_p_alphaRhoE2[celli]    *rEpsilon2;
         dalpha[celli] = dalphaStar[celli] + Dinv_alpha_alphaRho1[celli]*rAlphaRho1 + (Dinv_alpha_alphaRhoU1[celli] & rAlphaRhoU1) + Dinv_alpha_alphaRhoE1[celli]*rEpsilon1 + Dinv_alpha_alphaRho2[celli]*rAlphaRho2 + (Dinv_alpha_alphaRhoU2[celli] & rAlphaRhoU2) + Dinv_alpha_alphaRhoE2[celli]*rEpsilon2;
         dU1[celli]    = dU1Star[celli]    + Dinv_U1_alphaRho1[celli]   *rAlphaRho1 + (Dinv_U1_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_U1_alphaRhoE1[celli]   *rEpsilon1 + Dinv_U1_alphaRho2[celli]   *rAlphaRho2 + (Dinv_U1_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_U1_alphaRhoE2[celli]   *rEpsilon2;
         dU2[celli]    = dU2Star[celli]    + Dinv_U2_alphaRho1[celli]   *rAlphaRho1 + (Dinv_U2_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_U2_alphaRhoE1[celli]   *rEpsilon1 + Dinv_U2_alphaRho2[celli]   *rAlphaRho2 + (Dinv_U2_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_U2_alphaRhoE2[celli]   *rEpsilon2;
         dT1[celli]    = dT1Star[celli]    + Dinv_T1_alphaRho1[celli]   *rAlphaRho1 + (Dinv_T1_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_T1_alphaRhoE1[celli]   *rEpsilon1 + Dinv_T1_alphaRho2[celli]   *rAlphaRho2 + (Dinv_T1_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_T1_alphaRhoE2[celli]   *rEpsilon2;
-        dT2[celli]    = dT2Star[celli]    + Dinv_T2_alphaRho1[celli]   *rAlphaRho1 + (Dinv_T2_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_T2_alphaRhoE1[celli]   *rEpsilon1 + Dinv_T2_alphaRho2[celli]   *rAlphaRho2 + (Dinv_T2_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_T2_alphaRhoE2[celli]   *rEpsilon2;
+        dT2[celli]    = dT2Star[celli]    + Dinv_T2_alphaRho1[celli]   *rAlphaRho1 + (Dinv_T2_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_T2_alphaRhoE1[celli]   *rEpsilon1 + Dinv_T2_alphaRho2[celli]   *rAlphaRho2 + (Dinv_T2_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_T2_alphaRhoE2[celli]   *rEpsilon2;*/
+
+        //Eigen::Vector<double,10> dState = D_inv[celli].solve((Eigen::Vector<double,10>() << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2).finished());
+        
+        Eigen::Vector<double,10> b;
+        b << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2;
+
+        Eigen::Vector<double,10> dState = D_inv[celli].solve(b);
+
+        dp[celli]     = dpStar[celli]     + dState(0);
+        dalpha[celli] = dalphaStar[celli] + dState(1);
+        dU1[celli]    = dU1Star[celli]    + vector(dState(2), dState(3), dState(4));
+        dU2[celli]    = dU2Star[celli]    + vector(dState(5), dState(6), dState(7));
+        dT1[celli]    = dT1Star[celli]    + dState(8);
+        dT2[celli]    = dT2Star[celli]    + dState(9);
     }
 }

@@ -27,7 +27,7 @@
         cp2[celli] = gasProps2.Cp(p[celli], T2[celli]);
     }
 
-    Field<scalar> Dinv_p_alphaRho1 (mesh.nCells());
+    /*Field<scalar> Dinv_p_alphaRho1 (mesh.nCells());
     Field<vector> Dinv_p_alphaRhoU1(mesh.nCells());
     Field<scalar> Dinv_p_alphaRhoE1(mesh.nCells());
     Field<scalar> Dinv_p_alphaRho2 (mesh.nCells());
@@ -67,7 +67,9 @@
     Field<scalar> Dinv_T2_alphaRhoE1(mesh.nCells());
     Field<scalar> Dinv_T2_alphaRho2 (mesh.nCells());
     Field<vector> Dinv_T2_alphaRhoU2(mesh.nCells());
-    Field<scalar> Dinv_T2_alphaRhoE2(mesh.nCells());
+    Field<scalar> Dinv_T2_alphaRhoE2(mesh.nCells());*/
+
+    std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
     
     #include "calculateDinv.H"
 
