@@ -5,7 +5,7 @@
     const surfaceScalarField& magSf = mesh.magSf();
 
     const gasProperties& gasProps1 = fluid.gasProps1();
-    const gasProperties& gasProps2 = fluid.gasProps1();
+    const gasProperties& gasProps2 = fluid.gasProps2();
 
     Field<scalar> drhodp1(mesh.nCells());
     Field<scalar> drhodp2(mesh.nCells());
@@ -69,7 +69,8 @@
     Field<vector> Dinv_T2_alphaRhoU2(mesh.nCells());
     Field<scalar> Dinv_T2_alphaRhoE2(mesh.nCells());*/
 
-    std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+    //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+    std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<long double,10,10>>> D_inv(mesh.nCells()); 
     
     #include "calculateDinv.H"
 

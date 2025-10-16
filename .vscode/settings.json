@@ -214,7 +214,8 @@
         "shared_mutex": "cpp",
         "span": "cpp",
         "stdfloat": "cpp",
-        "text_encoding": "cpp"
+        "text_encoding": "cpp",
+        "Constant.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

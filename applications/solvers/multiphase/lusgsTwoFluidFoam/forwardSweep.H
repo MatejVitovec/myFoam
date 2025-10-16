@@ -32,9 +32,10 @@
                             max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
                                 mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
 
-                    const scalar ac = lusgsOmega*(
-                        max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) 
-                      + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
+                    //const scalar ac = lusgsOmega*(max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
+
+                    const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
+                    const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
                     
                     const scalar p_1 = p[own]     + dpStar[own];
                     scalar alpha_1   = alpha[own] + dalphaStar[own];
@@ -65,12 +66,12 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac*(alpha1_1*rho1_1                    - alpha1[own]*rho1[own])                  - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac*(alpha2_1*rho2_1                    - alpha2[own]*rho2[own])                  - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac*(alpha1_1*rho1_1*U1_1               - alpha1[own]*rho1[own]*U1[own])          - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
-                    rEpsilon2   += 0.5*ac*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
+                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1                    - alpha1[own]*rho1[own])                  - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1                    - alpha2[own]*rho2[own])                  - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1               - alpha1[own]*rho1[own]*U1[own])          - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
+                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
             }
         }
@@ -82,11 +83,11 @@
         dT1Star[celli]    = Dinv_T1_alphaRho1[celli]   *rAlphaRho1 + (Dinv_T1_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_T1_alphaRhoE1[celli]   *rEpsilon1 + Dinv_T1_alphaRho2[celli]   *rAlphaRho2 + (Dinv_T1_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_T1_alphaRhoE2[celli]   *rEpsilon2;
         dT2Star[celli]    = Dinv_T2_alphaRho1[celli]   *rAlphaRho1 + (Dinv_T2_alphaRhoU1[celli]    & rAlphaRhoU1) + Dinv_T2_alphaRhoE1[celli]   *rEpsilon1 + Dinv_T2_alphaRho2[celli]   *rAlphaRho2 + (Dinv_T2_alphaRhoU2[celli]    & rAlphaRhoU2) + Dinv_T2_alphaRhoE2[celli]   *rEpsilon2;*/
     
-        Eigen::Vector<double,10> b;
+        Eigen::Vector<long double,10> b;
         b << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2;
 
         //Eigen::Vector<double,10> starState = D_inv[celli].solve((Eigen::Vector<double,10>() << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2).finished());
-        Eigen::Vector<double,10> starState = D_inv[celli].solve(b);
+        Eigen::Vector<long double,10> starState = D_inv[celli].solve(b);
 
         dpStar[celli]     = starState(0);
         dalphaStar[celli] = starState(1);
@@ -94,6 +95,8 @@
         dU2Star[celli]    = vector(starState(5), starState(6), starState(7));
         dT1Star[celli]    = starState(8);
         dT2Star[celli]    = starState(9);
+
+        //std::cin.ignore();
 
         //std::cout << starState << std::endl << std::endl;
 

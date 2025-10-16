@@ -1,5 +1,8 @@
 {
-    volScalarField::Internal D = mesh.V()/dt;
+    //volScalarField::Internal D = mesh.V()/dt;
+
+    volScalarField::Internal D1 = mesh.V()/dt;
+    volScalarField::Internal D2 = mesh.V()/dt;
 
     forAll(owner, faceI)
     {
@@ -9,8 +12,13 @@
                                 max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI],
                                     mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI])));*/
 
-        D[owner[faceI]]     += 0.5*lusgsOmega*max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],     mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]);
-        D[neighbour[faceI]] += 0.5*lusgsOmega*max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI], mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
+        //D[owner[faceI]]     += 0.5*lusgsOmega*max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],     mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]);
+        //D[neighbour[faceI]] += 0.5*lusgsOmega*max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI], mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
+
+        D1[owner[faceI]]     += 0.5*lusgsOmega*(mag(U1[owner[faceI]]     & Sf[faceI]) + a1[owner[faceI]]    *magSf[faceI]);
+        D2[owner[faceI]]     += 0.5*lusgsOmega*(mag(U2[owner[faceI]]     & Sf[faceI]) + a2[owner[faceI]]    *magSf[faceI]);
+        D1[neighbour[faceI]] += 0.5*lusgsOmega*(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI]);
+        D2[neighbour[faceI]] += 0.5*lusgsOmega*(mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
     }
     forAll(mesh.boundary(), patchi)
     {
@@ -18,13 +26,16 @@
 
         forAll(mesh.boundary()[patchi], faceI)
         {
-            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI], mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]));
+            //D[pFaceCells[faceI]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI], mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]));
+
+            D1[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI]);
+            D2[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]);
         }
     }
 
     forAll(mesh.cells(), celli)
     {
-        Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
+        Eigen::Matrix<long double, 10, 10> J = Eigen::Matrix<long double, 10, 10>::Zero();
 
         J(0, 0) += alpha1[celli]*drhodp1[celli];
         J(1, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].x();
@@ -118,9 +129,30 @@
         Dinv_T2_alphaRhoU2 = vector(A(9, 6), A(9, 7), A(9, 8));
         Dinv_T2_alphaRhoE2 = A(9, 9);*/
 
-        Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
-        D_inv[celli].compute(A);
-        
+        //Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
+        //D_inv[celli].compute(A);
+
         //D_inv[celli].compute((D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J);
+
+        D_inv[celli].setThreshold(1e-300);
+        //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
+        D_inv[celli].compute((Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J);
+
+        //if (runTime.timeIndex() > 8000)
+        //{
+            //if (celli > 498)
+            //{
+            /*    std::cout << A << std::endl << std::endl;
+
+                Eigen::Matrix<long double, 10, 10> aux = D_inv[celli].inverse();
+                std::cout << aux << std::endl << std::endl;
+
+                std::cout << "alpha: " << alpha2[celli] << std::endl;
+                std::cout << "D1: " << D1[celli] << std::endl;
+                std::cout << "D2: " << D2[celli] << std::endl << std::endl;
+
+                std::cin.ignore();*/
+            //}
+        //}
     }
 }
