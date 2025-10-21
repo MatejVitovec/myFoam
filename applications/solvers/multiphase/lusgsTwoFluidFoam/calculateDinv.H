@@ -35,7 +35,7 @@
 
     forAll(mesh.cells(), celli)
     {
-        Eigen::Matrix<long double, 10, 10> J = Eigen::Matrix<long double, 10, 10>::Zero();
+        Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
 
         J(0, 0) += alpha1[celli]*drhodp1[celli];
         J(1, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].x();
@@ -85,50 +85,6 @@
         J(8, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].z();
         J(9, 9) += alpha2[celli]*drhodT2[celli]*H2[celli] + alpha2[celli]*rho2[celli]*gasProps2.Cp(p[celli], T2[celli]);
 
-        /*Eigen::Matrix<double, 10, 10> A = (((D[celli]*Eigen::Matrix<double, 10, 10>::Identity())) * J).inverse();
-
-        Dinv_p_alphaRho1  = A(0, 0);
-        Dinv_p_alphaRhoU1 = vector(A(0, 1), A(0, 2), A(0, 3));
-        Dinv_p_alphaRhoE1 = A(0, 4);
-        Dinv_p_alphaRho2  = A(0, 5);
-        Dinv_p_alphaRhoU2 = vector(A(0, 6), A(0, 7), A(0, 8));
-        Dinv_p_alphaRhoE2 = A(0, 9);
-
-        Dinv_alpha_alphaRho1  = A(1, 0);
-        Dinv_alpha_alphaRhoU1 = vector(A(1, 1), A(1, 2), A(1, 3));
-        Dinv_alpha_alphaRhoE1 = A(1, 4);
-        Dinv_alpha_alphaRho2  = A(1, 5);
-        Dinv_alpha_alphaRhoU2 = vector(A(1, 6), A(1, 7), A(1, 8));
-        Dinv_alpha_alphaRhoE2 = A(1, 9);
-
-        Dinv_U1_alphaRho1  = vector(A(2, 0), A(3, 0), A(4, 0));
-        Dinv_U1_alphaRhoU1 = tensor(A(2, 1), A(2, 2), A(2, 3), A(3, 1), A(3, 2), A(3, 3), A(4, 1), A(4, 2), A(4, 3));
-        Dinv_U1_alphaRhoE1 = vector(A(2, 4), A(3, 4), A(4, 4));
-        Dinv_U1_alphaRho2  = vector(A(2, 5), A(3, 5), A(4, 5));
-        Dinv_U1_alphaRhoU2 = tensor(A(2, 6), A(2, 7), A(2, 8), A(3, 6), A(3, 7), A(3, 8), A(4, 6), A(4, 7), A(4, 8));
-        Dinv_U1_alphaRhoE2 = vector(A(2, 9), A(3, 9), A(4, 9));
-
-        Dinv_U2_alphaRho1  = vector(A(5, 0), A(6, 0), A(7, 0));
-        Dinv_U2_alphaRhoU1 = tensor(A(5, 1), A(5, 2), A(5, 3), A(6, 1), A(6, 2), A(6, 3), A(7, 1), A(7, 2), A(7, 3));
-        Dinv_U2_alphaRhoE1 = vector(A(5, 4), A(6, 4), A(7, 4));
-        Dinv_U2_alphaRho2  = vector(A(5, 5), A(6, 5), A(7, 5));
-        Dinv_U2_alphaRhoU2 = tensor(A(5, 6), A(5, 7), A(5, 8), A(6, 6), A(6, 7), A(6, 8), A(7, 6), A(7, 7), A(7, 8));
-        Dinv_U2_alphaRhoE2 = vector(A(5, 9), A(6, 9), A(7, 9));
-        
-        Dinv_T1_alphaRho1  = A(8, 0);
-        Dinv_T1_alphaRhoU1 = vector(A(8, 1), A(8, 2), A(8, 3));
-        Dinv_T1_alphaRhoE1 = A(8, 4);
-        Dinv_T1_alphaRho2  = A(8, 5);
-        Dinv_T1_alphaRhoU2 = vector(A(8, 6), A(8, 7), A(8, 8));
-        Dinv_T1_alphaRhoE2 = A(8, 9);
-
-        Dinv_T2_alphaRho1  = A(9, 0);
-        Dinv_T2_alphaRhoU1 = vector(A(9, 1), A(9, 2), A(9, 3));
-        Dinv_T2_alphaRhoE1 = A(9, 4);
-        Dinv_T2_alphaRho2  = A(9, 5);
-        Dinv_T2_alphaRhoU2 = vector(A(9, 6), A(9, 7), A(9, 8));
-        Dinv_T2_alphaRhoE2 = A(9, 9);*/
-
         //Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
         //D_inv[celli].compute(A);
 
@@ -136,7 +92,7 @@
 
         D_inv[celli].setThreshold(1e-300);
         //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
-        D_inv[celli].compute((Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J);
+        D_inv[celli].compute((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J);
 
         //if (runTime.timeIndex() > 8000)
         //{

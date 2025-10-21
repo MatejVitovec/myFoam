@@ -27,50 +27,8 @@
         cp2[celli] = gasProps2.Cp(p[celli], T2[celli]);
     }
 
-    /*Field<scalar> Dinv_p_alphaRho1 (mesh.nCells());
-    Field<vector> Dinv_p_alphaRhoU1(mesh.nCells());
-    Field<scalar> Dinv_p_alphaRhoE1(mesh.nCells());
-    Field<scalar> Dinv_p_alphaRho2 (mesh.nCells());
-    Field<vector> Dinv_p_alphaRhoU2(mesh.nCells());
-    Field<scalar> Dinv_p_alphaRhoE2(mesh.nCells());
-
-    Field<scalar> Dinv_alpha_alphaRho1 (mesh.nCells());
-    Field<vector> Dinv_alpha_alphaRhoU1(mesh.nCells());
-    Field<scalar> Dinv_alpha_alphaRhoE1(mesh.nCells());
-    Field<scalar> Dinv_alpha_alphaRho2 (mesh.nCells());
-    Field<vector> Dinv_alpha_alphaRhoU2(mesh.nCells());
-    Field<scalar> Dinv_alpha_alphaRhoE2(mesh.nCells());
-
-    Field<vector> Dinv_U1_alphaRho1 (mesh.nCells());
-    Field<tensor> Dinv_U1_alphaRhoU1(mesh.nCells());
-    Field<vector> Dinv_U1_alphaRhoE1(mesh.nCells());
-    Field<vector> Dinv_U1_alphaRho2 (mesh.nCells());
-    Field<tensor> Dinv_U1_alphaRhoU2(mesh.nCells());
-    Field<vector> Dinv_U1_alphaRhoE2(mesh.nCells());
-
-    Field<vector> Dinv_U2_alphaRho1 (mesh.nCells());
-    Field<tensor> Dinv_U2_alphaRhoU1(mesh.nCells());
-    Field<vector> Dinv_U2_alphaRhoE1(mesh.nCells());
-    Field<vector> Dinv_U2_alphaRho2 (mesh.nCells());
-    Field<tensor> Dinv_U2_alphaRhoU2(mesh.nCells());
-    Field<vector> Dinv_U2_alphaRhoE2(mesh.nCells());
-    
-    Field<scalar> Dinv_T1_alphaRho1 (mesh.nCells());
-    Field<vector> Dinv_T1_alphaRhoU1(mesh.nCells());
-    Field<scalar> Dinv_T1_alphaRhoE1(mesh.nCells());
-    Field<scalar> Dinv_T1_alphaRho2 (mesh.nCells());
-    Field<vector> Dinv_T1_alphaRhoU2(mesh.nCells());
-    Field<scalar> Dinv_T1_alphaRhoE2(mesh.nCells());
-
-    Field<scalar> Dinv_T2_alphaRho1 (mesh.nCells());
-    Field<vector> Dinv_T2_alphaRhoU1(mesh.nCells());
-    Field<scalar> Dinv_T2_alphaRhoE1(mesh.nCells());
-    Field<scalar> Dinv_T2_alphaRho2 (mesh.nCells());
-    Field<vector> Dinv_T2_alphaRhoU2(mesh.nCells());
-    Field<scalar> Dinv_T2_alphaRhoE2(mesh.nCells());*/
-
-    //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
-    std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<long double,10,10>>> D_inv(mesh.nCells()); 
+    std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+    //std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells()); 
     
     #include "calculateDinv.H"
 

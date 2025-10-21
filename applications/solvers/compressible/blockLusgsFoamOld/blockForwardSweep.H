@@ -4,13 +4,13 @@
     const surfaceVectorField& Sf = mesh.Sf();
     const surfaceScalarField& magSf = mesh.magSf();
 
-    forAll(mesh.cells(), celli)
+    forAll(mesh.cells(), cellI)
     {
-        const labelList& cellFaces = mesh.cells()[celli];
+        const labelList& cellFaces = mesh.cells()[cellI];
 
-        scalar rRho  = mesh.V()[celli]/dt.value()*resRho[celli];
-        vector rRhoU = mesh.V()[celli]/dt.value()*resRhoU[celli];
-        scalar rRhoE = mesh.V()[celli]/dt.value()*resRhoE[celli];
+        scalar rRho  = mesh.V()[cellI]/dt.value()*resRho[cellI];
+        vector rRhoU = mesh.V()[cellI]/dt.value()*resRhoU[cellI];
+        scalar rRhoE = mesh.V()[cellI]/dt.value()*resRhoE[cellI];
 
         forAll(cellFaces, i)
         {
@@ -22,7 +22,7 @@
                 label nei = neighbour[faceI];
 
                 // we use the mesh ordering property: own < nei
-                if (own != celli)  // then data[own] belongs to lower triangle
+                if (own != cellI)  // then data[own] belongs to lower triangle
                 {
                     /*scalar ac = lusgsOmega*(mag(U[own] & Sf[faceI]) + a[own]*magSf[faceI]);
 
@@ -53,7 +53,7 @@
                     rRhoE += 0.5*(unMac*(drhodp[own]*H[own] + (T[own]/rho[own])*drhodT[own])*dpStar[own] + un*dpStar[own] + rho[own]*dun*H[own] + unMac*rho[own]*(U[own] & dUStar[own]) + unMac*(drhodT[own]*H[own] + rho[own]*cp[own])*dTStar[own]);
                 }
 
-                if (nei != celli)  // then data[own] belongs to lower triangle
+                if (nei != cellI)  // then data[own] belongs to lower triangle
                 {
                     /*scalar ac = lusgsOmega*(mag(U[nei] & Sf[faceI]) + a[nei]*magSf[faceI]);
 
@@ -79,15 +79,15 @@
                     scalar dun = dU[nei] & Sf[faceI];
                     scalar unMac = un - ac;
                     
-                    rRho  -= 0.5*(unMac*drhodp[nei]*dp[nei]                                                       + rho[nei]*dun                                            + unMac*drhodT[nei]*dT[nei]);
-                    rRhoU -= 0.5*(unMac*drhodp[nei]*dp[nei]*U[nei]               + Sf[faceI]*dp[nei]              + rho[nei]*dun*U[nei] + unMac*rho[nei]*dU[nei]            + unMac*drhodT[nei]*dT[nei]*U[nei]);
-                    rRhoE -= 0.5*(unMac*(drhodp[nei]*H[nei] + (T[nei]/rho[nei])*drhodT[nei])*dp[nei] + un*dp[nei] + rho[nei]*dun*H[nei] + unMac*rho[nei]*(U[nei] & dU[nei]) + unMac*(drhodT[nei]*H[nei] + rho[nei]*cp[nei])*dT[nei]);
+                    rRho  -= 0.5*(unMac*drhodp[nei]*dp[nei]                                                           + rho[nei]*dun                                            + unMac*drhodT[nei]*dT[nei]);
+                    rRhoU -= 0.5*(unMac*drhodp[nei]*dp[nei]*U[nei]               + Sf[faceI]*dp[nei]                  + rho[nei]*dun*U[nei] + unMac*rho[nei]*dU[nei]            + unMac*drhodT[nei]*dT[nei]*U[nei]);
+                    rRhoE -= 0.5*(unMac*(drhodp[nei]*H[nei] + (T[nei]/rho[nei])*drhodT[nei])*dp[nei] + un*dp[nei]     + rho[nei]*dun*H[nei] + unMac*rho[nei]*(U[nei] & dU[nei]) + unMac*(drhodT[nei]*H[nei] + rho[nei]*cp[nei])*dT[nei]);
                 }
             }
         }
 
-        dpStar[celli] = ((subC[celli]/subA[celli])*rRho + ((( drhodT[celli]*rho[celli])/subA[celli])*U[celli] & rRhoU) + ((-drhodT[celli]*rho[celli])/subA[celli])*rRhoE)/D[celli];
-        dUStar[celli] = ((-U[celli]/rho[celli])   *rRho + (1/rho[celli])*rRhoU)/D[celli];
-        dTStar[celli] = ((subB[celli]/subA[celli])*rRho + (((-drhodp[celli]*rho[celli])/subA[celli])*U[celli] & rRhoU) + (( drhodp[celli]*rho[celli])/subA[celli])*rRhoE)/D[celli];
+        dpStar[cellI] = Dinv_p_rho[cellI]*rRho + (Dinv_p_rhoU[cellI] & rRhoU) + Dinv_p_rhoE[cellI]*rRhoE;
+        dUStar[cellI] = Dinv_U_rho[cellI]*rRho + (Dinv_U_rhoU[cellI] & rRhoU) + Dinv_U_rhoE[cellI]*rRhoE;
+        dTStar[cellI] = Dinv_T_rho[cellI]*rRho + (Dinv_T_rhoU[cellI] & rRhoU) + Dinv_T_rhoE[cellI]*rRhoE;
     }
 }
