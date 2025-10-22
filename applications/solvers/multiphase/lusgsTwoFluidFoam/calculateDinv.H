@@ -35,6 +35,12 @@
 
     forAll(mesh.cells(), celli)
     {
+        //DRAG
+        Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
+        
+
+        //END DRAG
+
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
 
         J(0, 0) += alpha1[celli]*drhodp1[celli];

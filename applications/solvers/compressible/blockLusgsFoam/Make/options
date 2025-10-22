@@ -27,5 +27,6 @@ EXE_LIBS = \
     -ltopoChangerFvMesh \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
+    -lmyFiniteVolumeFoam \
     -lmyConvectiveFlux \
     -lmyFoam

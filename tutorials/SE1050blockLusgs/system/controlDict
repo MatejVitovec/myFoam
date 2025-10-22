@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 10;
+maxCo 20;
 
 rDeltaTSmoothingCoeff 0.15;
 
