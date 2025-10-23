@@ -8,19 +8,19 @@
     {
         const labelList& cellFaces = mesh.cells()[celli];
 
-        /*scalar rAlphaRho1  = 0;
+        scalar rAlphaRho1  = 0;
         scalar rAlphaRho2  = 0;
         vector rAlphaRhoU1 = vector(0, 0, 0);
         vector rAlphaRhoU2 = vector(0, 0, 0);
         scalar rEpsilon1   = 0;
-        scalar rEpsilon2   = 0;*/
+        scalar rEpsilon2   = 0;
 
-        scalar rAlphaRho1  = mesh.V()[celli]/dt.value() * rezAlphaRho1[celli];
+        /*scalar rAlphaRho1  = mesh.V()[celli]/dt.value() * rezAlphaRho1[celli];
         scalar rAlphaRho2  = mesh.V()[celli]/dt.value() * rezAlphaRho2[celli];
         vector rAlphaRhoU1 = mesh.V()[celli]/dt.value() * rezAlphaRhoU1[celli];
         vector rAlphaRhoU2 = mesh.V()[celli]/dt.value() * rezAlphaRhoU2[celli];
         scalar rEpsilon1   = mesh.V()[celli]/dt.value() * rezEpsilon1[celli];
-        scalar rEpsilon2   = mesh.V()[celli]/dt.value() * rezEpsilon2[celli];
+        scalar rEpsilon2   = mesh.V()[celli]/dt.value() * rezEpsilon2[celli];*/
             
         forAll(cellFaces,i)
         {
@@ -76,13 +76,13 @@
                     rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[nei]) - alpha2[nei]*(rho2[nei]*E2 + pInt[nei])) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
 
-                if (own != celli)
+                /*if (own != celli)
                 {
-                    /*const scalar ac = lusgsOmega*( 
-                        max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
-                                mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
-                            max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
-                                mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
+                    //const scalar ac = lusgsOmega*( 
+                    //    max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
+                    //            mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
+                    //        max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
+                    //            mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));
 
                     //const scalar ac = lusgsOmega*(max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
 
@@ -119,7 +119,7 @@
                     rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
                     rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
                     rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
-                }
+                }*/
             }
         }
 
@@ -130,18 +130,18 @@
 
         Eigen::Vector<double,10> dState = D_inv[celli].solve(b);
 
-        /*dp[celli]     = dpStar[celli]     + dState(0);
+        dp[celli]     = dpStar[celli]     + dState(0);
         dalpha[celli] = dalphaStar[celli] + dState(1);
         dU1[celli]    = dU1Star[celli]    + vector(dState(2), dState(3), dState(4));
         dU2[celli]    = dU2Star[celli]    + vector(dState(5), dState(6), dState(7));
         dT1[celli]    = dT1Star[celli]    + dState(8);
-        dT2[celli]    = dT2Star[celli]    + dState(9);*/
+        dT2[celli]    = dT2Star[celli]    + dState(9);
 
-        dp[celli]     = dState(0);
+        /*dp[celli]     = dState(0);
         dalpha[celli] = dState(1);
         dU1[celli]    = vector(dState(2), dState(3), dState(4));
         dU2[celli]    = vector(dState(5), dState(6), dState(7));
         dT1[celli]    = dState(8);
-        dT2[celli]    = dState(9);
+        dT2[celli]    = dState(9);*/
     }
 }

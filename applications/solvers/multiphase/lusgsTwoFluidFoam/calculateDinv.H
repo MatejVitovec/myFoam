@@ -36,12 +36,12 @@
     forAll(mesh.cells(), celli)
     {
         //DRAG
-        const double K = dragK[celli];
+        const double K = dragK[celli]*mesh.V()[celli];
 
         Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
         
 
-        /*dragJ(1, 2) = K;
+        dragJ(1, 2) = K;
         dragJ(4, 2) = K*(2*U1[celli].x() - U2[celli].x());
         dragJ(6, 2) = -K;
         dragJ(9, 2) = -K*U2[celli].x();
@@ -70,9 +70,9 @@
         dragJ(3, 7) = -K;
         dragJ(4, 7) = -K*U1[celli].z(); 
         dragJ(8, 7) = K;
-        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());*/
+        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());
 
-        double A = 0;
+        /*double A = 0;
         double D = mag(U1[celli] - U2[celli]);
         double D1 = (U1[celli] - U2[celli]) & U1[celli];
         double D2 = (U2[celli] - U1[celli]) & U2[celli];
@@ -85,7 +85,7 @@
         dragJ(6, 2) = -dragJ(1, 2);
         dragJ(7, 2) = -dragJ(2, 2);
         dragJ(8, 2) = -dragJ(3, 2);
-        dragJ(9, 2) = -(-(d.x()*D2)/D + U2[celli].x()*D);
+        dragJ(9, 2) = -(-(d.x()*D2)/D + U2[celli].x()*D);*/
 
         //END DRAG
 

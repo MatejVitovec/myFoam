@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         dimensionedScalar dt = runTime.deltaT();
 
 
-        for (int intIter = 0; intIter < lusgsIntIters; intIter++)
+        //for (int intIter = 0; intIter < lusgsIntIters; intIter++)
         {
             twoFluidFlux.computeFlux();
 
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
             Info << "LUSGS:  Solving for T1,    " << "Final residual = " << finalRezT1    << ", No Iterations 1" << nl;
             Info << "LUSGS:  Solving for T2,    " << "Final residual = " << finalRezT2    << ", No Iterations 1" << nl;
 
-            bool lastIteration = ((intIter + 1) == lusgsIntIters);
+            /*bool lastIteration = ((intIter + 1) == lusgsIntIters);
 
             lastIteration = lastIteration || ( 
                 (finalRezp     < lusgsTolerance) && 
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
             {
                 Info << "LUSGS: converged in " << intIter + 1 << " iterations." << nl << nl;
                 break;
-            }
+            }*/
         }
 
         rho1.ref() = thermo1.rho();

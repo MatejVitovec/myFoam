@@ -69,13 +69,13 @@
                     rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
 
-                if (nei != celli)
+                /*if (nei != celli)
                 {
-                    /*const scalar ac = lusgsOmega*( 
-                        max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
-                                mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
-                            max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
-                                mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
+                    //const scalar ac = lusgsOmega*( 
+                    //    max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
+                    //            mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
+                    //        max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
+                    //            mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));
 
                     //const scalar ac = lusgsOmega*(max(mag(U1[nei] & Sf[facei]), mag(U2[nei] & Sf[facei])) + max(a1[nei] * magSf[facei], a2[nei] * magSf[facei]));
 
@@ -112,7 +112,7 @@
                     rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[nei]*rho2[nei]*U2[nei])          + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
                     rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 + pInt[nei]) - alpha1[nei]*(rho1[nei]*E1 + pInt[nei])) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
                     rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[nei]) - alpha2[nei]*(rho2[nei]*E2 + pInt[nei])) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
-                }
+                }*/
             }
         }
     
