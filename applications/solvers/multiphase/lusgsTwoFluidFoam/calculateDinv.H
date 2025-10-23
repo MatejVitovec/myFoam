@@ -36,8 +36,56 @@
     forAll(mesh.cells(), celli)
     {
         //DRAG
+        const double K = dragK[celli];
+
         Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
         
+
+        /*dragJ(1, 2) = K;
+        dragJ(4, 2) = K*(2*U1[celli].x() - U2[celli].x());
+        dragJ(6, 2) = -K;
+        dragJ(9, 2) = -K*U2[celli].x();
+
+        dragJ(2, 3) = K;
+        dragJ(4, 3) = K*(2*U1[celli].y() - U2[celli].y());
+        dragJ(7, 3) = -K;
+        dragJ(9, 3) = -K*U2[celli].y();
+
+        dragJ(3, 4) = K;
+        dragJ(4, 4) = K*(2*U1[celli].z() - U2[celli].z());
+        dragJ(8, 4) = -K;
+        dragJ(9, 4) = -K*U2[celli].z();
+
+
+        dragJ(1, 5) = -K;
+        dragJ(4, 5) = -K*U1[celli].x(); 
+        dragJ(6, 5) = K;
+        dragJ(9, 5) = K*(2*U2[celli].x() - U1[celli].x());
+
+        dragJ(2, 6) = -K;
+        dragJ(4, 6) = -K*U1[celli].y(); 
+        dragJ(7, 6) = K;
+        dragJ(9, 6) = K*(2*U2[celli].y() - U1[celli].y());
+
+        dragJ(3, 7) = -K;
+        dragJ(4, 7) = -K*U1[celli].z(); 
+        dragJ(8, 7) = K;
+        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());*/
+
+        double A = 0;
+        double D = mag(U1[celli] - U2[celli]);
+        double D1 = (U1[celli] - U2[celli]) & U1[celli];
+        double D2 = (U2[celli] - U1[celli]) & U2[celli];
+        vector d = U1[celli] - U2[celli];
+
+        dragJ(1, 2) = (d.x()*d.x())/D + D;
+        dragJ(2, 2) = (d.x()*d.y())/D;
+        dragJ(3, 2) = (d.x()*d.z())/D;
+        dragJ(4, 2) = ((d.x()*D1)/D + (2*U1[celli].x() - U2[celli].x())*D);
+        dragJ(6, 2) = -dragJ(1, 2);
+        dragJ(7, 2) = -dragJ(2, 2);
+        dragJ(8, 2) = -dragJ(3, 2);
+        dragJ(9, 2) = -(-(d.x()*D2)/D + U2[celli].x()*D);
 
         //END DRAG
 
@@ -98,7 +146,7 @@
 
         D_inv[celli].setThreshold(1e-300);
         //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
-        D_inv[celli].compute((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J);
+        D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
 
         //if (runTime.timeIndex() > 8000)
         //{

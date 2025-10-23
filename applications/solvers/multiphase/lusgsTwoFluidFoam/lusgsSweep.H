@@ -38,7 +38,10 @@
     Field<vector> dU2Star(mesh.nCells());
     Field<scalar> dT1Star(mesh.nCells());
     Field<scalar> dT2Star(mesh.nCells());
-    
-    #include "forwardSweep.H"
-    #include "backwardSweep.H"
+
+    for (int intIter = 0; intIter < lusgsIntIters; intIter++)
+    {
+        #include "forwardSweep.H"
+        #include "backwardSweep.H"
+    }
 }
