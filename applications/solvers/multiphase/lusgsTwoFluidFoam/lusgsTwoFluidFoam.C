@@ -139,6 +139,13 @@ int main(int argc, char *argv[])
                 //- ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
+            dp     = dimensionedScalar("pzero", dimPressure, 0.0);
+            dalpha = dimensionedScalar("alphazero", dimless, 0.0);
+            dU1    = dimensionedVector("U1zero", dimVelocity, vector(0, 0, 0));
+            dU2    = dimensionedVector("U2zero", dimVelocity, vector(0, 0, 0));
+            dT1    = dimensionedScalar("T1zero", dimTemperature, 0.0);
+            dT2    = dimensionedScalar("T2zero", dimTemperature, 0.0);
+
             #include "lusgsSweep.H"
 
             p     += dp;
