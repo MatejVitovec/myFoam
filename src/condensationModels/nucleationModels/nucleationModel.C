@@ -26,7 +26,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "dragModel.H"
+#include "nucleationModel.H"
 #include "twoFluid.H"
 #include "surfaceInterpolate.H"
 
@@ -36,19 +36,22 @@ namespace Foam
 {
 namespace TwoFluidFoam
 {
-    defineTypeNameAndDebug(dragModel, 0);
-    defineRunTimeSelectionTable(dragModel, dictionary);
+    defineTypeNameAndDebug(nucleationModel, 0);
+    defineRunTimeSelectionTable(nucleationModel, dictionary);
 }
 }
 
-const Foam::dimensionSet Foam::TwoFluidFoam::dragModel::dimK(1, -3, -1, 0, 0);
+const Foam::dimensionSet Foam::TwoFluidFoam::nucleationModel::dimK(1, -3, -1, 0, 0);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModel::dragModel
+Foam::TwoFluidFoam::nucleationModel::nucleationModel
 (
-    const twoFluid& fluid,
+    const fluidThermo& gasThermo,
+    const fluidThermo& liquidThermo,
+    const volScalarField& sigma,
+    const volScalarField& Ts,
     const bool registerObject
 )
 :
@@ -58,21 +61,27 @@ Foam::TwoFluidFoam::dragModel::dragModel
         (
             //IOobject::groupName(typeName, twoFluid.name()),
             typeName,
-            fluid.mesh().time().timeName(),
-            fluid.mesh(),
+            gasThermo.mesh().time().timeName(),
+            gasThermo.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             registerObject
         )
     ),
-    fluid_(fluid)
+    gasThermo_(gasThermo),
+    liquidThermo_(liquidThermo),
+    sigma_(sigma),
+    Ts_(Ts)
 {}
 
 
-Foam::TwoFluidFoam::dragModel::dragModel
+Foam::TwoFluidFoam::nucleationModel::nucleationModel
 (
     const dictionary& dict,
-    const twoFluid& fluid,
+    const fluidThermo& gasThermo,
+    const fluidThermo& liquidThermo,
+    const volScalarField& sigma,
+    const volScalarField& Ts,
     const bool registerObject
 )
 :
@@ -82,58 +91,35 @@ Foam::TwoFluidFoam::dragModel::dragModel
         (
             //IOobject::groupName(typeName, fluid.name()),
             typeName,
-            fluid.mesh().time().timeName(),
-            fluid.mesh(),
+            gasThermo.mesh().time().timeName(),
+            gasThermo.mesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE,
             registerObject
         )
     ),
-    fluid_(fluid)
+    gasThermo_(gasThermo),
+    liquidThermo_(liquidThermo),
+    sigma_(sigma),
+    Ts_(Ts)
 {}
 
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
-Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
-Foam::TwoFluidFoam::dragModel::New
-(
-    const twoFluid& fluid
-)
-{
-    const dictionary& dict = fluid.subDict("drag");
 
-    const word modelType(dict.get<word>("type"));
-
-    Info<< "Selecting dragModel for "
-        << fluid << ": " << modelType << endl;
-
-    auto* ctorPtr = dictionaryConstructorTable(modelType);
-
-    if (!ctorPtr)
-    {
-        FatalIOErrorInLookup
-        (
-            dict,
-            "dragModel",
-            modelType,
-            *dictionaryConstructorTablePtr_
-        ) << exit(FatalIOError);
-    }
-
-    return ctorPtr(dict, fluid, true);
-}
-
-
-Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
-Foam::TwoFluidFoam::dragModel::New
+Foam::autoPtr<Foam::TwoFluidFoam::nucleationModel>
+Foam::TwoFluidFoam::nucleationModel::New
 (
     const dictionary& dict,
-    const twoFluid& fluid
+    const fluidThermo& gasThermo,
+    const fluidThermo& liquidThermo,
+    const volScalarField& sigma,
+    const volScalarField& Ts
 )
 {
     const word modelType(dict.get<word>("type"));
 
-    Info<< "Selecting dragModel for "
+    Info<< "Selecting nucleationModel for "
         << fluid << ": " << modelType << endl;
 
     auto* ctorPtr = dictionaryConstructorTable(modelType);
@@ -143,44 +129,39 @@ Foam::TwoFluidFoam::dragModel::New
         FatalIOErrorInLookup
         (
             dict,
-            "dragModel",
+            "nucleationModel",
             modelType,
             *dictionaryConstructorTablePtr_
         ) << exit(FatalIOError);
     }
 
-    return ctorPtr(dict, fluid, true);
+    return ctorPtr(dict, gasThermo, liquidThermo, sigma, Ts, true);
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModel::~dragModel()
+Foam::TwoFluidFoam::nucleationModel::~nucleationModel()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::Ki(const volScalarField& d) const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::nucleationModel::J(const volScalarField& rc) const
 {
-    return (0.75*CdRe()*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d;
+    const volScalarField sigma;
+
+    const volScalarField& rho_g = gasThermo_.rho();
+    const volScalarField& rho_l = liquidThermo_.rho();
+    const volScalarField& T_g = gasThermo_.T();
+
+    volScalarField J = sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g));
+
+    return pos(Ts_ - T_g)*J;
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K(const volScalarField& d) const
-{
-    return Ki(d)*fluid_.alpha();
-}
-
-/*std::array<double, 100> Foam::TwoFluidFoam::dragModel::dKdpUT(const label celli) const
-{
-    std::array<double, 100> out;
-
-    return out;
-}*/
-
-
-bool Foam::TwoFluidFoam::dragModel::writeData(Ostream& os) const
+bool Foam::TwoFluidFoam::nucleationModel::writeData(Ostream& os) const
 {
     return os.good();
 }

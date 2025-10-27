@@ -25,17 +25,17 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::dragModel
+    Foam::nucleationModel
 
 Description
 
 SourceFiles
-    dragModel.C
+    nucleationModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dragModel_H
-#define dragModel_H
+#ifndef nucleationModel_H
+#define nucleationModel_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,24 +53,29 @@ namespace TwoFluidFoam
 class twoFluid;
 
 /*---------------------------------------------------------------------------*\
-                           Class dragModel Declaration
+                           Class nucleationModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class dragModel
+class nucleationModel
 :
     public regIOobject
 {
 protected:
 
     // Protected Data
-    const TwoFluidFoam::twoFluid& fluid_;
+    const fluidThermo& gasThermo_;
+    const fluidThermo& liquidThermo_;
 
-    const dimensionedScalar dropletDiameter_ = dimensionedScalar("dropletDiameter", dimLength, 1e-5);
+    const volScalarField& sigma_;
+    const volScalarField& Ts_;
+
+    const dimensionedScalar m1_;
+    const dimensionedScalar beta_;
 
 public:
 
     //- Runtime type information
-    TypeName("dragModel");
+    TypeName("nucleationModel");
 
 
     // Declare runtime construction
@@ -78,14 +83,17 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            dragModel,
+            nucleationModel,
             dictionary,
             (
                 const dictionary& dict,
-                const twoFluid& fluid,
+                const fluidThermo& gasThermo,
+                const fluidThermo& liquidThermo,
+                const volScalarField& sigma,
+                const volScalarField& Ts,
                 const bool registerObject
             ),
-            (dict, fluid, registerObject)
+            (dict, gasThermo, liquidThermo, sigma, Ts, registerObject)
         );
 
 
@@ -98,57 +106,47 @@ public:
     // Constructors
 
         // Construct without residual constants
-        dragModel
+        nucleationModel
         (
-            const twoFluid& fluid,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const volScalarField& sigma,
+            const volScalarField& Ts,
             const bool registerObject
         );
 
         // Construct with residual constants
-        dragModel
+        nucleationModel
         (
             const dictionary& dict,
-            const twoFluid& fluid,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const volScalarField& sigma,
+            const volScalarField& Ts,
             const bool registerObject
         );
 
 
     //- Destructor
-    virtual ~dragModel();
+    virtual ~nucleationModel();
 
 
     // Selectors
 
-        static autoPtr<dragModel> New
-        (
-            const twoFluid& fluid
-        );
-
-        static autoPtr<dragModel> New
+        static autoPtr<nucleationModel> New
         (
             const dictionary& dict,
-            const twoFluid& fluid
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const volScalarField& sigma,
+            const volScalarField& Ts
         );
 
 
     // Member Functions
 
-        //- Drag coefficient
-        virtual tmp<volScalarField> CdRe() const = 0;
-
-        //- Return the phase-intensive drag coefficient Ki
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ... alphad*K*(U1-U2)
-        //    ddt(alpha2*rho2*U2) + ... = ... alphad*K*(U2-U1)
-        virtual tmp<volScalarField> Ki(const volScalarField& d) const;
-
-        //- Return the drag coefficient K
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ... K*(U1-U2)
-        //    ddt(alpha2*rho2*U2) + ... = ... K*(U2-U1)
-        virtual tmp<volScalarField> K(const volScalarField& d) const;
-
-        //virtual std::array<double, 100> dKdpUT(const label celli) const;
+        //- Return the rate of nucleation J
+        virtual tmp<volScalarField> J(const volScalarField& rc) const;
 
         //- Dummy write for regIOobject
         bool writeData(Ostream& os) const;

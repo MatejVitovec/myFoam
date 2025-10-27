@@ -231,6 +231,7 @@ void condensationMonodispersion::correct()
 
         const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
         const scalar sigma = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
+        //scalar sigma = liquidProps_.sigma(p[i], T_g[i]);
 
         scalar dH = gasProps_.Ha(p[i], T_g[i]) - gasProps_.Ha(ps[i], T_g[i]);
         scalar ds = gasProps_.S( p[i], T_g[i]) - gasProps_.S( ps[i], T_g[i]);
@@ -253,15 +254,6 @@ void condensationMonodispersion::correct()
         }
         else                    // Condensation (T < Ts)
         {
-            //scalar sigma = liquidProps_.sigma(p[i], T_g[i]);
-            /*const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
-            const scalar sigma = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
-
-            scalar dH = gasProps_.Ha(p[i], T_g[i]) - gasProps_.Ha(ps[i], T_g[i]);
-            scalar ds = gasProps_.S( p[i], T_g[i]) - gasProps_.S( ps[i], T_g[i]);
-            scalar dG = dH - T_g[i]*ds;
-            rc[i] = 2*sigma/(rhos_l[i]*dG);*/
-
             J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rhos_l[i]*
                 exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T_g[i]));
 

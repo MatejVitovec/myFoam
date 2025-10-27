@@ -215,7 +215,10 @@
         "span": "cpp",
         "stdfloat": "cpp",
         "text_encoding": "cpp",
-        "Constant.C": "cpp"
+        "Constant.C": "cpp",
+        "lusgsTwoFluidWetSteamFoam.C": "cpp",
+        "nucleationModel.C": "cpp",
+        "saturation.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

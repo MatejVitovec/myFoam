@@ -28,6 +28,6 @@ EXE_LIBS = \
     -ltopoChangerFvMesh \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
-    -lmyTwoFluid \
+    -lmyFiniteVolumeFoam \
     -lmyCondensationModels \
-    -lmyFoam
+    -lmyTwoFluid
