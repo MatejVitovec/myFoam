@@ -50,8 +50,21 @@ namespace Foam
                            Class slau2 Declaration
 \*---------------------------------------------------------------------------*/
 
-class slau2 : public advectionSplitting
+class slau2
+:
+    public advectionSplitting
 {
+
+private:
+    // Private Member Functions
+
+    //- Disallow default bitwise copy construct
+    slau2(const slau2&) = delete;;
+
+    //- Disallow default bitwise assignment
+    void operator=(const slau2&) = delete;
+
+
     scalar massFlux
     (
         const scalar& pLeft,
@@ -79,12 +92,15 @@ class slau2 : public advectionSplitting
     ) const;
 
 public:
-    //TypeName("slau2");
+    TypeName("slau2");
+
 
     // Constructors
-    //- Constructor null
-    slau2(const fvMesh&, const dictionary&) : advectionSplitting() {};
-    slau2() : advectionSplitting() {};
+
+        //- Constructor null
+        slau2() : advectionSplitting() {};
+        slau2(const dictionary& dict) : advectionSplitting(dict) {};
+
 
     // Destructor - default
     virtual ~slau2() {};

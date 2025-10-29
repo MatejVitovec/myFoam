@@ -23,7 +23,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    advectionSplitting
+    mslau2
 
 Description
     Basic class for of inviscid numerical fluxes.
@@ -32,12 +32,12 @@ Author
     Matej Vitovec
 
 SourceFiles
-    advectionSplitting.H
+    mslau2.H
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef advectionSplitting_H
-#define advectionSplitting_H
+#ifndef mslau2_H
+#define mslau2_H
 
 #include "fvCFD.H"
 #include "riemannSolver.H"
@@ -48,10 +48,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class advectionSplitting Declaration
+                           Class mslau2 Declaration
 \*---------------------------------------------------------------------------*/
 
-class advectionSplitting
+class mslau2
 :
     public riemannSolver
 {
@@ -60,10 +60,10 @@ private:
     // Private Member Functions
 
     //- Disallow default bitwise copy construct
-    advectionSplitting(const advectionSplitting&) = delete;;
+    mslau2(const mslau2&) = delete;;
 
     //- Disallow default bitwise assignment
-    void operator=(const advectionSplitting&) = delete;
+    void operator=(const mslau2&) = delete;
 
     virtual scalar massFlux
     (
@@ -76,7 +76,7 @@ private:
         const scalar& aLeft,
         const scalar& aRight,
         const vector& normalVector
-    ) const = 0;
+    ) const;
 
     virtual scalar pressureFlux
     (
@@ -89,20 +89,20 @@ private:
         const scalar& aLeft,
         const scalar& aRight,
         const vector& normalVector
-    ) const = 0;
+    ) const;
 
 public:
 
-    //TypeName("advectionSplitting");
+    //TypeName("mslau2");
 
     // Constructors
 
-        advectionSplitting() : riemannSolver() {};
+        mslau2() : riemannSolver() {};
 
-        advectionSplitting(const dictionary& dict) : riemannSolver(dict) {};
+        mslau2(const dictionary& dict) : riemannSolver(dict) {};
 
     // Destructor - default
-    virtual ~advectionSplitting() {};
+    virtual ~mslau2() {};
 
     // Member Functions
 

@@ -27,7 +27,6 @@ License
 #include "convectiveFlux.H"
 #include "directionInterpolate.H"
 
-#include "hllc.H"
 #include <iostream>
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -38,21 +37,18 @@ Foam::convectiveFlux::convectiveFlux
     const volScalarField& p,
     const volVectorField& U,
     const volScalarField& T,
-    psiThermo& thermo,
-    gasProperties& gasProps
+    const psiThermo& thermo
 )
 :
-    //fluxSolver_(Foam::riemannSolver::New( 
-    //    p.mesh(), 
-    //    p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
-    //),
-    fluxSolver_(new Foam::hllc()),
+    fluxSolver_(Foam::riemannSolver::New
+    (
+        p.mesh().thisDb().lookupObject<IOdictionary>("fvSchemes")) 
+    ),
     mesh_(p.mesh()),
     p_(p),
     U_(U),
     T_(T),
-    thermo_(thermo),
-    gasProps_(gasProps),
+    gasProps_(gasProperties::New(thermo)),
     rhoFlux_
     (
         IOobject
@@ -63,7 +59,8 @@ Foam::convectiveFlux::convectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        (linearInterpolate(thermo_.rho()*U_) & mesh_.Sf())
+        mesh_,
+        dimensionedScalar("rhoUzero", dimDensity*dimVelocity*dimArea, 0.0)
     ),
     rhoUFlux_
     (
@@ -75,7 +72,8 @@ Foam::convectiveFlux::convectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        rhoFlux_*linearInterpolate(U_)
+        mesh_,
+        dimensionedVector("rhoUUzero", dimDensity*dimVelocity*dimVelocity*dimArea, vector::zero)
     ),
     rhoEFlux_
     (
@@ -87,7 +85,8 @@ Foam::convectiveFlux::convectiveFlux
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        rhoFlux_*linearInterpolate(thermo_.he() + 0.5*magSqr(U_))
+        mesh_,
+        dimensionedScalar("rhoEUzero", dimDensity*dimEnergy/dimMass*dimVelocity*dimArea, 0.0)
     ) 
 {}
 
@@ -129,7 +128,7 @@ void Foam::convectiveFlux::computeFlux()
             T_pos[faceI],   T_neg[faceI],
             Sf[faceI],
             magSf[faceI],
-            gasProps_
+            gasProps()
         );
     }
 
@@ -170,7 +169,7 @@ void Foam::convectiveFlux::computeFlux()
                     pT_pos[facei],  pT_neg[facei],
                     pSf[facei],
                     pMagSf[facei],
-                    gasProps_
+                    gasProps()
                 );
             }
         }
@@ -193,7 +192,7 @@ void Foam::convectiveFlux::computeFlux()
                     pT[facei],  pT[facei],
                     pSf[facei],
                     pMagSf[facei],
-                    gasProps_
+                    gasProps()
                 );
             }
         }

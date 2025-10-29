@@ -218,7 +218,8 @@
         "Constant.C": "cpp",
         "lusgsTwoFluidWetSteamFoam.C": "cpp",
         "nucleationModel.C": "cpp",
-        "saturation.C": "cpp"
+        "saturation.C": "cpp",
+        "mslau2.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -22,7 +22,7 @@ License
     along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    advectionSplitting
+    mslau2
 
 Description
     Basic class for of inviscid numerical fluxes.
@@ -31,21 +31,99 @@ Author
     Matej Vitovec
 
 SourceFiles
-    advectionSplitting.C
+    mslau2.C
 
 \*---------------------------------------------------------------------------*/
 
-#include "advectionSplitting.H"
+#include "mslau2.H"
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+#include "addToRunTimeSelectionTable.H"
 
-/*namespace Foam
+namespace Foam
 {
-    defineTypeNameAndDebug(advectionSplitting, 0);
-    addToRunTimeSelectionTable(riemannSolver, advectionSplitting, dict);
-}*/
+    defineTypeNameAndDebug(mslau2, 0);
+    addToRunTimeSelectionTable(riemannSolver, mslau2, dict);
+}
 
-void Foam::advectionSplitting::calculateFlux
+scalar Foam::mslau2::massFlux
+(
+    const scalar& pLeft,
+    const scalar& pRight,
+    const vector& ULeft,
+    const vector& URight,
+    const scalar& rhoLeft,
+    const scalar& rhoRight,
+    const scalar& aLeft,
+    const scalar& aRight,
+    const vector& normalVector
+) const
+{
+    const scalar qLeft  = (ULeft  & normalVector);
+    const scalar qRight = (URight & normalVector);
+
+    const scalar aTilde = 0.5*(aLeft + aRight);
+
+    //const scalar sqrtUDash = sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    const scalar sqrtUDash = sqrt(0.5*(magSqr(ULeft) + magSqr(URight)));
+
+    const scalar MaRelLeft  = qLeft /aTilde;
+    const scalar MaRelRight = qRight/aTilde;
+
+    const scalar Chi = sqr(1.0 - min(1.0, (1.0/aTilde)*sqrtUDash));
+
+    const scalar g = -max(min(MaRelLeft, 0), -1.0)*min(max(MaRelRight, 0), 1.0);
+
+    const scalar magVnBar = (rhoLeft*mag(qLeft) + rhoRight*mag(qRight))
+        /(rhoLeft + rhoRight);
+        
+    const scalar magVnBarPlus  = (1.0 - g)*magVnBar + g*mag(qLeft);
+    const scalar magVnBarMinus = (1.0 - g)*magVnBar + g*mag(qRight);
+
+    return 0.5*(rhoLeft*(qLeft + magVnBarPlus)
+        + rhoRight*(qRight - magVnBarMinus)
+        - (Chi/aTilde)*(pRight - pLeft));
+}
+
+scalar Foam::mslau2::pressureFlux
+(
+    const scalar& pLeft,
+    const scalar& pRight,
+    const vector& ULeft,
+    const vector& URight,
+    const scalar& rhoLeft,
+    const scalar& rhoRight,
+    const scalar& aLeft,
+    const scalar& aRight,
+    const vector& normalVector
+) const
+{
+    const scalar qLeft  = (ULeft  & normalVector);
+    const scalar qRight = (URight & normalVector);
+
+    const scalar aTilde   = 0.5*(aLeft   + aRight);
+    const scalar rhoTilde = 0.5*(rhoLeft + rhoRight);
+
+    //const scalar sqrtUDash = Foam::sqrt(0.5*(sqr(qLeft) + sqr(qRight)));
+    const scalar sqrtUDash = sqrt(0.5*(magSqr(ULeft) + magSqr(URight)));
+
+    const scalar MaRelLeft  = qLeft /aTilde;
+    const scalar MaRelRight = qRight/aTilde;
+       
+    const scalar PPlusLeft   = ((mag(MaRelLeft)  >= 1.0) ?
+        0.5*(1.0 + sign(MaRelLeft))
+        : (0.25*sqr(MaRelLeft + 1.0)*(2.0 - MaRelLeft)));
+
+    const scalar PMinusRight = ((mag(MaRelRight) >= 1.0) ?
+        0.5*(1.0 - sign(MaRelRight))
+        : (0.25*sqr(MaRelRight - 1.0)*(2.0 + MaRelRight)));
+
+    return 0.5*(pLeft + pRight)
+        + 0.5*(PPlusLeft - PMinusRight)*(pLeft - pRight)
+        + sqrtUDash*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
+}
+
+
+void Foam::mslau2::calculateFlux
 (
     scalar& rhoFlux,
     vector& rhoUFlux,
@@ -92,7 +170,7 @@ void Foam::advectionSplitting::calculateFlux
     rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
 }
 
-void Foam::advectionSplitting::calculateFlux
+void Foam::mslau2::calculateFlux
 (
     scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,
     scalar& alphaRhoFlux2Left,  scalar& alphaRhoFlux2Right,

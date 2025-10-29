@@ -39,40 +39,44 @@ SourceFiles
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-/*namespace Foam
+namespace Foam
 {
-  defineTypeNameAndDebug(riemannSolver, 0);
-  defineRunTimeSelectionTable(riemannSolver,dictionary);
-}*/
+    defineTypeNameAndDebug(riemannSolver, 0);
+    defineRunTimeSelectionTable(riemannSolver, dict);
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-/*
-Foam::autoPtr<Foam::riemannSolver> Foam::riemannSolver::New
+
+
+Foam::autoPtr<Foam::riemannSolver>
+Foam::riemannSolver::New
 (
-    const fvMesh& mesh,
-    const dictionary& dict,
-    const word key
+    const dictionary& dict
 )
 {
-    const word fluxName( dict.lookup(key) );
+    const word name
+    (
+        dict.lookup("riemannSolver")
+    );
 
-    auto cstrIter = dictionaryConstructorTablePtr_->cfind(fluxName);
+    Info<< "Selecting Riemann solver "
+        << name << endl;
+
+    auto cstrIter = dictConstructorTablePtr_->cfind(name);
 
     if (!cstrIter.found())
     {
-        FatalErrorIn
-        (
-            "riemannSolver::New(mesh, dict, key)"
-        )   << "Unknown riemannSolver type "
-            << fluxName << nl << nl
+        FatalErrorInFunction
+            << "Unknown riemannSolver type "
+            << name << endl << endl
             << "Valid riemannSolver types are :" << endl
-            << dictionaryConstructorTablePtr_->sortedToc()
+            << dictConstructorTablePtr_->sortedToc()
             << exit(FatalError);
     }
 
-    return autoPtr<riemannSolver>(cstrIter()(mesh, dict));
-}*/
+    return autoPtr<riemannSolver>(cstrIter()(dict));
+}
 
 
 // ************************************************************************* //

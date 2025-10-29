@@ -57,15 +57,25 @@ class hllc
 :
     public riemannSolver
 {
+private:
+    // Private Member Functions
+
+    //- Disallow default bitwise copy construct
+    hllc(const hllc&) = delete;;
+
+    //- Disallow default bitwise assignment
+    void operator=(const hllc&) = delete;
 
 public:
-    //TypeName("hllc");
+    TypeName("hllc");
 
     // Constructors
 
+        //- Construct from dictionary
+        hllc(const dictionary& dict) : riemannSolver(dict) {};
+
         //- Constructor null
-        hllc(const fvMesh&, const dictionary&) {};
-        hllc() {};
+        hllc() : riemannSolver() {};
 
 
     // Destructor - default

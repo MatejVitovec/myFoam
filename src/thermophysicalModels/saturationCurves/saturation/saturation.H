@@ -37,10 +37,9 @@ SourceFiles
 #include "IOdictionary.H"
 #include "runTimeSelectionTables.H"
 #include "volFields.H"
+#include "fluidThermo.H"
 
 #include "saturationCurve.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
@@ -56,33 +55,49 @@ protected:
     // Protected Data
     const fluidThermo& thermo_;
 
+    autoPtr<saturationCurve> pSaturation_;
     const saturationCurve& saturationCurve_;
 
-    const volScalarField ps_;
-    const volScalarField Ts_;
+    volScalarField ps_;
+    volScalarField Ts_;
 
-    const volScalarField L_;
+    volScalarField L_;
     
 public:
-    TypeName("saturation");
-    
-    declareRunTimeSelectionTable
-    (
-        autoPtr,
-        saturation,
-        dict,
-        (
-            const dictionary& dict
-        ),
-        (dict)
-    );
 
-    saturation(const dictionary& dict) {};
+    //- Runtime type information
+    //TypeName("saturation");
+
+    // Declare runtime construction    
+
+        /*declareRunTimeSelectionTable
+        (
+            autoPtr,
+            saturation,
+            dict,
+            (
+                const dictionary& dict
+            ),
+            (dict)
+        );*/
+
+    
+    // Static data members
+
+
+    // Constructors
+
+        // Construct
+        saturation(const dictionary& dict, const fluidThermo& thermo);
+
+        //saturation(const fluidThermo& thermo);
+
+    
     
     // Selectors
 
-    //- Select null constructed
-    static autoPtr<saturation> New(const dictionary& dict);
+        //- Select null constructed
+        //static autoPtr<saturation> New(const dictionary& dict);
 
 
     //- Destructor
@@ -95,7 +110,7 @@ public:
     virtual const volScalarField& ps() const;
     
     //- Saturation temperature [K]
-    virtual const volScalarField Ts() const;
+    virtual const volScalarField& Ts() const;
 
     //- Latent heat
     virtual const volScalarField& L() const;

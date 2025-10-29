@@ -9,5 +9,6 @@ thermophysicalProperties/liquidProperties/H2O_IAPWS97reg1/H2O_IAPWS97reg1.C
 saturationCurves/saturationCurve/saturationCurve.C
 saturationCurves/saturationIAPWS95/saturationIAPWS95.C
 saturationCurves/saturationIF97/saturationIF97.C
+saturationCurves/saturation/saturation.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyThermophysicalModels

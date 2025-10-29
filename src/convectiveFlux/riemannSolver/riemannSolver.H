@@ -40,6 +40,7 @@ SourceFiles
 #define riemannSolver_H
 
 #include "fvCFD.H"
+#include "runTimeSelectionTables.H"
 #include "gasProperties.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -54,19 +55,19 @@ namespace Foam
 class riemannSolver
 {
 
-private:
     // Private Member Functions
+private:
 
     //- Disallow default bitwise copy construct
-    riemannSolver(const riemannSolver&);
+    riemannSolver(const riemannSolver&) = delete;
 
     //- Disallow default bitwise assignment
-    void operator=(const riemannSolver&);
+    void operator=(const riemannSolver&) = delete;
 
 
 public:
 
-    //TypeName("riemannSolver");
+    TypeName("riemannSolver");
 
     /*declareRunTimeSelectionTable
     (
@@ -77,23 +78,40 @@ public:
         (mesh, dict)
     );*/
 
-    // Constructors
-    riemannSolver() {};
-
-    //- Return a reference to the selected riemannSolver
-    /*static autoPtr<riemannSolver> New
+    declareRunTimeSelectionTable
     (
-        const fvMesh& mesh, 
-        const dictionary& dict,
-	    const word key="riemannSolver"
-    );*/
+        autoPtr,
+        riemannSolver,
+        dict,
+        (
+            const dictionary& dict
+        ),
+        (dict)
+    );
+
+    // Constructors
+
+        //- Construct from dictionary
+        riemannSolver(const dictionary& dict) {};
+
+        //- Construct null
+        riemannSolver() {};
+
+    // Selectors
+
+        //- Return a reference to the selected riemannSolver
+        static autoPtr<riemannSolver> New
+        (
+            const dictionary& dict
+        );
+
 
     // Destructor - default
-    virtual ~riemannSolver() {};
+    virtual ~riemannSolver() = default;
 
     // Member Functions
 
-        // Update fluxes based on current left and right states
+        //- Update fluxes based on current left and right states
         virtual void calculateFlux
         (
             scalar& rhoFlux,
@@ -108,7 +126,30 @@ public:
             const vector& Sf,
             const scalar& magSf,
             const gasProperties& gas
-        ) const = 0;
+        ) const
+        {}
+
+        //- Update twoFluid fluxes based on current left and right states
+        virtual void calculateFlux
+        (
+            scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,
+            scalar& alphaRhoFlux2Left,  scalar& alphaRhoFlux2Right,
+            vector& alphaRhoUFlux1Left, vector& alphaRhoUFlux1Right,
+            vector& alphaRhoUFlux2Left, vector& alphaRhoUFlux2Right,
+            scalar& alphaRhoEFlux1Left, scalar& alphaRhoEFlux1Right,
+            scalar& alphaRhoEFlux2Left, scalar& alphaRhoEFlux2Right,
+            const scalar& alphaLeft,    const scalar& alphaRight,
+            const scalar& pLeft,        const scalar& pRight,
+            const vector& U1Left,       const vector& U1Right,
+            const vector& U2Left,       const vector& U2Right,
+            const scalar& T1Left,       const scalar& T1Right,
+            const scalar& T2Left,       const scalar& T2Right,
+            const vector& Sf,
+            const scalar& magSf,
+            const gasProperties& gas1,
+            const gasProperties& gas2
+        ) const
+        {}
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -50,8 +50,13 @@ namespace Foam
                            Class ausmPlusUp Declaration
 \*---------------------------------------------------------------------------*/
 
-class ausmPlusUp : public advectionSplitting
+class ausmPlusUp
+:
+    public advectionSplitting
 {
+
+private:
+
     const scalar kp_;
     const scalar ku_;
     const scalar beta_;
@@ -84,25 +89,29 @@ class ausmPlusUp : public advectionSplitting
     ) const;
 
 public:
-    //TypeName("ausmPlusUp");
+    TypeName("ausmPlusUp");
+
 
     // Constructors
-    //- Constructor null
-    ausmPlusUp(const fvMesh&, const dictionary&) :
-        advectionSplitting(),
-        kp_(0.5),
-        ku_(0.5),
-        beta_(1/8),    
-        MaInf_(0.05)
-    {};
 
-    ausmPlusUp() :
-        advectionSplitting(),
-        kp_(1.0),
-        ku_(1.0),
-        beta_(1/8),    
-        MaInf_(0.05)
-    {};
+        //- Constructor null
+        ausmPlusUp()
+        :
+            advectionSplitting(),
+            kp_(0.5),
+            ku_(0.5),
+            beta_(1/8),    
+            MaInf_(0.05)
+        {};
+
+        ausmPlusUp(const dictionary& dict)
+        :
+            advectionSplitting(dict),
+            kp_(0.5),
+            ku_(0.5),
+            beta_(1/8),    
+            MaInf_(0.05)
+        {};
 
     // Destructor - default
     virtual ~ausmPlusUp() {};

@@ -71,9 +71,10 @@ class convectiveFlux
             const volScalarField& T_;
         
         //- Reference to the thermophysicalModel
-        psiThermo& thermo_;
+        //psiThermo& thermo_;
 
-        gasProperties& gasProps_;
+        autoPtr<gasProperties> gasProps_;
+        //gasProperties& gasProps_;
     
 
         // Fluxes
@@ -115,6 +116,11 @@ class convectiveFlux
         {
             return rhoEFlux_.internalField();
         }
+
+        const gasProperties& gasProps() const
+        {
+            return *gasProps_;
+        }
     
 
 public:
@@ -127,8 +133,7 @@ public:
             const volScalarField& p,
             const volVectorField& U,
             const volScalarField& T,
-            psiThermo& thermo,
-            gasProperties& gasProps
+            const psiThermo& thermo
         );
 
 

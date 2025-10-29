@@ -49,9 +49,6 @@ namespace Foam
 namespace TwoFluidFoam
 {
 
-// Forward Declarations
-class twoFluid;
-
 /*---------------------------------------------------------------------------*\
                            Class nucleationModel Declaration
 \*---------------------------------------------------------------------------*/

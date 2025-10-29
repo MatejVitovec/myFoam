@@ -208,12 +208,12 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        if (runTime.timeIndex() > 7180)
+        /*if (runTime.timeIndex() > 7180)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
-        }
+        }*/
 
         //runTime.printExecutionTime(Info);
 

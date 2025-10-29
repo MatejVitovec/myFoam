@@ -24,13 +24,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "hllc.H"
-//#include "addToRunTimeSelectionTable.H"
+#include "addToRunTimeSelectionTable.H"
 
-/*namespace Foam
+namespace Foam
 {
     defineTypeNameAndDebug(hllc, 0);
-    addToRunTimeSelectionTable(riemannSolver, hllc, dictionary);
-}*/
+    addToRunTimeSelectionTable(riemannSolver, hllc, dict);
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

@@ -24,13 +24,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "slau2.H"
-//#include "addToRunTimeSelectionTable.H"
+#include "addToRunTimeSelectionTable.H"
 
-/*namespace Foam
+namespace Foam
 {
     defineTypeNameAndDebug(slau2, 0);
-    addToRunTimeSelectionTable(riemannSolver, slau2, dictionary);
-}*/
+    addToRunTimeSelectionTable(riemannSolver, slau2, dict);
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

@@ -104,8 +104,8 @@ Foam::TwoFluidFoam::dragModel::New
 
     const word modelType(dict.get<word>("type"));
 
-    Info<< "Selecting dragModel for "
-        << fluid << ": " << modelType << endl;
+    Info<< "Selecting dragModel "
+        << modelType << endl;
 
     auto* ctorPtr = dictionaryConstructorTable(modelType);
 

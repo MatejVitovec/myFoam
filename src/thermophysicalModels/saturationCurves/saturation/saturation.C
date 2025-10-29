@@ -24,17 +24,74 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "saturation.H"
-#include "applyFunctions.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
+/*namespace Foam
+{
+    defineTypeNameAndDebug(saturation, 0);
+    defineRunTimeSelectionTable(saturation, dictionary);
+
+}*/
+
 namespace Foam
 {
-defineTypeNameAndDebug(saturation, 0);
-defineRunTimeSelectionTable(saturation, dict);
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+saturation::saturation
+(
+    const dictionary& dict,
+    const fluidThermo& thermo
+)
+:
+    thermo_(thermo),
+    pSaturation_(saturationCurve::New(dict)),
+    saturationCurve_(pSaturation_()),
+    ps_(
+        IOobject
+        (
+            "ps",
+            thermo.p().mesh().time().timeName(),
+            thermo.p().mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        thermo.p().mesh(),
+        dimensionedScalar("initSaturPressure", dimPressure, 0.0)
+    ),
+    Ts_(
+        IOobject
+        (
+            "Ts",
+            thermo.p().mesh().time().timeName(),
+            thermo.p().mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        thermo.p().mesh(),
+        dimensionedScalar("initSaturTemperature", dimTemperature, 0.0)
+    ),
+    L_(
+        IOobject
+        (
+            "latentHeat",
+            thermo.p().mesh().time().timeName(),
+            thermo.p().mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        thermo.p().mesh(),
+        dimensionedScalar("initLatentHeat", dimEnergy, 0.0)
+    )
+{
+    correct();
+}
 
 
-autoPtr<saturation>
+// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
+
+/*autoPtr<saturation>
 saturation::New
 (
     const dictionary& dict
@@ -61,7 +118,7 @@ saturation::New
     }
 
     return autoPtr<saturation>(cstrIter()(dict));
-}
+}*/
 
 const volScalarField& saturation::ps() const
 {

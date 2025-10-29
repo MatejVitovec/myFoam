@@ -24,13 +24,13 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "ausmPlusUp.H"
-//#include "addToRunTimeSelectionTable.H"
+#include "addToRunTimeSelectionTable.H"
 
-/*namespace Foam
+namespace Foam
 {
     defineTypeNameAndDebug(ausmPlusUp, 0);
-    addToRunTimeSelectionTable(riemannSolver, ausmPlusUp, dictionary);
-}*/
+    addToRunTimeSelectionTable(riemannSolver, ausmPlusUp, dict);
+}
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

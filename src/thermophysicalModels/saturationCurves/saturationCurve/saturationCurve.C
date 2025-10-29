@@ -30,9 +30,14 @@ License
 
 namespace Foam
 {
-defineTypeNameAndDebug(saturationCurve, 0);
-defineRunTimeSelectionTable(saturationCurve, dict);
+    defineTypeNameAndDebug(saturationCurve, 0);
+    defineRunTimeSelectionTable(saturationCurve, dict);
+}
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
 
 autoPtr<saturationCurve>
 saturationCurve::New
