@@ -47,6 +47,8 @@ namespace Foam
 
 scalar Foam::mslau2::massFlux
 (
+    const scalar& alphaLeft,
+    const scalar& alphaRight,
     const scalar& pLeft,
     const scalar& pRight,
     const vector& ULeft,
@@ -79,13 +81,22 @@ scalar Foam::mslau2::massFlux
     const scalar magVnBarPlus  = (1.0 - g)*magVnBar + g*mag(qLeft);
     const scalar magVnBarMinus = (1.0 - g)*magVnBar + g*mag(qRight);
 
-    return 0.5*(rhoLeft*(qLeft + magVnBarPlus)
-        + rhoRight*(qRight - magVnBarMinus)
-        - (Chi/aTilde)*(pRight - pLeft));
+    scalar massFlux = 0.5*(rhoLeft*(qLeft + magVnBarPlus)
+        + rhoRight*(qRight - magVnBarMinus));
+
+    constexpr scalar epsilon = 1e-30;
+    if(abs(alphaLeft - alphaRight) > 5*epsilon)
+    {
+        return massFlux + ((max(pLeft, pRight)/min(pLeft, pRight))*(1.0 - Chi) + 1)*(pLeft - pRight)/aTilde;
+    }
+
+    return massFlux + (Chi/aTilde)*(pLeft - pRight);
 }
 
 scalar Foam::mslau2::pressureFlux
 (
+    const scalar& alphaLeft,
+    const scalar& alphaRight,
     const scalar& pLeft,
     const scalar& pRight,
     const vector& ULeft,
@@ -94,6 +105,7 @@ scalar Foam::mslau2::pressureFlux
     const scalar& rhoRight,
     const scalar& aLeft,
     const scalar& aRight,
+    const scalar& lambdaMr,
     const vector& normalVector
 ) const
 {
@@ -117,9 +129,16 @@ scalar Foam::mslau2::pressureFlux
         0.5*(1.0 - sign(MaRelRight))
         : (0.25*sqr(MaRelRight - 1.0)*(2.0 + MaRelRight)));
 
-    return 0.5*(pLeft + pRight)
-        + 0.5*(PPlusLeft - PMinusRight)*(pLeft - pRight)
-        + sqrtUDash*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
+    scalar pressureFlux = 0.5*(pLeft + pRight)
+        + 0.5*(PPlusLeft - PMinusRight)*(pLeft - pRight);
+
+    constexpr scalar epsilon = 1e-30;
+    if(abs(alphaLeft - alphaRight) > 5*epsilon)
+    {
+        return pressureFlux + lambdaMr*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
+    }
+
+    return pressureFlux + sqrtUDash*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
 }
 
 
@@ -139,35 +158,7 @@ void Foam::mslau2::calculateFlux
     const gasProperties& gas
 ) const
 {
-    const vector normalVector = Sf/magSf;
-
-    const scalar rhoLeft  = gas.rho(pLeft,  TLeft);
-    const scalar rhoRight = gas.rho(pRight, TRight);
-
-    const scalar aLeft  = gas.c(pLeft,  TLeft);
-    const scalar aRight = gas.c(pRight, TRight);
-
-    const scalar HLeft  = gas.Hs(pLeft,  TLeft)  + 0.5*magSqr(ULeft);
-    const scalar HRight = gas.Hs(pRight, TRight) + 0.5*magSqr(URight);
-
-    const scalar massFlux_ = massFlux(pLeft,    pRight,
-                                      ULeft,    URight,
-                                      rhoLeft,  rhoRight,
-                                      aLeft,    aRight,
-                                      normalVector);                               
-
-    const scalar leftMassFlux  = 0.5*(massFlux_ + mag(massFlux_));
-    const scalar rightMassFlux = 0.5*(massFlux_ - mag(massFlux_));                 
-
-    const scalar pressureFlux_ = pressureFlux(pLeft,    pRight,
-                                              ULeft,    URight,
-                                              rhoLeft,  rhoRight,
-                                              aLeft,    aRight,
-                                              normalVector);
-
-    rhoFlux  = (leftMassFlux       + rightMassFlux)*magSf;
-    rhoUFlux = (leftMassFlux*ULeft + rightMassFlux*URight + pressureFlux_*normalVector)*magSf;
-    rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
+    Info << "Modified slau2 is not an option for single fluid" << endl;
 }
 
 void Foam::mslau2::calculateFlux
@@ -208,16 +199,18 @@ void Foam::mslau2::calculateFlux
     const scalar H2Left  = gas2.Hs(pLeft,  T2Left)  + 0.5*magSqr(U2Left);    
     const scalar H2Right = gas2.Hs(pRight, T2Right) + 0.5*magSqr(U2Right);
 
-    const scalar massFlux1 = massFlux(pLeft,    pRight,
-                                      U1Left,   U1Right,
-                                      rho1Left, rho1Right,
-                                      aLeft,    aRight,
+    const scalar massFlux1 = massFlux(alphaLeft,    alphaRight,
+                                      pLeft,        pRight,
+                                      U1Left,       U1Right,
+                                      rho1Left,     rho1Right,
+                                      aLeft,        aRight,
                                       normalVector);
 
     const scalar leftMassFlux1  = 0.5*(massFlux1 + mag(massFlux1));
     const scalar rightMassFlux1 = 0.5*(massFlux1 - mag(massFlux1));
 
-    const scalar massFlux2 = massFlux(pLeft,        pRight,
+    const scalar massFlux2 = massFlux(alphaLeft,    alphaRight,
+                                      pLeft,        pRight,
                                       U2Left,       U2Right,
                                       rho2Left,     rho2Right,
                                       aLeft,        aRight,
@@ -226,17 +219,24 @@ void Foam::mslau2::calculateFlux
     const scalar leftMassFlux2  = 0.5*(massFlux2 + mag(massFlux2));
     const scalar rightMassFlux2 = 0.5*(massFlux2 - mag(massFlux2));
 
-    const scalar pressureFlux1 = pressureFlux(pLeft,    pRight,
-                                              U1Left,   U1Right,
-                                              rho1Left, rho1Right,
-                                              aLeft,    aRight,
+    const scalar lambdaMr = abs(sqrt(0.5*(magSqr(U1Left) + magSqr(U1Right))) - sqrt(0.5*(magSqr(U2Left) + magSqr(U2Right))));
+
+    const scalar pressureFlux1 = pressureFlux(alphaLeft,    alphaRight,
+                                              pLeft,        pRight,
+                                              U1Left,       U1Right,
+                                              rho1Left,     rho1Right,
+                                              aLeft,        aRight,
+                                              lambdaMr,
                                               normalVector);
 
-    const scalar pressureFlux2 = pressureFlux(pLeft,    pRight,
-                                              U2Left,   U2Right,
-                                              rho2Left, rho2Right,
-                                              aLeft,    aRight,
+    const scalar pressureFlux2 = pressureFlux(alphaLeft,    alphaRight,
+                                              pLeft,        pRight,
+                                              U2Left,       U2Right,
+                                              rho2Left,     rho2Right,
+                                              aLeft,        aRight,
+                                              lambdaMr,
                                               normalVector);
+
 
     alphaRhoFlux1Left   = (leftMassFlux1*(1.0 - alphaLeft) + rightMassFlux1*(1.0 - alphaRight))*magSf;
     alphaRhoFlux1Right  = alphaRhoFlux1Left;
@@ -247,7 +247,6 @@ void Foam::mslau2::calculateFlux
 
     alphaRhoEFlux1Left  = (leftMassFlux1*(1.0 - alphaLeft)*H1Left + rightMassFlux1*(1.0 - alphaRight)*H1Right)*magSf;
     alphaRhoEFlux1Right = alphaRhoEFlux1Left;
-
 
 
     alphaRhoFlux2Left   = (leftMassFlux2*alphaLeft + rightMassFlux2*alphaRight)*magSf;

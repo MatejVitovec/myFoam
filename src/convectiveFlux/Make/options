@@ -16,7 +16,8 @@ EXE_INC = \
     -IconvectiveFlux/riemannSolver/hllc \
     -IconvectiveFlux/riemannSolver/advectionSplitting \
     -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
-    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp
+    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
+    -IconvectiveFlux/riemannSolver/mslau2
 
 EXE_LIBS = \
     -lfiniteVolume \

@@ -65,8 +65,10 @@ private:
     //- Disallow default bitwise assignment
     void operator=(const mslau2&) = delete;
 
-    virtual scalar massFlux
+    scalar massFlux
     (
+        const scalar& alphaLeft,
+        const scalar& alphaRight,
         const scalar& pLeft,
         const scalar& pRight,
         const vector& ULeft,
@@ -78,8 +80,10 @@ private:
         const vector& normalVector
     ) const;
 
-    virtual scalar pressureFlux
+    scalar pressureFlux
     (
+        const scalar& alphaLeft,
+        const scalar& alphaRight,
         const scalar& pLeft,
         const scalar& pRight,
         const vector& ULeft,
@@ -88,12 +92,14 @@ private:
         const scalar& rhoRight,
         const scalar& aLeft,
         const scalar& aRight,
+        const scalar& lambdaMr,
         const vector& normalVector
     ) const;
+
 
 public:
 
-    //TypeName("mslau2");
+    TypeName("mslau2");
 
     // Constructors
 

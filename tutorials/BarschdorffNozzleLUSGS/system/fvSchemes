@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-riemannSolver           slau2;
+riemannSolver           mslau2;
 
 ddtSchemes
 {
