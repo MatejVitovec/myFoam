@@ -184,6 +184,16 @@ public:
         scalar& T2
     ) const;
 
+    void blendVanishingFluid
+    (
+        scalar& alpha2,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar& T2vanished
+    ) const;
+
     void fluxFromConservative
     (
         scalar& fluxAlphaRho1,

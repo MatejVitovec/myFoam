@@ -317,6 +317,47 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
     }
 }
 
+void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
+(
+    scalar& alpha2,
+    vector& U1,
+    vector& U2,
+    scalar& T1,
+    scalar& T2,
+    const scalar& T2vanished
+) const
+{
+    if ((1.0 - alpha2) <= epsilonMin_)
+    {
+        alpha2 = 1.0 - epsilonMin_;
+        U1 = U2;
+        T1 = T2;
+    }
+    else if ((1.0 - alpha2) < epsilonMax_)
+    {
+        const scalar xi = ((1.0 - alpha2) - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const scalar gFunc = -sqr(xi)*(2.0*xi - 3.0);
+            
+        U1 = gFunc*U1 + (1.0 - gFunc)*U2;
+        T1 = gFunc*T1 + (1.0 - gFunc)*T2;
+    }
+        
+    if (alpha2 <= epsilonMin_)
+    {
+        alpha2 = epsilonMin_;
+        U2 = U1;
+        T2 = T2vanished;
+    }
+    else if (alpha2 < epsilonMax_)
+    {
+        const double xi = (alpha2 - epsilonMin_)/(epsilonMax_ - epsilonMin_);
+        const double gFunc = -sqr(xi)*(2.0*xi - 3.0);
+
+        U2 = gFunc*U2 + (1.0 - gFunc)*U1;
+        T2 = gFunc*T2 + (1.0 - gFunc)*T2vanished;
+    }
+}
+
 void Foam::TwoFluidFoam::twoFluid::fluxFromConservative
 (
     scalar& fluxAlphaRho1,

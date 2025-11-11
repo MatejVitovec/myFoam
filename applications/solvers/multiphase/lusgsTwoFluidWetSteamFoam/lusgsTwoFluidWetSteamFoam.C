@@ -176,8 +176,8 @@ int main(int argc, char *argv[])
             T2    += dT2;
 
             //fluid.correct();
-            fluid.blendVanishingFluid();
-            fluid.blendVanishingFluid(condensation.saturation().Ts(p));
+            //fluid.blendVanishingFluid();
+            fluid.blendVanishingFluid(Ts);
             //fluid.bound();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
@@ -208,12 +208,12 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        if (runTime.timeIndex() > 21650)
+        /*if (runTime.timeIndex() > 21650)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
-        }
+        }*/
 
         //runTime.printExecutionTime(Info);
 

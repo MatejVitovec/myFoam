@@ -201,7 +201,7 @@ mapFieldU2ToT1FixedValueFvPatchVectorField::updateCoeffs()
     }
 
 //{{{ begin code
-    #line 32 "/home/matejv/myFoam/tutorials/BarschdorffNozzleLUSGS/0/U.2/boundaryField/inlet"
+    #line 32 "/home/matej/myFoam/tutorials/BarschdorffNozzleLUSGS/0/U.2/boundaryField/inlet"
 const volVectorField& sourceField = db().lookupObject<volVectorField>("U.1");
             operator== (sourceField.boundaryField()[patch().index()]);
 //}}} end code

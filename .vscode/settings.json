@@ -219,7 +219,8 @@
         "lusgsTwoFluidWetSteamFoam.C": "cpp",
         "nucleationModel.C": "cpp",
         "saturation.C": "cpp",
-        "mslau2.C": "cpp"
+        "mslau2.C": "cpp",
+        "fixedValueFvPatchFieldTemplate.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
