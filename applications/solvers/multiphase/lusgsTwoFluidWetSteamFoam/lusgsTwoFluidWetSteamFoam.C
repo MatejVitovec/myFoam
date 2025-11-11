@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
             volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
 
             volScalarField dragK = drag.K(condensation.dropletDiameter());
-            dragSource = dragK*(U1 - U2);
+            dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
             volScalarField condensationMassSource = condensation.condensationRateMassSource();
             volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
                 /*fvc::ddt(conservative.alphaRhoU1())
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
-                + dragK*(fluid.U1() - fluid.U2())
+                + dragSource
                 + condensationMomentumSource
             ));
 
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
                 /*fvc::ddt(conservative.alphaRhoU2())
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
-                + dragK*(fluid.U2() - fluid.U1())
+                - dragSource
                 - condensationMomentumSource
             ));
 
@@ -208,12 +208,12 @@ int main(int argc, char *argv[])
 
         runTime.write();
 
-        /*if (runTime.timeIndex() > 7180)
+        if (runTime.timeIndex() > 21650)
         {
             Info << ">>> Forcing write <<<" << endl;
             runTime.writeNow();
             runTime.write();
-        }*/
+        }
 
         //runTime.printExecutionTime(Info);
 

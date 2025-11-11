@@ -72,7 +72,7 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(
     const objectRegistry& db = fluid_.mesh();
     const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
 
-    return 1.0 + 2*Kn*(1.257 + 0.4*exp(-1.1)/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL)));
+    return 1.0 + 2*Kn*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))));
     //return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))))*Kn*0.0;
 }
 
