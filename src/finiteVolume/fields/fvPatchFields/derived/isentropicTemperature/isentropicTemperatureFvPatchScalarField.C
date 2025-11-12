@@ -44,7 +44,6 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 )
 :
     fixedValueFvPatchScalarField(p, iF),
-    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
     fluidName_(this->internalField().group()),
     pName_("p"),
     UName_(IOobject::groupName("U", fluidName_)),
@@ -79,7 +78,6 @@ Foam::isentropicTemperatureFvPatchScalarField::isentropicTemperatureFvPatchScala
 )
 :
     fixedValueFvPatchScalarField(p, iF, dict, false),
-    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
     fluidName_(this->internalField().group()),
     pName_("p"),
     UName_(IOobject::groupName("U", fluidName_)),
@@ -183,10 +181,7 @@ void Foam::isentropicTemperatureFvPatchScalarField::updateCoeffs()
     //const fvsPatchScalarField& phip =
     //    patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    //const fluidThermo& thermo =
-    //    db().lookupObject<fluidThermo>(fluidThermo::dictName);
-
-    const auto& thermo =
+    const fluidThermo& thermo =
         db().lookupObject<fluidThermo>(IOobject::groupName("thermophysicalProperties", fluidName_));
 
     autoPtr<gasProperties> gasProps(gasProperties::New(thermo));
@@ -225,10 +220,11 @@ void Foam::isentropicTemperatureFvPatchScalarField::write(Ostream& os) const
 {
     fvPatchScalarField::write(os);
     os.writeEntryIfDifferent<word>("fluidName", "", fluidName_);
-    os.writeEntryIfDifferent<word>("p" + (fluidName_ != "" ? "." + fluidName_ : ""), "p", pName_);
-    os.writeEntryIfDifferent<word>("U" + (fluidName_ != "" ? "." + fluidName_ : ""), "U", UName_);
-    os.writeEntryIfDifferent<word>("phi" + (fluidName_ != "" ? "." + fluidName_ : ""), "phi", phiName_);
-    T0_.writeEntry("T0" + (fluidName_ != "" ? "." + fluidName_ : ""), os);
+    os.writeEntryIfDifferent<word>(IOobject::groupName("p", fluidName_), "p", pName_);
+    os.writeEntryIfDifferent<word>(IOobject::groupName("U", fluidName_), "U", UName_);
+    os.writeEntryIfDifferent<word>(IOobject::groupName("phi", fluidName_), "phi", phiName_);
+    T0_.writeEntry(IOobject::groupName("T0", fluidName_), os);
+    p0_.writeEntry("p0", os);
     writeEntry("value", os);
 }
 

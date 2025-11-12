@@ -203,10 +203,23 @@ int main(int argc, char *argv[])
         rhoMPhi2 = linearInterpolate(rho*U2) & mesh.Sf();
         condensation.correct();
 
-        rho1.ref() = thermo1.rho();
-        rho2.ref() = thermo2.rho();
+
+        forAll(s1, celli)
+        {
+            s1[celli] = fluid.gasProps1().S(p[celli], T1[celli]);
+        }
+        
+        h1 = e1 + p/rho1;
 
         runTime.write();
+
+        if (mesh.time().outputTime())
+        {
+            rho1.write();
+            rho2.write();
+            //e1.write();
+            //e2.write();
+        }
 
         /*if (runTime.timeIndex() > 21650)
         {

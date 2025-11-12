@@ -37,6 +37,9 @@ const volScalarField& a2 = fluid.a2();
 const volScalarField& e1 = thermo1.he();
 const volScalarField& e2 = thermo2.he();
 
+const volScalarField& rho1 = thermo1.rho();
+const volScalarField& rho2 = thermo2.rho();
+
 surfaceScalarField amaxSf
 (
     "amaxSf",
@@ -84,33 +87,34 @@ volScalarField d
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
 
-
-//Pro ukladani
-volScalarField rho1
+volScalarField s1
 (
     IOobject
     (
-        "rho1",
+        "s.1",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    thermo1.rho()
+    mesh,
+    dimensionedScalar("s", dimEnergy/dimMass/dimTemperature, 0.0)
 );
 
-volScalarField rho2
+volScalarField h1
 (
     IOobject
     (
-        "rho2",
+        "h.1",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    thermo2.rho()
+    mesh,
+    dimensionedScalar("h1", dimEnergy/dimMass, 0.0)
 );
+
 
 volScalarField dp
 (

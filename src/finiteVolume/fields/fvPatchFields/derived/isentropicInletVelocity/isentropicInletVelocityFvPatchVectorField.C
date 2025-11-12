@@ -46,7 +46,6 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(p, iF),
-    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
     fluidName_(this->internalField().group()),
     pName_("p"),
     TName_(IOobject::groupName("T", fluidName_)),
@@ -94,7 +93,6 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(p, iF),
-    //fluidName_(this->internalField().name().substr(this->internalField().name().find('.') + 1)),
     fluidName_(this->internalField().group()),
     pName_("p"),
     TName_(IOobject::groupName("T", fluidName_)),
@@ -233,7 +231,7 @@ void Foam::isentropicInletVelocityFvPatchVectorField::updateCoeffs()
 
     const fvMesh& mesh = patch().boundaryMesh().mesh();
 
-    const auto& thermo =
+    const fluidThermo& thermo =
         mesh.lookupObject<fluidThermo>(IOobject::groupName("thermophysicalProperties", fluidName_));
 
     autoPtr<gasProperties> gasProps(gasProperties::New(thermo));
@@ -302,13 +300,13 @@ void Foam::isentropicInletVelocityFvPatchVectorField::updateCoeffs()
         const scalar magU = sqrt(2*max(H0 - hb, 0.0));
         const scalar ub = magU;
         
-
         // Inward normal
         const vector n = -pSf[faceI] / mag(pSf[faceI]);
         const vector dir = (hasInletDirection()) ? inletDir_[faceI] / mag(inletDir_[faceI]) : n;
         const vector utau = (hasTangentialVelocity()) ? tangentialVelocity_[faceI] : Zero;
 
         const scalar oneByCos = 1 / (n & dir);
+        
         /*const scalar p1 = pint[faceCellI];
         const scalar u1 = n & Uint[faceCellI];
         const scalar c1 = gasProps->c(pint[faceCellI], Tint[faceCellI]);
