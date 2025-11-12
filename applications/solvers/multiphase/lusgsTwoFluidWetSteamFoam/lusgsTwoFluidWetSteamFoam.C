@@ -208,7 +208,6 @@ int main(int argc, char *argv[])
         {
             s1[celli] = fluid.gasProps1().S(p[celli], T1[celli]);
         }
-        
         h1 = e1 + p/rho1;
 
         runTime.write();

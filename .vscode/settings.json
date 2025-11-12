@@ -221,7 +221,8 @@
         "saturation.C": "cpp",
         "mslau2.C": "cpp",
         "fixedValueFvPatchFieldTemplate.C": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "mixtureConvectiveFlux.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
