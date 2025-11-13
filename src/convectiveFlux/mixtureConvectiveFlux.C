@@ -128,37 +128,38 @@ void Foam::mixtureConvectiveFlux::computeFlux()
     //TODO
 
     // Calculate fluxes at internal faces
-    forAll (owner, faceI)
+    forAll (owner, facei)
     {
-        const scalar rho1_pos = gasProps1().rho(p_pos[faceI], T1_pos[faceI]);
-        const scalar rho1_neg = gasProps1().rho(p_neg[faceI], T1_neg[faceI]);
-        const scalar rho2_pos = gasProps2().rho(p_pos[faceI], T2_pos[faceI]);
-        const scalar rho2_neg = gasProps2().rho(p_neg[faceI], T2_neg[faceI]);
+        const scalar rho1_pos = gasProps1().rho(p_pos[facei], T1_pos[facei]);
+        const scalar rho1_neg = gasProps1().rho(p_neg[facei], T1_neg[facei]);
+        const scalar rho2_pos = gasProps2().rho(p_pos[facei], T2_pos[facei]);
+        const scalar rho2_neg = gasProps2().rho(p_neg[facei], T2_neg[facei]);
         
-        const scalar rho_pos  = rho1_pos*(1.0 - alpha_pos[faceI]) + rho2_pos*alpha_pos[faceI];
-        const scalar rho_neg  = rho1_neg*(1.0 - alpha_neg[faceI]) + rho2_neg*alpha_neg[faceI];
+        const scalar rho_pos  = rho1_pos*(1.0 - alpha_pos[facei]) + rho2_pos*alpha_pos[facei];
+        const scalar rho_neg  = rho1_neg*(1.0 - alpha_neg[facei]) + rho2_neg*alpha_neg[facei];
 
-        const scalar w_pos = (rho2_pos/rho_pos)*alpha_pos[faceI];
-        const scalar w_neg = (rho2_neg/rho_neg)*alpha_neg[faceI];
+        const scalar w_pos = (rho2_pos/rho_pos)*alpha_pos[facei];
+        const scalar w_neg = (rho2_neg/rho_neg)*alpha_neg[facei];
 
-        const scalar e_pos = gasProps1().Es(p_pos[faceI], T1_pos[faceI])*(1.0 - w_pos) + gasProps2().Es(p_pos[faceI], T2_pos[faceI])*w_pos;
-        const scalar e_neg = gasProps1().Es(p_neg[faceI], T1_neg[faceI])*(1.0 - w_neg) + gasProps2().Es(p_neg[faceI], T2_neg[faceI])*w_neg;
+        const scalar e_pos = gasProps1().Es(p_pos[facei], T1_pos[facei])*(1.0 - w_pos) + gasProps2().Es(p_pos[facei], T2_pos[facei])*w_pos;
+        const scalar e_neg = gasProps1().Es(p_neg[facei], T1_neg[facei])*(1.0 - w_neg) + gasProps2().Es(p_neg[facei], T2_neg[facei])*w_neg;
 
-        const scalar c_pos = gasProps1().c(p_pos[faceI], T1_pos[faceI])*sqrt(1.0 - w_pos) + gasProps2().c(p_pos[faceI], T2_pos[faceI])*sqrt(w_pos);
-        const scalar c_neg = gasProps1().c(p_neg[faceI], T1_neg[faceI])*sqrt(1.0 - w_neg) + gasProps2().c(p_neg[faceI], T2_neg[faceI])*sqrt(w_neg);
+        const scalar a_pos = gasProps1().c(p_pos[facei], T1_pos[facei])*sqrt(1.0 - w_pos) + gasProps2().c(p_pos[facei], T2_pos[facei])*sqrt(w_pos);
+        const scalar a_neg = gasProps1().c(p_neg[facei], T1_neg[facei])*sqrt(1.0 - w_neg) + gasProps2().c(p_neg[facei], T2_neg[facei])*sqrt(w_neg);
 
         // calculate fluxes with reconstructed primitive variables at faces
 	    fluxSolver_->calculateFlux
         (
-            rhoFlux_[faceI],
-            rhoUFlux_[faceI],
-            rhoEFlux_[faceI],
-            p_pos[faceI],   p_neg[faceI],
-            U_pos[faceI],   U_neg[faceI],
-            T_pos[faceI],   T_neg[faceI],
-            Sf[faceI],
-            magSf[faceI],
-            gasProps()
+            rhoFlux_[facei],
+            rhoUFlux_[facei],
+            rhoEFlux_[facei],
+            p_pos[facei],   p_neg[facei],
+            U_pos[facei],   U_neg[facei],
+            rho_pos,        rho_neg,
+            e_pos,          e_neg,
+            a_pos,          a_neg,
+            Sf[facei],
+            magSf[facei]
         );
     }
 
@@ -179,16 +180,37 @@ void Foam::mixtureConvectiveFlux::computeFlux()
         if (curPatch.coupled())
         {
             // Patch fields
+            const fvsPatchScalarField& palpha_pos = alpha_pos.boundaryField()[patchi];
             const fvsPatchScalarField& pp_pos = p_pos.boundaryField()[patchi];
             const fvsPatchVectorField& pU_pos = U_pos.boundaryField()[patchi];
-            const fvsPatchScalarField& pT_pos = T_pos.boundaryField()[patchi];
+            const fvsPatchScalarField& pT_pos = T1_pos.boundaryField()[patchi];
+            const fvsPatchScalarField& pT_pos = T2_pos.boundaryField()[patchi];
             
+            const fvsPatchScalarField& palpha_neg = alpha_neg.boundaryField()[patchi];
             const fvsPatchScalarField& pp_neg = p_neg.boundaryField()[patchi];
             const fvsPatchVectorField& pU_neg = U_neg.boundaryField()[patchi];
-            const fvsPatchScalarField& pT_neg = T_neg.boundaryField()[patchi];
+            const fvsPatchScalarField& pT_neg = T1_neg.boundaryField()[patchi];
+            const fvsPatchScalarField& pT_neg = T2_neg.boundaryField()[patchi];
             
             forAll (curPatch, facei)
             {
+                const scalar rho1_pos = gasProps1().rho(pp_pos[facei], pT1_pos[facei]);
+                const scalar rho1_neg = gasProps1().rho(pp_neg[facei], pT1_neg[facei]);
+                const scalar rho2_pos = gasProps2().rho(pp_pos[facei], pT2_pos[facei]);
+                const scalar rho2_neg = gasProps2().rho(pp_neg[facei], pT2_neg[facei]);
+                
+                const scalar rho_pos  = rho1_pos*(1.0 - palpha_pos[facei]) + rho2_pos*palpha_pos[facei];
+                const scalar rho_neg  = rho1_neg*(1.0 - palpha_neg[facei]) + rho2_neg*palpha_neg[facei];
+
+                const scalar w_pos = (rho2_pos/rho_pos)*palpha_pos[facei];
+                const scalar w_neg = (rho2_neg/rho_neg)*palpha_neg[facei];
+
+                const scalar e_pos = gasProps1().Es(pp_pos[facei], pT1_pos[facei])*(1.0 - w_pos) + gasProps2().Es(pp_pos[facei], pT2_pos[facei])*w_pos;
+                const scalar e_neg = gasProps1().Es(pp_neg[facei], pT1_neg[facei])*(1.0 - w_neg) + gasProps2().Es(pp_neg[facei], pT2_neg[facei])*w_neg;
+
+                const scalar a_pos = gasProps1().c(pp_pos[facei], pT1_pos[facei])*sqrt(1.0 - w_pos) + gasProps2().c(pp_pos[facei], pT2_pos[facei])*sqrt(w_pos);
+                const scalar a_neg = gasProps1().c(pp_neg[facei], pT1_neg[facei])*sqrt(1.0 - w_neg) + gasProps2().c(pp_neg[facei], pT2_neg[facei])*sqrt(w_neg);
+
                 fluxSolver_->calculateFlux
                 (
                     pRhoFlux[facei],
@@ -196,21 +218,31 @@ void Foam::mixtureConvectiveFlux::computeFlux()
                     pRhoEFlux[facei],
                     pp_pos[facei],  pp_neg[facei],
                     pU_pos[facei],  pU_neg[facei],
-                    pT_pos[facei],  pT_neg[facei],
+                    rho_pos,        rho_neg,
+                    e_pos,          e_neg,
+                    a_pos,          a_neg,
                     pSf[facei],
-                    pMagSf[facei],
-                    gasProps()
+                    pMagSf[facei]
                 );
             }
         }
         else
         {
+            const scalarField& palpha = alpha_.boundaryField()[patchi];
             const fvPatchScalarField& pp = p_.boundaryField()[patchi];
             const vectorField& pU = U_.boundaryField()[patchi];
-            const scalarField& pT = T_.boundaryField()[patchi];
+            const scalarField& pT1 = T1_.boundaryField()[patchi];
+            const scalarField& pT2 = T2_.boundaryField()[patchi];
 
             forAll (pp, facei)
             {
+                const scalar prho1 = gasProps1().rho(pp[facei], pT1[facei]);
+                const scalar prho2 = gasProps2().rho(pp[facei], pT2[facei]);
+                const scalar prho  = prho1*(1.0 - palpha[facei]) + prho2*palpha[facei];
+                const scalar pw = (prho2/prho)*palpha[facei];
+                const scalar pe = gasProps1().Es(pp[facei], pT1[facei])*(1.0 - pw) + gasProps2().Es(pp[facei], pT2[facei])*pw;
+                const scalar pa = gasProps1().c(pp[facei], pT1[facei])*sqrt(1.0 - pw) + gasProps2().c(pp[facei], pT2[facei])*sqrt(pw);
+
                 // Calculate fluxes
                 fluxSolver_->calculateFlux
                 (
@@ -219,10 +251,11 @@ void Foam::mixtureConvectiveFlux::computeFlux()
                     pRhoEFlux[facei],
                     pp[facei],  pp[facei],
                     pU[facei],  pU[facei],
-                    pT[facei],  pT[facei],
+                    prho,       prho,
+                    pe,         pe,
+                    pa,         pa,
                     pSf[facei],
-                    pMagSf[facei],
-                    gasProps()
+                    pMagSf[facei]
                 );
             }
         }

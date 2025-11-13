@@ -100,6 +100,25 @@ public:
             const scalar& magSf,
             const gasProperties& gas
         ) const;
+
+        virtual void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const;
 };
 
 

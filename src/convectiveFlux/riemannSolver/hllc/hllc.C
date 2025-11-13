@@ -198,4 +198,159 @@ void Foam::hllc::calculateFlux
 }
 
 
+void Foam::hllc::calculateFlux
+(
+    scalar& rhoFlux,
+    vector& rhoUFlux,
+    scalar& rhoEFlux,
+    const scalar pLeft,
+    const scalar pRight,
+    const vector ULeft,
+    const vector URight,
+    const scalar rhoLeft,
+    const scalar rhoRight,
+    const scalar eLeft,
+    const scalar eRight,
+    const scalar aLeft,
+    const scalar aRight,
+    const vector Sf,
+    const scalar magSf
+) const
+{
+    // normal vector
+    const vector normalVector = Sf/magSf;
+
+    // DensityVelocity
+    const vector rhoULeft  = rhoLeft *ULeft;
+    const vector rhoURight = rhoRight*URight;
+
+    // DensityTotalEnergy
+    const scalar rhoELeft  = rhoLeft *(eLeft  + 0.5*magSqr(ULeft));
+    const scalar rhoERight = rhoRight*(eRight + 0.5*magSqr(URight));
+
+    // Compute qLeft and qRight (q_{l,r} = U_{l,r} \bullet n)
+    const scalar qLeft  = (ULeft  & normalVector);
+    const scalar qRight = (URight & normalVector);
+
+    // Step 2: Primitive variable Riemann solver for pStar
+    scalar pStar = max(0, 0.5*(pLeft + pRight)
+        - 0.125*(qRight - qLeft)*(rhoLeft + rhoRight)*(aLeft + aRight));
+
+    // Step 3: compute signal speeds for face (Lax speed estimate):
+    scalar SLeft;
+    scalar SRight;
+
+    if (pStar <= pLeft)
+    {
+        SLeft = qLeft - aLeft;
+    }        
+    else
+    {
+        SLeft = 0.5*(qLeft + qRight) - 0.5*(aLeft + aRight);
+    }
+        
+    if (pStar <= pRight)
+    {
+        SRight = qRight + aRight;
+    }        
+    else
+    {
+        SRight = 0.5*(qLeft + qRight) + 0.5*(aLeft + aRight);
+    }
+
+    const scalar SStar = (pRight - pLeft + rhoLeft*qLeft*(SLeft - qLeft) - rhoRight*qRight*(SRight - qRight))
+        /stabilise(rhoLeft*(SLeft - qLeft) - rhoRight*(SRight - qRight), VSMALL);
+    //const scalar SStar = (pRight - pLeft + rhoLeft*qLeft*(SLeft - qLeft) - rhoRight*qRight*(SRight - qRight))
+    //    /rhoLeft*(SLeft - qLeft) - rhoRight*(SRight - qRight);
+        
+
+    // Compute pressure in star region from the right side
+    const scalar pStarRight =
+        rhoRight*(qRight - SRight)*(qRight - SStar) + pRight;
+
+    // Should be equal to the left side
+    const scalar pStarLeft  =
+        rhoLeft*(qLeft - SLeft)*(qLeft - SStar) + pLeft;
+
+    // Give a warning if this is not the case
+    if (mag(pStarRight - pStarLeft) > 1e-6)
+    {
+        Info << "mag(pStarRight - pStarLeft) > VSMALL " << endl;
+    }
+
+    // Use pStarRight for pStar, as in theory, pStarRight == pStarLeft
+    //pStar = pStarRight;
+
+    // Step 4: upwinding - compute states:
+    scalar convectionSpeed = 0.0;
+    scalar rhoState = 0.0;
+    vector rhoUState = vector::zero;
+    scalar rhoEState = 0.0;
+    scalar pState = 0.0;
+
+    if (pos(SLeft))
+    {
+        // compute F_l
+        convectionSpeed = qLeft;
+        rhoState  = rhoLeft;
+        rhoUState = rhoULeft;
+        rhoEState = rhoELeft;
+        pState = pLeft;
+    }
+    else if (pos(SStar))
+    {
+        scalar omegaLeft = scalar(1.0)/stabilise((SLeft - SStar), VSMALL);
+        //scalar omegaLeft = scalar(1.0)/(SLeft - SStar);
+        pStar = pStarLeft;
+
+        // Compute left star region
+        convectionSpeed = SStar;
+
+        rhoState  = omegaLeft*(SLeft - qLeft)*rhoLeft;
+
+        rhoUState = omegaLeft*((SLeft - qLeft)*rhoULeft
+            + (pStar - pLeft)*normalVector);
+
+        rhoEState = omegaLeft*((SLeft - qLeft)*rhoELeft
+            - pLeft*qLeft + pStar*SStar);
+
+        pState = pStar;
+    }
+    else if (pos(SRight))
+    {
+        scalar omegaRight = scalar(1.0)/stabilise((SRight - SStar), VSMALL);
+        //scalar omegaRight = scalar(1.0)/(SRight - SStar);
+        pStar = pStarRight;
+
+        // compute right star region
+        convectionSpeed = SStar;
+
+        rhoState  = omegaRight*(SRight - qRight)*rhoRight;
+
+        rhoUState = omegaRight*((SRight - qRight)*rhoURight + (pStar - pRight)*normalVector);
+
+        rhoEState = omegaRight*((SRight - qRight)*rhoERight
+            - pRight*qRight + pStar*SStar);
+
+        pState = pStar;
+    }
+    else if (neg(SRight))
+    {
+        // compute F_r
+        convectionSpeed = qRight;
+        rhoState  = rhoRight;
+        rhoUState = rhoURight;
+        rhoEState = rhoERight;
+        pState = pRight;
+    }
+    else
+    {
+        Info << "Error in HLLC Riemann solver" << endl;
+    }
+
+    rhoFlux  = (convectionSpeed*rhoState)*magSf;
+    rhoUFlux = (convectionSpeed*rhoUState + pState*normalVector)*magSf;
+    rhoEFlux = (convectionSpeed*(rhoEState + pState))*magSf;
+}
+
 // ************************************************************************* //

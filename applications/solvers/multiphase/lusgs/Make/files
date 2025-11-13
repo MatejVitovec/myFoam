@@ -1,8 +1,0 @@
-convectiveFlux.C
-riemannSolver/riemannSolver.C
-riemannSolver/hllc/hllc.C
-riemannSolver/advectionSplitting/advectionSplitting.C
-riemannSolver/advectionSplitting/slau2/slau2.C
-riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
-
-LIB = $(FOAM_USER_LIBBIN)/libmyConvectiveFlux
