@@ -61,6 +61,8 @@ surfaceScalarField rhoMPhi2
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
 TwoFluidFoam::dragModel& drag = pDrag();
 
+saturation satur = saturation(fluid.subDict("condensation"), thermo1);
+
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
     fluid.alpha2(),
@@ -69,6 +71,7 @@ autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::conde
     rhoMPhi2,
     fluid.thermo1(),
     fluid.thermo2(),
+    satur,
     fluid
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();

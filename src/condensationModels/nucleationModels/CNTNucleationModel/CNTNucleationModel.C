@@ -26,24 +26,25 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "nucleationModel.H"
+#include "CNTNucleationModel.H"
 #include "addToRunTimeSelectionTable.H"
-
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+#include "physicoChemicalConstants.H"
+#include "fundamentalConstants.H"
+#include "mathematicalConstants.H"
 
 namespace Foam
 {
 namespace WetSteam
-{
-    defineTypeNameAndDebug(nucleationModel, 0);
-    defineRunTimeSelectionTable(nucleationModel, dictionary);
+{    
+    defineTypeNameAndDebug(CNTNucleationModel, 0);
+    addToRunTimeSelectionTable(nucleationModel, CNTNucleationModel, dictionary);
 }
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::WetSteam::nucleationModel::nucleationModel
+Foam::WetSteam::CNTNucleationModel::CNTNucleationModel
 (
     const dictionary& dict,
     const fluidThermo& gasThermo,
@@ -51,65 +52,41 @@ Foam::WetSteam::nucleationModel::nucleationModel
     const saturation& satur
 )
 :
-    gasThermo_(gasThermo),
-    liquidThermo_(liquidThermo),
-    saturation_(satur)
-{}
-
-
-// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
-
-Foam::autoPtr<Foam::WetSteam::nucleationModel>
-Foam::WetSteam::nucleationModel::New
-(
-    const dictionary& dict,
-    const fluidThermo& gasThermo,
-    const fluidThermo& liquidThermo,
-    const saturation& satur
-)
-{
-    word nucleationModelName(dict.lookup("nucleationModel"));
-
-    Info<< "Selecting nucleationModel "
-        << nucleationModelName << endl;
-
-    auto* ctorPtr = dictionaryConstructorTable(nucleationModelName);
-
-    if (!ctorPtr)
-    {
-        FatalIOErrorInLookup
-        (
-            dict,
-            "nucleationModel",
-            nucleationModelName,
-            *dictionaryConstructorTablePtr_
-        ) << exit(FatalIOError);
-    }
-
-    return ctorPtr(dict, gasThermo, liquidThermo, satur);
-}
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::WetSteam::nucleationModel::~nucleationModel()
+    nucleationModel(dict, gasThermo, liquidThermo, satur),
+    m1_
+    (
+        "m1",
+        dimMass,
+        dict.lookupOrDefault<scalar>("molecularMass", 2.99046e-26)
+    ),
+    beta_
+    (
+        "beta",
+        dimless,
+        dict.lookupOrDefault<scalar>("surfaceTensionCorrection", 1)
+    )
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-/*Foam::tmp<Foam::volScalarField> Foam::WetSteam::nucleationModel::J(const volScalarField& rc) const
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::J(const volScalarField& rc, const volScalarField& sigma) const
 {
-
     const volScalarField& rho_g = gasThermo_.rho();
     const volScalarField& rho_l = liquidThermo_.rho();
     const volScalarField& T_g = gasThermo_.T();
     const volScalarField& T_s = saturation_.Ts();
 
-    volScalarField J = sqrt(2*sigma_/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma_/(3*kB*T_g));
+    const volScalarField rhos_l = saturation_.rhosl();
 
-    return pos(T_s - T_g)*J;
-}*/
+    const scalar pi = constant::mathematical::pi;
+    const dimensionedScalar kB = constant::physicoChemical::k;
+
+    //volScalarField J = sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g));
+    //return pos(T_s - T_g)*J;
+
+    return pos(T_s - T_g)*(sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g)));
+}
 
 
 // ************************************************************************* //

@@ -42,11 +42,13 @@ SourceFiles
 #include "volFields.H"
 #include "dictionary.H"
 #include "runTimeSelectionTables.H"
+#include "fluidThermo.H"
+#include "saturation.H"
 
 namespace Foam
 {
 
-namespace TwoFluidFoam
+namespace WetSteam
 {
 
 /*---------------------------------------------------------------------------*\
@@ -54,20 +56,22 @@ namespace TwoFluidFoam
 \*---------------------------------------------------------------------------*/
 
 class nucleationModel
-:
-    public regIOobject
 {
 protected:
 
     // Protected Data
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
+    const saturation& saturation_;
 
-    const volScalarField& sigma_;
-    const volScalarField& Ts_;
+    //const volScalarField& sigma_;
 
-    const dimensionedScalar m1_;
-    const dimensionedScalar beta_;
+private:
+    //- Disallow default bitwise copy construct
+    nucleationModel(const nucleationModel&) = delete;
+
+    //- Disallow default bitwise assignment
+    void operator=(const nucleationModel&) = delete;
 
 public:
 
@@ -86,41 +90,27 @@ public:
                 const dictionary& dict,
                 const fluidThermo& gasThermo,
                 const fluidThermo& liquidThermo,
-                const volScalarField& sigma,
-                const volScalarField& Ts,
-                const bool registerObject
+                const saturation& satur
             ),
-            (dict, gasThermo, liquidThermo, sigma, Ts, registerObject)
+            (dict, gasThermo, liquidThermo, satur)
         );
 
 
     // Static data members
 
         //- Coefficient dimensions
-        static const dimensionSet dimK;
+        //static const dimensionSet dimK;
 
 
     // Constructors
 
-        // Construct without residual constants
-        nucleationModel
-        (
-            const fluidThermo& gasThermo,
-            const fluidThermo& liquidThermo,
-            const volScalarField& sigma,
-            const volScalarField& Ts,
-            const bool registerObject
-        );
-
-        // Construct with residual constants
+        // Construct from components
         nucleationModel
         (
             const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const volScalarField& sigma,
-            const volScalarField& Ts,
-            const bool registerObject
+            const saturation& satur
         );
 
 
@@ -135,18 +125,15 @@ public:
             const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const volScalarField& sigma,
-            const volScalarField& Ts
+            const saturation& satur
         );
 
 
     // Member Functions
 
         //- Return the rate of nucleation J
-        virtual tmp<volScalarField> J(const volScalarField& rc) const;
+        virtual tmp<volScalarField> J(const volScalarField& rc, const volScalarField& sigma) const = 0;
 
-        //- Dummy write for regIOobject
-        bool writeData(Ostream& os) const;
 };
 
 

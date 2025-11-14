@@ -40,6 +40,7 @@ SourceFiles
 #include "fluidThermo.H"
 #include "gasProperties.H"
 #include "liquidProperties.H"
+#include "saturation.H"
 #include "saturationCurve.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -72,14 +73,16 @@ protected:
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
 
+    const saturation& saturation_;
+
     autoPtr<gasProperties> pGasProps_;
     const gasProperties& gasProps_;
 
     autoPtr<liquidProperties> pliquidProps_;
     const liquidProperties& liquidProps_;
 
-    autoPtr<saturationCurve> pSaturation_;
-    const saturationCurve& saturation_;
+    //autoPtr<saturationCurve> pSaturation_;
+    //const saturationCurve& saturation_;
 
     volScalarField Kn_;
 
@@ -113,9 +116,10 @@ public:
             const surfaceScalarField& alphaRhoPhi,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
+            const saturation& satur,
             const dictionary& dict
         ),
-        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, dict)
+        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict)
     );
 
     
@@ -130,6 +134,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const saturation& satur,
         const dictionary& dict
     );
        
@@ -145,6 +150,7 @@ public:
         const surfaceScalarField& alphaRhoPhi,
         const fluidThermo& gasThermo,
         const fluidThermo& liquidThermo,
+        const saturation& satur,
         const dictionary& dict
     );
     
@@ -180,10 +186,10 @@ public:
         return mesh_;
     }
 
-    const saturationCurve& saturation() const
+    /*const saturationCurve& saturation() const
     {
         return saturation_;
-    }
+    }*/
 
     tmp<volScalarField> w() const;
     
@@ -191,7 +197,7 @@ public:
     virtual tmp<volScalarField> dropletDiameter() const;
 
 
-    virtual tmp<volScalarField> L() const;
+    //virtual tmp<volScalarField> L() const;
     
     // Check
     

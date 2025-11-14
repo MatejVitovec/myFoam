@@ -45,6 +45,7 @@ condensationModel::New
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturation& satur,
     const dictionary& dict
 )
 {
@@ -70,7 +71,7 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, condensationDict));
+    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, condensationDict));
 }
 
 
@@ -82,6 +83,7 @@ condensationModel::condensationModel
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturation& satur,
     const dictionary& dict
 )
 :
@@ -97,8 +99,9 @@ condensationModel::condensationModel
     gasProps_(pGasProps_()),
     pliquidProps_(liquidProperties::New(dict.lookupOrDefault<word>("liquidProperties", "H2O"))),
     liquidProps_(pliquidProps_()),
-    pSaturation_(saturationCurve::New(dict)),
-    saturation_(pSaturation_()),
+    //pSaturation_(saturationCurve::New(dict)),
+    //saturation_(pSaturation_()),
+    saturation_(satur),
     Kn_(
         IOobject
         (
@@ -138,8 +141,8 @@ condensationModel::condensationModel
 {}
 
 
-tmp<volScalarField> condensationModel::L() const
-{
+//tmp<volScalarField> condensationModel::L() const
+//{
     /*const volScalarField Ts = saturation_.Ts(gasThermo_.p());
     const volScalarField p = gasThermo_.p();
 
@@ -181,13 +184,13 @@ tmp<volScalarField> condensationModel::L() const
         rhosl[i] = rhoslCells[i];
     }*/
    
-    const volScalarField p = gasThermo_.p();
+    /*TADY const volScalarField p = gasThermo_.p();
 
     return tmp<volScalarField>
         (
             //new volScalarField("L", gasThermo_.Cp()*(gasThermo_.T() - Ts) + (1/rhosg - 1/rhosl)*Ts*saturation_.dpsdT(Ts))
-            new volScalarField("L", (gasThermo_.he() + p/gasThermo_.rho()) - saturation_.hsl(saturation_.Ts(p)))
-        );
+            new volScalarField("L", (gasThermo_.he() + p/gasThermo_.rho()) - saturation_.hsl())
+        );*/
 
 
     /*const std::function<scalar(scalar,scalar)> f = [&](scalar pp, scalar TT)
@@ -207,7 +210,7 @@ tmp<volScalarField> condensationModel::L() const
         {return 461.52*(-2.7246e-2*sqr(TT) + 2*1.6853e-5*pow(TT,3) + 2.4576*TT + 6094.4642);};
 
     return applyFunction1(f, T(), "L", dimEnergy/dimMass);*/
-}
+//}
 
 
 tmp<volScalarField> condensationModel::w() const

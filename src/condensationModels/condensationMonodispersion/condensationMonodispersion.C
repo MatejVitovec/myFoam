@@ -47,10 +47,11 @@ condensationMonodispersion::condensationMonodispersion
     const surfaceScalarField& alphaRhoPhi,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
+    const saturation& satur,
     const dictionary& dict
 )
 :
-    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, dict),
+    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict),
 
     n_(
         IOobject
@@ -77,7 +78,7 @@ condensationMonodispersion::condensationMonodispersion
         dimensionedScalar("zeroLenght", dimLength, 0.0)
     ),
 
-    L_(
+    /*L_(
         IOobject
         (
             "latentHeat",
@@ -88,7 +89,10 @@ condensationMonodispersion::condensationMonodispersion
         ),
         U.mesh(),
         dimensionedScalar("zeroLenght", gasThermo_.he().dimensions(), 0.0)
-    ),
+    ),*/
+
+    pNucleation_(nucleationModel::New(dict, gasThermo_, liquidThermo_, saturation_)),
+    nucleation_(pNucleation_()),
 
     m1_(
         "m1",
@@ -138,9 +142,13 @@ void condensationMonodispersion::correct()
     const volScalarField& rho_g = gasThermo_.rho();
     const volScalarField& rho_l = liquidThermo_.rho();
 
-    const volScalarField Ts = saturation_.Ts(p);
-    const volScalarField ps = saturation_.ps(T_g);
-    const volScalarField rhos_l = saturation_.rhosl(Ts);
+    //const volScalarField Ts = saturation_.Ts(p);
+    //const volScalarField ps = saturation_.ps(T_g);
+    //const volScalarField rhos_l = saturation_.rhosl(Ts);
+    const volScalarField& Ts = saturation_.Ts();
+    const volScalarField& ps = saturation_.ps();
+    const volScalarField rhos_l = saturation_.rhosl();
+    const volScalarField& L = saturation_.L();
     const volScalarField Cp_g = gasThermo_.Cp();
     //const volScalarField mu_g = gasThermo_.mu();
     //const volScalarField kappa_g = gasThermo_.kappa();
@@ -192,7 +200,22 @@ void condensationMonodispersion::correct()
         dimensionedScalar("zero", dimLength, 0.0)
     );
 
-    L_ = condensationModel::L();
+    // sigma
+    volScalarField sigma
+    (
+        IOobject
+        (
+            "sigma",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimMass/dimTime/dimTime, 0.0)
+    );
+
+    //L_ = condensationModel::L();
 
     /*r_ = max(pow((3.0*alpha_)/(4*pi*rho_*(n_ + dimensionedScalar("smallN", dimensionSet(-1, 0, 0, 0, 0, 0, 0), SMALL))), 1.0/3.0), rMin_);
 
@@ -203,6 +226,12 @@ void condensationMonodispersion::correct()
         Kn_[i] = auxKn[i];
     }*/
 
+    forAll(sigma, i)
+    {
+        const scalar tau = max(1.0 - T_g[i]/647.096, 0.0);
+        sigma[i] = 235.8e-3*pow(tau, 1.256)*(1 - 0.625*tau);
+        //sigma[i] = liquidProps_.sigma(p[i], T_g[i]);
+    }
 
     forAll(J, i)
     {
@@ -249,21 +278,23 @@ void condensationMonodispersion::correct()
             else                // No new droplets, only evaporation
             {
                 J[i] = 0;
-                rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L_[i]));
+                rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L[i]));
             }
         }
         else                    // Condensation (T < Ts)
         {
-            J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rhos_l[i]*
-                exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T_g[i]));
+            //J[i] = sqrt(2*sigma/(pi*pow3(m1_.value())))*sqr(rho_g[i])/rhos_l[i]*
+            //    exp(-beta_.value()*4*pi*sqr(rc[i])*sigma/(3*kB*T_g[i]));
 
             //if (r_[i] > rc[i])
             if (r_[i] > rMin_.value())
             {
-                rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L_[i]));
+                rDot[i] = (lambda_g/(r_[i]*(1 + 3.18*Kn/Pr)))*((T_l[i] - T_g[i])/(rho_l[i]*L[i]));
             }
         }
     }
+
+    J = nucleation_.J(rc, sigma);
 
     /////////////////////////
     
@@ -323,10 +354,10 @@ tmp<volScalarField> condensationMonodispersion::dropletDiameter() const
     return 2*max(r_, rMin_);
 }
 
-tmp<volScalarField> condensationMonodispersion::L() const
+/*tmp<volScalarField> condensationMonodispersion::L() const
 {
     return L_;
-}
+}*/
 
 
 }

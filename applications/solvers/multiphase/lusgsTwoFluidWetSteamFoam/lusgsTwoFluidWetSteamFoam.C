@@ -44,6 +44,7 @@ Description
 #include "twoFluidFvc.H"
 #include "dragModel.H"
 #include "condensationModel.H"
+#include "saturation.H"
 
 #include <eigen3/Eigen/Dense>
 
@@ -103,16 +104,20 @@ int main(int argc, char *argv[])
 
             volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
-            volScalarField Ts = condensation.saturation().Ts(p);
-            volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
-            volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
+            volScalarField Ts = satur.Ts();
+            //volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
+            //volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
+
+            volScalarField Hvint = satur.hsv() + (Uint & U1) - 0.5*magSqr(U1);
+            volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
             volScalarField dragK = drag.K(condensation.dropletDiameter());
             dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
             volScalarField condensationMassSource = condensation.condensationRateMassSource();
             volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
-            volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - condensation.L());
+            //volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - condensation.L());
+            volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - satur.L());
             volScalarField condensationEnergyLiquidSource = condensation.condensationRateMassSource()*Hlint;
 
             volScalarField rezAlphaRho1(-dt*(
@@ -183,6 +188,8 @@ int main(int argc, char *argv[])
             fluid.correctThermo();
             fluid.correctInterfacialPressure();
             //fluid.correctConservative();
+
+            satur.correct();
 
             scalar finalRezp     = fvc::domainIntegrate(mag(dp)    /dt).value();
             scalar finalRezalpha = fvc::domainIntegrate(mag(dalpha)/dt).value();

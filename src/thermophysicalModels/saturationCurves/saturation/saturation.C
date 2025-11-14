@@ -82,7 +82,7 @@ saturation::saturation
             IOobject::NO_WRITE
         ),
         thermo.p().mesh(),
-        dimensionedScalar("initLatentHeat", dimEnergy, 0.0)
+        dimensionedScalar("initLatentHeat", dimEnergy/dimMass, 0.0)
     )
 {
     correct();
@@ -174,7 +174,9 @@ void saturation::correct()
 {
     ps_ = saturationCurve_.ps(thermo_.T());
     Ts_ = saturationCurve_.Ts(thermo_.p());
-    L_  = saturationCurve_.L(Ts_);
+    //L_  = saturationCurve_.L(Ts_);
+
+    L_ = (thermo_.he() + thermo_.p()/thermo_.rho()) - hsl();
 }
 
 }

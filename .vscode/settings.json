@@ -222,7 +222,8 @@
         "mslau2.C": "cpp",
         "fixedValueFvPatchFieldTemplate.C": "cpp",
         "ranges": "cpp",
-        "mixtureConvectiveFlux.C": "cpp"
+        "mixtureConvectiveFlux.C": "cpp",
+        "CNTNucleationModel.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

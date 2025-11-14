@@ -1,9 +1,12 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2019 OpenFOAM Foundation
+   \\    /   O peration     |
+    \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
+-------------------------------------------------------------------------------
+    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -22,112 +25,83 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::condensationModel
+    Foam::CNTNucleationModel
 
 Description
 
 SourceFiles
-    condensationModel.C
+    CNTNucleationModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef condensationMonodispersion_H
-#define condensationMonodispersion_H
+#ifndef CNTNucleationModel_H
+#define CNTNucleationModel_H
 
-#include "condensationModel.H"
 #include "nucleationModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
 namespace WetSteam
 {
 
-/*---------------------------------------------------------------------------* \
-                         Class condensationModel Declaration
+/*---------------------------------------------------------------------------*\
+                           Class CNTNucleationModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class condensationMonodispersion
+class CNTNucleationModel
 :
-    public condensationModel
+    public nucleationModel
 {
+
 private:
     // Private data
 
     //- Disallow default bitwise copy construct
-    condensationMonodispersion(const condensationMonodispersion&) = delete;
+    CNTNucleationModel(const CNTNucleationModel&) = delete;
     
     //- Disallow default bitwise assignment
-    void operator=(const condensationMonodispersion&) = delete;
-
+    void operator=(const CNTNucleationModel&) = delete;
+    
 protected:
-    //- Number of droplets
-    volScalarField n_;
 
-    //- Droplet radius
-    volScalarField r_;
-
-    //volScalarField L_;
-    
-    //- Mass of single molecule
     const dimensionedScalar m1_;
-
-    //- Surface tension correction coefficient
     const dimensionedScalar beta_;
-
-    //- Schmidt number (turbulent diffusion of w and Q0)
-    const dimensionedScalar Sct_;
-
-    
-    const dimensionedScalar rMin_;
-
-    autoPtr<nucleationModel> pNucleation_;
-    const nucleationModel& nucleation_;
 
 public:
 
-    TypeName("monodispersion");
-        
+    //- Runtime type information
+    TypeName("CNTNucleationModel");
+
+
     // Constructors
 
-        //- Construct from components
-        condensationMonodispersion
+        // Construct from components
+        CNTNucleationModel
         (
-            volScalarField& alpha,
-            const volScalarField& rho,
-            const volVectorField& U,
-            const surfaceScalarField& alphaRhoPhi,
+            const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const saturation& satur,
-            const dictionary& dict
+            const saturation& satur
         );
-    
+
+
     //- Destructor
-    virtual ~condensationMonodispersion() {};
-    
+    virtual ~CNTNucleationModel() {}
 
     // Member Functions
 
-        //- Main update/correction routine
-        virtual void correct();
-
-        virtual tmp<volScalarField> dropletDiameter() const;
-
-        //virtual tmp<volScalarField> L() const;
-
+        //- Return the rate of nucleation J
+        virtual tmp<volScalarField> J(const volScalarField& rc, const volScalarField& sigma) const;
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 }
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

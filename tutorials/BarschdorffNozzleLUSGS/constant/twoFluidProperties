@@ -28,6 +28,7 @@ drag
 condensation
 {
     condensationModel monodispersion;
+    nucleationModel     CNTNucleationModel;
     saturationCurve IF97;
     liquidProperties H2O_IAPWS97reg1;
 
