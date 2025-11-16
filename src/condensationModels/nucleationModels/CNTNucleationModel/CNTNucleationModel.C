@@ -28,9 +28,8 @@ License
 
 #include "CNTNucleationModel.H"
 #include "addToRunTimeSelectionTable.H"
-#include "physicoChemicalConstants.H"
 #include "fundamentalConstants.H"
-#include "mathematicalConstants.H"
+
 
 namespace Foam
 {
@@ -49,10 +48,12 @@ Foam::WetSteam::CNTNucleationModel::CNTNucleationModel
     const dictionary& dict,
     const fluidThermo& gasThermo,
     const fluidThermo& liquidThermo,
-    const saturation& satur
+    const saturation& satur,
+    const gasProperties& gasProps,
+    const liquidProperties& liquidProps
 )
 :
-    nucleationModel(dict, gasThermo, liquidThermo, satur),
+    nucleationModel(dict, gasThermo, liquidThermo, satur, gasProps, liquidProps),
     m1_
     (
         "m1",
@@ -64,16 +65,86 @@ Foam::WetSteam::CNTNucleationModel::CNTNucleationModel
         "beta",
         dimless,
         dict.lookupOrDefault<scalar>("surfaceTensionCorrection", 1)
+    ),
+    kantrowitz_
+    (
+	    "Kantrowitz",
+	    dict,
+        false
+    ),
+    courtney_
+    (
+        "Courtney",
+	    dict,
+	    false
     )
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::J(const volScalarField& rc, const volScalarField& sigma) const
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::kantrowitzCorrection() const
+{
+    const dimensionedScalar Rg = constant::physicoChemical::k/m1_;
+
+    const volScalarField& gamma = gasThermo_.gamma();
+    const volScalarField& T_g = gasThermo_.T();
+    const volScalarField& L = saturation_.L();
+    
+    return 1/(1 + 2*(gamma - 1)/(gamma + 1)*L/(Rg*T_g)*(L/(Rg*T_g) - 0.5));    
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::courtneyCorrection() const
+{
+    const volScalarField& p = gasThermo_.p();
+    const volScalarField& ps = saturation_.ps();
+
+    return 1/(p/ps);
+}
+
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::applyCorrections() const
+{
+    const fvMesh& mesh = gasThermo_.p().mesh();
+    tmp<Foam::volScalarField> corrections;
+
+    if (kantrowitz_ || courtney_)
+    {
+        corrections = tmp<Foam::volScalarField>
+        (
+            new Foam::volScalarField
+            (
+                Foam::IOobject
+                (
+                    "nucleationCorrections",
+                    mesh.time().timeName(),
+                    mesh,
+                    Foam::IOobject::NO_READ,
+                    Foam::IOobject::NO_WRITE
+                ),
+                mesh,
+                Foam::dimensionedScalar("zero", Foam::dimless, 0.0)
+            )
+        );
+    }
+
+    if (kantrowitz_)
+    {
+        corrections.ref() += kantrowitzCorrection()();
+    }
+
+    if (courtney_)
+    {
+        corrections.ref() += courtneyCorrection()();
+    }
+
+    return corrections;
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::nucleationRate(const volScalarField& rc, const volScalarField& sigma) const
 {
     const volScalarField& rho_g = gasThermo_.rho();
-    const volScalarField& rho_l = liquidThermo_.rho();
     const volScalarField& T_g = gasThermo_.T();
     const volScalarField& T_s = saturation_.Ts();
 
@@ -82,10 +153,17 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::J(const volS
     const scalar pi = constant::mathematical::pi;
     const dimensionedScalar kB = constant::physicoChemical::k;
 
-    //volScalarField J = sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g));
-    //return pos(T_s - T_g)*J;
+    return pos(T_s - T_g)
+        *applyCorrections()
+        *(sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g)));
+}
 
-    return pos(T_s - T_g)*(sqrt(2*sigma/(pi*pow3(m1_)))*sqr(rho_g)/rhos_l*exp(-beta_*4*pi*sqr(rc)*sigma/(3*kB*T_g)));
+void Foam::WetSteam::CNTNucleationModel::correct()
+{
+    const volScalarField sigma_ = sigma();
+
+    rc_ = criticalDropletRadius(sigma_);
+    J_ = nucleationRate(rc_, sigma_);
 }
 
 

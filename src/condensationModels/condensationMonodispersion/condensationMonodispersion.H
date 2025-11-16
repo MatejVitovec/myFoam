@@ -36,6 +36,7 @@ SourceFiles
 
 #include "condensationModel.H"
 #include "nucleationModel.H"
+#include "growthModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,25 +66,16 @@ protected:
     //- Number of droplets
     volScalarField n_;
 
-    //- Droplet radius
-    volScalarField r_;
-
-    //volScalarField L_;
-    
-    //- Mass of single molecule
-    const dimensionedScalar m1_;
-
-    //- Surface tension correction coefficient
-    const dimensionedScalar beta_;
-
-    //- Schmidt number (turbulent diffusion of w and Q0)
-    const dimensionedScalar Sct_;
-
-    
-    const dimensionedScalar rMin_;
-
+    //- Nucelation model
     autoPtr<nucleationModel> pNucleation_;
-    const nucleationModel& nucleation_;
+    nucleationModel& nucleation_;
+
+    //- Growth rate model
+    autoPtr<growthModel> pGrowth_;
+    growthModel& growth_;
+
+    //- Explicitly constrain n in dry steam region
+    void constrainN();
 
 public:
 
@@ -113,9 +105,17 @@ public:
         //- Main update/correction routine
         virtual void correct();
 
+        //- Return droplet radius
+        virtual tmp<volScalarField> dropletRadius() const;
+
+        //- return droplet diameter
         virtual tmp<volScalarField> dropletDiameter() const;
 
-        //virtual tmp<volScalarField> L() const;
+        //- return condensation nucleation rate source
+        virtual tmp<volScalarField> nucleationRateMassSource() const;
+
+        //- return condensation droplet growth rate source
+        virtual tmp<volScalarField> growthRateMassSource() const;
 
 };
 

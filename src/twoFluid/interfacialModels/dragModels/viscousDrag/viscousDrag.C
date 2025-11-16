@@ -67,13 +67,15 @@ Foam::TwoFluidFoam::dragModels::viscousDrag::~viscousDrag()
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(const volScalarField& d) const
 {
-    //const volScalarField Kn = 1.5*fluid_.thermo1().mu()*sqrt(fluid_.thermo1().R()*fluid_.T1())/(d*fluid_.p());
+    //const objectRegistry& db = fluid_.mesh();
+    //const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
 
-    const objectRegistry& db = fluid_.mesh();
-    const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
+    const dimensionedScalar Rg("SpecificGasConstant", dimEnergy/dimMass/dimTemperature, 461.68449);
+    volScalarField Kn = 1.5*fluid_.thermo1().mu()*sqrt(Rg*fluid_.T1())/(d*fluid_.p());
+
+    //volScalarField Kn = 1.5*fluid_.thermo1().mu()*sqrt((Foam::constant::thermodynamic::RR/fluid_.thermo1().W())*fluid_.T1())/(d*fluid_.p());
 
     return 1.0 + 2*Kn*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))));
-    //return 1.0 + 2*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))))*Kn*0.0;
 }
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdRe() const

@@ -12,8 +12,11 @@ EXE_INC = \
     -I../thermophysicalModels/lnInclude \
     -I./condensationModel \
     -I./condensationMonodispersion \
+    -I./condensationMomentum \
     -I./nucleationModels \
     -I./nucleationModels/CNTNucleationModel \
+    -I./growthModels \
+    -I./growthModels/gyarmathyGrowthModel \
     -I./../applyFunctions
 
 

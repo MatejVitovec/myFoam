@@ -223,7 +223,14 @@
         "fixedValueFvPatchFieldTemplate.C": "cpp",
         "ranges": "cpp",
         "mixtureConvectiveFlux.C": "cpp",
-        "CNTNucleationModel.C": "cpp"
+        "CNTNucleationModel.C": "cpp",
+        "growthModel.C": "cpp",
+        "gyarmathyGrowthModel.C": "cpp",
+        "twoPhaseMixtureThermo.C": "cpp",
+        "multiphaseMixtureThermo.C": "cpp",
+        "physicoChemicalConstants.C": "cpp",
+        "WALE.C": "cpp",
+        "condensationNone.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

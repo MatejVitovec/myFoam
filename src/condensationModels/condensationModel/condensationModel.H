@@ -65,10 +65,10 @@ protected:
     //- Time
     const Time& time_;
 
-    const volScalarField& alpha_;           //liquid alpha
-    const volScalarField& rho_;             //liquid rho
-    const volVectorField& U_;               //liquid velocity
-    const surfaceScalarField& alphaRhoPhi_; //liquid alphaPhi
+    const volScalarField& alpha_;           //liquid/mixture alpha
+    const volScalarField& rho_;             //liquid/mixture rho
+    const volVectorField& U_;               //liquid/mixture velocity
+    const surfaceScalarField& alphaRhoPhi_; //liquid/mixture alphaPhi
 
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
@@ -81,17 +81,10 @@ protected:
     autoPtr<liquidProperties> pliquidProps_;
     const liquidProperties& liquidProps_;
 
-    //autoPtr<saturationCurve> pSaturation_;
-    //const saturationCurve& saturation_;
-
-    volScalarField Kn_;
-
-    volScalarField nucleationRateMassSource_;
-    volScalarField growthRateMassSource_;
     
-    // Private Member Functions
-
 private:
+    // Private Member Functions
+    
     //- Disallow default bitwise copy construct
     condensationModel(const condensationModel&) = delete;
 
@@ -125,85 +118,74 @@ public:
     
     // Constructors
 
-    //- Construct from components
-    condensationModel
-    (
-        volScalarField& alpha,
-        const volScalarField& rho,
-        const volVectorField& U,
-        const surfaceScalarField& alphaRhoPhi,
-        const fluidThermo& gasThermo,
-        const fluidThermo& liquidThermo,
-        const saturation& satur,
-        const dictionary& dict
-    );
+        //- Construct from components
+        condensationModel
+        (
+            volScalarField& alpha,
+            const volScalarField& rho,
+            const volVectorField& U,
+            const surfaceScalarField& alphaRhoPhi,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const saturation& satur,
+            const dictionary& dict
+        );
        
 
     // Selectors
     
-    //- Return a reference to the selected condensation model
-    static autoPtr<condensationModel> New
-    (
-        volScalarField& alpha,
-        const volScalarField& rho,
-        const volVectorField& U,
-        const surfaceScalarField& alphaRhoPhi,
-        const fluidThermo& gasThermo,
-        const fluidThermo& liquidThermo,
-        const saturation& satur,
-        const dictionary& dict
-    );
+        //- Return a reference to the selected condensation model
+        static autoPtr<condensationModel> New
+        (
+            volScalarField& alpha,
+            const volScalarField& rho,
+            const volVectorField& U,
+            const surfaceScalarField& alphaRhoPhi,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const saturation& satur,
+            const dictionary& dict
+        );
     
 
     //- Destructor
-    virtual ~condensationModel() = default;
+        virtual ~condensationModel() = default;
     
 
     // Member Functions
 
-    //- Main update/correction routine
-    virtual void correct() = 0;
-    
-    // Access
-    const volScalarField& nucleationRateMassSource() const
-    {
-        return nucleationRateMassSource_;
-    }
+        //- Main update/correction routine
+        virtual void correct() = 0;
+        
+        // Access
 
-    const volScalarField& growthRateMassSource() const
-    {
-        return growthRateMassSource_;
-    }
+        //- return condensation nucleation rate source
+        virtual tmp<volScalarField> nucleationRateMassSource() const = 0;
 
-    tmp<volScalarField> condensationRateMassSource() const
-    {
-        return nucleationRateMassSource_ + growthRateMassSource_;
-    }
+        //- return condensation droplet growth rate source
+        virtual tmp<volScalarField> growthRateMassSource() const = 0;
 
+        //- return condensation mass rate source
+        tmp<volScalarField> condensationRateMassSource() const
+        {
+            return nucleationRateMassSource() + growthRateMassSource();
+        }
 
-    const fvMesh& mesh() const
-    {
-        return mesh_;
-    }
+        //- return mesh
+        const fvMesh& mesh() const
+        {
+            return mesh_;
+        }
 
-    /*const saturationCurve& saturation() const
-    {
-        return saturation_;
-    }*/
+        //- return wetness
+        virtual tmp<volScalarField> w() const;
 
-    tmp<volScalarField> w() const;
-    
+        //- Return droplet radius
+        virtual tmp<volScalarField> dropletRadius() const;
 
-    virtual tmp<volScalarField> dropletDiameter() const;
-
-
-    //virtual tmp<volScalarField> L() const;
-    
-    // Check
-    
-    // Edit
-    
-    // Write
+        //- return droplet diameter
+        virtual tmp<volScalarField> dropletDiameter() const;
+        
 };
 
 

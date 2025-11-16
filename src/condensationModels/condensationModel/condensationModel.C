@@ -99,45 +99,7 @@ condensationModel::condensationModel
     gasProps_(pGasProps_()),
     pliquidProps_(liquidProperties::New(dict.lookupOrDefault<word>("liquidProperties", "H2O"))),
     liquidProps_(pliquidProps_()),
-    //pSaturation_(saturationCurve::New(dict)),
-    //saturation_(pSaturation_()),
-    saturation_(satur),
-    Kn_(
-        IOobject
-        (
-            "Kn",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("zero", dimless, 1.0)
-    ),
-    nucleationRateMassSource_(
-        IOobject
-        (
-            "mDotNucleation",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("zero", dimDensity/dimTime, 0.0)
-    ),
-    growthRateMassSource_(
-        IOobject
-        (
-            "mDotGrowthRate",
-            mesh_.time().timeName(),
-            mesh_,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh_,
-        dimensionedScalar("zero", dimDensity/dimTime, 0.0)
-    )
+    saturation_(satur)
 {}
 
 
@@ -219,7 +181,7 @@ tmp<volScalarField> condensationModel::w() const
 }
 
 
-tmp<volScalarField> condensationModel::dropletDiameter() const
+tmp<volScalarField> condensationModel::dropletRadius() const
 {
     return
         tmp<volScalarField>
@@ -235,9 +197,15 @@ tmp<volScalarField> condensationModel::dropletDiameter() const
                     IOobject::NO_WRITE
                 ),
                 mesh_,
-                2.0
+                1.0
             )
         );
+}
+
+
+tmp<volScalarField> condensationModel::dropletDiameter() const
+{
+    return 2.0*dropletRadius();
 }
 
 }

@@ -25,17 +25,17 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::nucleationModel
+    Foam::growthModel
 
 Description
 
 SourceFiles
-    nucleationModel.C
+    growthModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef nucleationModel_H
-#define nucleationModel_H
+#ifndef growthModel_H
+#define growthModel_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -44,8 +44,6 @@ SourceFiles
 #include "runTimeSelectionTables.H"
 #include "fluidThermo.H"
 #include "saturation.H"
-#include "gasProperties.H"
-#include "liquidProperties.H"
 
 namespace Foam
 {
@@ -54,38 +52,37 @@ namespace WetSteam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class nucleationModel Declaration
+                           Class growthModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class nucleationModel
+class growthModel
 {
 protected:
 
     // Protected Data
+
     const fluidThermo& gasThermo_;
     const fluidThermo& liquidThermo_;
     const saturation& saturation_;
 
-    const gasProperties& gasProps_;
-    const liquidProperties& liquidProps_;
+    //- Minimal droplet radius
+    const dimensionedScalar rMin_;
 
-    //- Critical droplet radius
-    volScalarField rc_;
-
-    //- Rate of nucleation
-    volScalarField J_;
+    //- Growth rate
+    volScalarField rDot_;
 
 private:
+
     //- Disallow default bitwise copy construct
-    nucleationModel(const nucleationModel&) = delete;
+    growthModel(const growthModel&) = delete;
 
     //- Disallow default bitwise assignment
-    void operator=(const nucleationModel&) = delete;
+    void operator=(const growthModel&) = delete;
 
 public:
 
     //- Runtime type information
-    TypeName("nucleationModel");
+    TypeName("growthModel");
 
 
     // Declare runtime construction
@@ -93,70 +90,55 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            nucleationModel,
+            growthModel,
             dictionary,
             (
                 const dictionary& dict,
                 const fluidThermo& gasThermo,
                 const fluidThermo& liquidThermo,
-                const saturation& satur,
-                const gasProperties& gasProps,
-                const liquidProperties& liquidProps
+                const saturation& satur
             ),
-            (dict, gasThermo, liquidThermo, satur, gasProps, liquidProps)
+            (dict, gasThermo, liquidThermo, satur)
         );
 
 
     // Constructors
 
         // Construct from components
-        nucleationModel
+        growthModel
         (
             const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const saturation& satur,
-            const gasProperties& gasProps,
-            const liquidProperties& liquidProps
+            const saturation& satur
         );
 
 
     //- Destructor
-    virtual ~nucleationModel() {}
+    virtual ~growthModel();
 
 
     // Selectors
 
-        static autoPtr<nucleationModel> New
+        static autoPtr<growthModel> New
         (
             const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const saturation& satur,
-            const gasProperties& gasProps,
-            const liquidProperties& liquidProps
+            const saturation& satur
         );
 
 
     // Member Functions
 
-        //- Calculate surface tension
-        tmp<volScalarField> sigma() const;
+        //- return minimal droplet radius
+        dimensionedScalar rMin() const;
 
-        //- Calculate critical droplet radius
-        virtual tmp<volScalarField> criticalDropletRadius(const volScalarField& sigma) const;
+        //- return ther growth rate
+        const volScalarField& rDot() const;
 
-        //- Calculate the rate of nucleation J
-        virtual tmp<volScalarField> nucleationRate(const volScalarField& rc, const volScalarField& sigma) const = 0;
-
-        //- Return the rate of nucleation
-        const volScalarField& J() const;
-
-        //- Return the critical radius
-        const volScalarField& rc() const;
-
-        //- Correct nucelation
-        virtual void correct() = 0;
+        //- correct growth rate
+        virtual void correct(const volScalarField& r) = 0;
 
 };
 

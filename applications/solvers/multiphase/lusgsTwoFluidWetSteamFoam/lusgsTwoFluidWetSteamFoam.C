@@ -92,11 +92,11 @@ int main(int argc, char *argv[])
         
         dimensionedScalar dt = runTime.deltaT();
 
-        volVectorField dragSource
+        /*volVectorField dragSource
         (
             "dragS",
             drag.K(condensation.dropletDiameter())*(U1 - U2)
-        );
+        );*/
 
         //for (int intIter = 0; intIter < lusgsIntIters; intIter++)
         {
@@ -104,21 +104,18 @@ int main(int argc, char *argv[])
 
             volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
-            volScalarField Ts = satur.Ts();
-            //volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
-            //volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
+            const volScalarField& Ts = satur.Ts();
 
             volScalarField Hvint = satur.hsv() + (Uint & U1) - 0.5*magSqr(U1);
             volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
             volScalarField dragK = drag.K(condensation.dropletDiameter());
-            dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
+            volVectorField dragSource = dragK*(U1 - U2);
 
             volScalarField condensationMassSource = condensation.condensationRateMassSource();
-            volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
-            //volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - condensation.L());
-            volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - satur.L());
-            volScalarField condensationEnergyLiquidSource = condensation.condensationRateMassSource()*Hlint;
+            //volVectorField condensationMomentumSource = Uint*condensationMassSource;
+            //volScalarField condensationEnergyVaporSource = condensationMassSource*(Hvint - satur.L());
+            //volScalarField condensationEnergyLiquidSource = condensationMassSource*Hlint;
 
             volScalarField rezAlphaRho1(-dt*(
                 /*fvc::ddt(conservative.alphaRho1())
@@ -137,7 +134,7 @@ int main(int argc, char *argv[])
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                 + dragSource
-                + condensationMomentumSource
+                + Uint*condensationMassSource
             ));
 
             volVectorField rezAlphaRhoU2(-dt*(
@@ -145,7 +142,7 @@ int main(int argc, char *argv[])
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 - dragSource
-                - condensationMomentumSource
+                - Uint*condensationMassSource
             ));
 
             volScalarField rezEpsilon1(-dt*(
@@ -153,7 +150,7 @@ int main(int argc, char *argv[])
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 //+ (dragSource & Uint)
                 + (dragSource & U1)
-                + condensationEnergyVaporSource                
+                + condensationMassSource*(Hvint - satur.L())                
             ));
 
             volScalarField rezEpsilon2(-dt*(
@@ -161,7 +158,7 @@ int main(int argc, char *argv[])
                 +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 //- (dragSource & Uint)
                 - (dragSource & U2)
-                - condensationEnergyLiquidSource
+                - condensationMassSource*Hlint
             ));
 
             dp     = dimensionedScalar("pzero", dimPressure, 0.0);

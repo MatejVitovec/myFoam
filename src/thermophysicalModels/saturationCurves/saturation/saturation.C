@@ -176,7 +176,13 @@ void saturation::correct()
     Ts_ = saturationCurve_.Ts(thermo_.p());
     //L_  = saturationCurve_.L(Ts_);
 
+    //L_ = hsv() - hsl();
     L_ = (thermo_.he() + thermo_.p()/thermo_.rho()) - hsl();
+
+    const auto& mesh = thermo_.p().mesh();
+    scalar averageValue = gSum(mesh.V()*(hsv() - hsl() - L_))/gSum(mesh.V());
+
+    Info << "latent heat mean diff: " << averageValue << endl;
 }
 
 }

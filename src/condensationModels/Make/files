@@ -1,6 +1,9 @@
 condensationModel/condensationModel.C
 condensationMonodispersion/condensationMonodispersion.C
+condensationMomentum/condensationMomentum.C
 nucleationModels/nucleationModel.C
 nucleationModels/CNTNucleationModel/CNTNucleationModel.C
+growthModels/growthModel.C
+growthModels/gyarmathyGrowthModel/gyarmathyGrowthModel.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyCondensationModels

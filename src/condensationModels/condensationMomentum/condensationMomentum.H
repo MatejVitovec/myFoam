@@ -35,6 +35,8 @@ SourceFiles
 #define condensationMomentum_H
 
 #include "condensationModel.H"
+#include "nucleationModel.H"
+#include "growthModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,22 +72,16 @@ protected:
     //- Sum of radii squared [m2]
     volScalarField Q2_;
 
-    //- Mass of single molecule
-    const dimensionedScalar m1_;
+    //- Nucelation model
+    autoPtr<nucleationModel> pNucleation_;
+    nucleationModel& nucleation_;
 
-    //- Surface tension correction coefficient
-    const dimensionedScalar beta_;
+    //- Growth rate model
+    autoPtr<growthModel> pGrowth_;
+    growthModel& growth_;
 
-    //- Turbulent schmidt number
-    const dimensionedScalar Sct_;
-
-    const dimensionedScalar rMin_;
-
-    //- Use Kantrowitz correction factor
-    Switch kantrowitz_;
-
-    //- Use Courtney correction factor
-    Switch courtney_;
+    //- Explicitly constrain moments in dry steam region
+    void constrainMoments();
     
 public:
 
@@ -93,17 +89,18 @@ public:
         
     // Constructors
 
-    //- Construct from components
-    condensationMomentum
-    (
-        volScalarField& alpha,
-        const volScalarField& rho,
-        const volVectorField& U,
-        const surfaceScalarField& alphaRhoPhi,
-        const fluidThermo& gasThermo,
-        const fluidThermo& liquidThermo,
-        const dictionary& dict
-    );
+        //- Construct from components
+        condensationMomentum
+        (
+            volScalarField& alpha,
+            const volScalarField& rho,
+            const volVectorField& U,
+            const surfaceScalarField& alphaRhoPhi,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const saturation& satur,
+            const dictionary& dict
+        );
     
     //- Destructor
     virtual ~condensationMomentum() {};
@@ -111,10 +108,18 @@ public:
 
     // Member Functions
 
-    //- Main update/correction routine
-    virtual void correct();
+        //- Main update/correction routine
+        virtual void correct();
 
-    virtual tmp<volScalarField> dropletDiameter() const;    
+        //- Return droplet radius
+        virtual tmp<volScalarField> dropletRadius() const;
+
+        //- return droplet diameter
+        virtual tmp<volScalarField> dropletDiameter() const;
+
+        virtual tmp<volScalarField> nucleationRateMassSource() const;
+
+        virtual tmp<volScalarField> growthRateMassSource() const;
 };
 
 

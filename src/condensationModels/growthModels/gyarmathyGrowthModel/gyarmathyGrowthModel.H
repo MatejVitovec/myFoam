@@ -25,19 +25,19 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::CNTNucleationModel
+    Foam::gyarmathyGrowthModel
 
 Description
 
 SourceFiles
-    CNTNucleationModel.C
+    gyarmathyGrowthModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef CNTNucleationModel_H
-#define CNTNucleationModel_H
+#ifndef gyarmathyGrowthModel_H
+#define gyarmathyGrowthModel_H
 
-#include "nucleationModel.H"
+#include "growthModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,69 +48,60 @@ namespace WetSteam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class CNTNucleationModel Declaration
+                           Class gyarmathyGrowthModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class CNTNucleationModel
+class gyarmathyGrowthModel
 :
-    public nucleationModel
+    public growthModel
 {
 
 private:
     // Private data
 
     //- Disallow default bitwise copy construct
-    CNTNucleationModel(const CNTNucleationModel&) = delete;
+    gyarmathyGrowthModel(const gyarmathyGrowthModel&) = delete;
     
     //- Disallow default bitwise assignment
-    void operator=(const CNTNucleationModel&) = delete;
+    void operator=(const gyarmathyGrowthModel&) = delete;
     
 protected:
 
     const dimensionedScalar m1_;
     const dimensionedScalar beta_;
 
-    //- Use Kantrowitz correction factor
-    Switch kantrowitz_;
-
-    //- Use Courtney correction factor
-    Switch courtney_;
-
-    tmp<volScalarField> kantrowitzCorrection() const;
-    tmp<volScalarField> courtneyCorrection() const;
-
-    tmp<volScalarField> applyCorrections() const;
+    //- Calculate the Knudsen number
+    virtual tmp<volScalarField> knudsenNumber(const volScalarField& r) const;
 
 public:
 
     //- Runtime type information
-    TypeName("CNTNucleationModel");
+    TypeName("gyarmathyGrowthModel");
 
 
     // Constructors
 
         // Construct from components
-        CNTNucleationModel
+        gyarmathyGrowthModel
         (
             const dictionary& dict,
             const fluidThermo& gasThermo,
             const fluidThermo& liquidThermo,
-            const saturation& satur,
-            const gasProperties& gasProps,
-            const liquidProperties& liquidProps
+            const saturation& satur
         );
 
 
     //- Destructor
-    virtual ~CNTNucleationModel() {}
+    virtual ~gyarmathyGrowthModel() {}
 
     // Member Functions
 
-        //- Return the rate of nucleation J
-        virtual tmp<volScalarField> nucleationRate(const volScalarField& rc, const volScalarField& sigma) const;
+        //- Calculate the growth rate
+        virtual tmp<volScalarField> growthRate(const volScalarField& r) const;
 
-        virtual void correct();
-        
+        //- Correct gyarmathy growth rate
+        virtual void correct(const volScalarField& r);
+
 };
 
 
