@@ -89,7 +89,8 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyGrowthModel::growthRate
     //const volScalarField lambda_g = gasThermo_.kappa();
     const scalar Pr = 1.0; //TODO - mozna odstranit
 
-    return pos(r - rMin_)*((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
+    //return pos(r - rMin_)*((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
+    return ((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
 }
 
 
