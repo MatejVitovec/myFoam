@@ -108,8 +108,8 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::applyCorrect
     const fvMesh& mesh = gasThermo_.p().mesh();
     tmp<Foam::volScalarField> corrections;
 
-    if (kantrowitz_ || courtney_)
-    {
+    //if (kantrowitz_ || courtney_)
+    //{
         corrections = tmp<Foam::volScalarField>
         (
             new Foam::volScalarField
@@ -123,19 +123,19 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::applyCorrect
                     Foam::IOobject::NO_WRITE
                 ),
                 mesh,
-                Foam::dimensionedScalar("zero", Foam::dimless, 0.0)
+                Foam::dimensionedScalar("zero", Foam::dimless, 1.0)
             )
         );
-    }
+    //}
 
     if (kantrowitz_)
     {
-        corrections.ref() += kantrowitzCorrection()();
+        corrections.ref() *= kantrowitzCorrection()();
     }
 
     if (courtney_)
     {
-        corrections.ref() += courtneyCorrection()();
+        corrections.ref() *= courtneyCorrection()();
     }
 
     return corrections;

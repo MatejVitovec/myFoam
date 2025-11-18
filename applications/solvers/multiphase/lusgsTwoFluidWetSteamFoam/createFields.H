@@ -46,16 +46,30 @@ surfaceScalarField amaxSf
     fluid.amaxSf()
 );
 
-volScalarField rho
+const volScalarField alphaM
 (
-    "rho",
+    IOobject
+    (
+        "alphaMixture",
+        mesh.time().timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("alphaMixtureIsOne", dimless, 1.0)
+);
+
+volScalarField rhoM
+(
+    "rhoMixture",
     fluid.rho()
 );
 
 surfaceScalarField rhoMPhi2
 (
     "rhoMPhi2",
-    linearInterpolate(rho*U2) & mesh.Sf()
+    linearInterpolate(rhoM*U2) & mesh.Sf()
 );
 
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
@@ -66,7 +80,8 @@ saturation satur = saturation(fluid.subDict("condensation"), thermo1);
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
     fluid.alpha2(),
-    fluid.thermo2().rho(),
+    alpha,
+    rhoM,
     fluid.U2(),
     rhoMPhi2,
     fluid.thermo1(),
@@ -76,7 +91,7 @@ autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::conde
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();
 
-volScalarField d
+/*volScalarField d
 (
     IOobject
     (
@@ -88,6 +103,32 @@ volScalarField d
     ),
     mesh,
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
+);*/
+
+volScalarField condensationMassSource
+(
+    IOobject
+    (
+        "mDotCondensation",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    condensation.condensationRateMassSource()
+);
+
+volScalarField nucleationMassSource
+(
+    IOobject
+    (
+        "mDotNucleation",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    condensation.nucleationRateMassSource()
 );
 
 volScalarField s1

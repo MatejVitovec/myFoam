@@ -86,7 +86,8 @@ public:
         //- Construct from components
         condensationMonodispersion
         (
-            volScalarField& alpha,
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& alphaRhoPhi,

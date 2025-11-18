@@ -39,7 +39,8 @@ defineRunTimeSelectionTable(condensationModel, params);
 autoPtr<condensationModel>
 condensationModel::New
 (
-    volScalarField& alpha,
+    volScalarField& alphaL,
+    const volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& alphaRhoPhi,
@@ -71,13 +72,14 @@ condensationModel::New
             << exit(FatalError);
     }
 
-    return autoPtr<condensationModel>(cstrIter()(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, condensationDict));
+    return autoPtr<condensationModel>(cstrIter()(alphaL, alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, condensationDict));
 }
 
 
 condensationModel::condensationModel
 (
-    volScalarField& alpha,
+    volScalarField& alphaL,
+    const volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& alphaRhoPhi,
@@ -89,6 +91,7 @@ condensationModel::condensationModel
 :
     mesh_(U.mesh()),
     time_(U.time()),
+    alphaL_(alphaL),
     alpha_(alpha),
     rho_(rho),
     U_(U),
@@ -177,7 +180,7 @@ condensationModel::condensationModel
 
 tmp<volScalarField> condensationModel::w() const
 {
-    return (liquidThermo_.rho()*alpha_)/(gasThermo_.rho() + alpha_*(liquidThermo_.rho() - gasThermo_.rho()));
+    return (liquidThermo_.rho()*alphaL_)/(gasThermo_.rho() + alphaL_*(liquidThermo_.rho() - gasThermo_.rho()));
 }
 
 

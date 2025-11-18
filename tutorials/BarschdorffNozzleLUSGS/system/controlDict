@@ -62,4 +62,16 @@ adjustTimeStep yes;
 //    #includeFunc axisLine
 //}
 
+functions
+{
+    relaxationLoss
+    {
+        type relaxationLoss;
+        libs ("libmyfieldFunctionObjects.so");
+
+	executeControl  writeTime;
+        writeControl    writeTime;
+    }
+}
+
 // ************************************************************************* //

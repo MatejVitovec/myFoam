@@ -112,7 +112,8 @@ int main(int argc, char *argv[])
             volScalarField dragK = drag.K(condensation.dropletDiameter());
             volVectorField dragSource = dragK*(U1 - U2);
 
-            volScalarField condensationMassSource = condensation.condensationRateMassSource();
+            condensationMassSource = condensation.condensationRateMassSource();
+            nucleationMassSource = condensation.nucleationRateMassSource(); //DOCASNE
             //volVectorField condensationMomentumSource = Uint*condensationMassSource;
             //volScalarField condensationEnergyVaporSource = condensationMassSource*(Hvint - satur.L());
             //volScalarField condensationEnergyLiquidSource = condensationMassSource*Hlint;
@@ -203,8 +204,8 @@ int main(int argc, char *argv[])
             Info << "LUSGS:  Solving for T2,    " << "Final residual = " << finalRezT2    << ", No Iterations " << lusgsIntIters << nl;
         }
 
-        rho = fluid.rho();
-        rhoMPhi2 = linearInterpolate(rho*U2) & mesh.Sf();
+        rhoM = fluid.rho();
+        rhoMPhi2 = linearInterpolate(rhoM*U2) & mesh.Sf();
         condensation.correct();
 
 

@@ -41,7 +41,8 @@ addToRunTimeSelectionTable(condensationModel, condensationMomentum, params);
 
 condensationMomentum::condensationMomentum
 (
-    volScalarField& alpha,
+    volScalarField& alphaL,
+    const volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& alphaRhoPhi,
@@ -51,7 +52,7 @@ condensationMomentum::condensationMomentum
     const dictionary& dict
 )
 :
-    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict),
+    condensationModel(alphaL, alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict),
 
     Q0_(
         IOobject
@@ -101,10 +102,10 @@ void condensationMomentum::constrainMoments()
 {
     const volScalarField& J = nucleation_.J();
 
-    forAll(alpha_, i)
+    forAll(alphaL_, i)
     {
         //TODO alphaMin/wmin
-        if (alpha_[i] <= 1e-29 && J[i] <= 0)
+        if (alphaL_[i] <= 1e-29 && J[i] <= 0)
         {
             Q0_[i] = 0;
             Q1_[i] = 0;
@@ -143,10 +144,10 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q2Eqn
         (
-            fvm::ddt(rho_, Q2_)
+            fvm::ddt(alpha_, rho_, Q2_)
             + mvConvection->fvmDiv(alphaRhoPhi_, Q2_)
             ==
-            sqr(nucleation_.rc())*nucleation_.J() + 2*rho_*Q1_*growth_.rDot()
+            alpha_*sqr(nucleation_.rc())*nucleation_.J() + 2*alpha_*rho_*Q1_*growth_.rDot()
         );
 
         Q2Eqn.relax();
@@ -156,10 +157,10 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q1Eqn
         (
-            fvm::ddt(rho_, Q1_) 
+            fvm::ddt(alpha_, rho_, Q1_) 
             + mvConvection->fvmDiv(alphaRhoPhi_, Q1_)
             ==
-            nucleation_.rc()*nucleation_.J() + rho_*Q0_*growth_.rDot()
+            alpha_*nucleation_.rc()*nucleation_.J() + alpha_*rho_*Q0_*growth_.rDot()
         );
 
         Q1Eqn.relax();
@@ -169,10 +170,10 @@ void condensationMomentum::correct()
     {
         fvScalarMatrix Q0Eqn
         (
-            fvm::ddt(rho_, Q0_) 
+            fvm::ddt(alpha_, rho_, Q0_) 
             + mvConvection->fvmDiv(alphaRhoPhi_, Q0_)
             ==
-            nucleation_.J()
+            alpha_*nucleation_.J()
         );
 
         Q0Eqn.relax();
@@ -203,7 +204,7 @@ tmp<volScalarField> condensationMomentum::nucleationRateMassSource() const
 {
     const scalar pi = constant::mathematical::pi;
 
-    return 4/3*pi*pow3(nucleation_.rc())*nucleation_.J()*liquidThermo_.rho();
+    return 4/3*pi*pow3(nucleation_.rc())*nucleation_.J()*liquidThermo_.rho(); // TODO nevim jak s alphou
 }
 
 
@@ -211,9 +212,41 @@ tmp<volScalarField> condensationMomentum::growthRateMassSource() const
 {
     const scalar pi = constant::mathematical::pi;
     
-    return 4*pi*rho_*Q2_*growth_.rDot()*liquidThermo_.rho();
-    //return 4*pi*(alpha_*rho_*Q2_)*growth_.rDot()*liquidThermo_.rho();
+    return 4*pi*alpha_*rho_*Q2_*growth_.rDot()*liquidThermo_.rho();
 }
+
+/*tmp<volScalarField> condensationMomentum::r32() const
+{
+    const scalar pi = constant::mathematical::pi;
+
+    //TODO n
+
+    return (3.0*alpha_)/(4.0*pi*n*rho_*Q2_)
+}
+
+tmp<volScalarField> condensationMomentum::r30() const
+{
+    const scalar pi = constant::mathematical::pi;
+
+    //TODO n and y
+
+    return pow((3.0*y)/(4*pi*liquidThermo_.rho()*n), 1.0/3.0);
+}
+
+tmp<volScalarField> condensationMomentum::r20() const
+{
+    return Q2_/(Q0_ + dimensionedScalar("Q0SMALL", Q0_.dimensions(), SMALL));
+}
+
+tmp<volScalarField> condensationMomentum::rG() const
+{
+    return r20()/(exp(0.5*sqr(log(sigmaG()))));
+}
+
+tmp<volScalarField> condensationMomentum::sigmaG() const
+{
+    return exp(sqrt(log(mag((Q0_*Q2_)/sqr(Q1_) - 1.0) + 1.0)));
+}*/
 
 }
 }

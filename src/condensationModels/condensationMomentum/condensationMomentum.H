@@ -92,7 +92,8 @@ public:
         //- Construct from components
         condensationMomentum
         (
-            volScalarField& alpha,
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& alphaRhoPhi,
@@ -120,6 +121,16 @@ public:
         virtual tmp<volScalarField> nucleationRateMassSource() const;
 
         virtual tmp<volScalarField> growthRateMassSource() const;
+
+        /*tmp<volScalarField> r32() const;
+        
+        tmp<volScalarField> r30() const;
+        
+        tmp<volScalarField> r20() const;
+        
+        tmp<volScalarField> rG() const;
+        
+        tmp<volScalarField> sigmaG() const;*/
 };
 
 

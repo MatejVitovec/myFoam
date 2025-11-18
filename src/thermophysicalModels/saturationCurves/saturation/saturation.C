@@ -55,7 +55,7 @@ saturation::saturation
             thermo.p().mesh().time().timeName(),
             thermo.p().mesh(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         thermo.p().mesh(),
         dimensionedScalar("initSaturPressure", dimPressure, 0.0)
@@ -67,7 +67,7 @@ saturation::saturation
             thermo.p().mesh().time().timeName(),
             thermo.p().mesh(),
             IOobject::NO_READ,
-            IOobject::NO_WRITE
+            IOobject::AUTO_WRITE
         ),
         thermo.p().mesh(),
         dimensionedScalar("initSaturTemperature", dimTemperature, 0.0)
@@ -179,10 +179,10 @@ void saturation::correct()
     //L_ = hsv() - hsl();
     L_ = (thermo_.he() + thermo_.p()/thermo_.rho()) - hsl();
 
-    const auto& mesh = thermo_.p().mesh();
-    scalar averageValue = gSum(mesh.V()*(hsv() - hsl() - L_))/gSum(mesh.V());
+    //const auto& mesh = thermo_.p().mesh();
+    //scalar averageValue = gSum(mesh.V()*(hsv() - hsl() - L_))/gSum(mesh.V());
 
-    Info << "latent heat mean diff: " << averageValue << endl;
+    //Info << "latent heat mean diff: " << averageValue << endl;
 }
 
 }

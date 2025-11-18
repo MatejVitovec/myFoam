@@ -230,7 +230,13 @@
         "multiphaseMixtureThermo.C": "cpp",
         "physicoChemicalConstants.C": "cpp",
         "WALE.C": "cpp",
-        "condensationNone.C": "cpp"
+        "condensationNone.C": "cpp",
+        "condensationLosses.C": "cpp",
+        "relaxationLoss.C": "cpp",
+        "fieldExpression.C": "cpp",
+        "functionObject.C": "cpp",
+        "fvcVolumeIntegrate.C": "cpp",
+        "totalLoss.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

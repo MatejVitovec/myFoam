@@ -33,10 +33,10 @@ condensation
     saturationCurve     IF97;
     liquidProperties    H2O_IAPWS97reg1;
 
-    //surfaceTensionCorrection 1.194;
+    surfaceTensionCorrection 1.194;
 
     Kantrowitz on;
-    Courtney on;
+    //Courtney on;
 }
 
 // ************************************************************************* //

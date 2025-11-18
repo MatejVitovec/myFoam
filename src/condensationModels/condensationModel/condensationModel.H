@@ -65,7 +65,9 @@ protected:
     //- Time
     const Time& time_;
 
-    const volScalarField& alpha_;           //liquid/mixture alpha
+    const volScalarField& alphaL_;          //true volume fraction same for mixture/twoFluid/mixtureTwoFluid
+
+    const volScalarField& alpha_;           //liquid/mixture alpha (if mixture alpha = 1)
     const volScalarField& rho_;             //liquid/mixture rho
     const volVectorField& U_;               //liquid/mixture velocity
     const surfaceScalarField& alphaRhoPhi_; //liquid/mixture alphaPhi
@@ -103,7 +105,8 @@ public:
         condensationModel,
         params,
         (
-            volScalarField& alpha,
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& alphaRhoPhi,
@@ -112,7 +115,7 @@ public:
             const saturation& satur,
             const dictionary& dict
         ),
-        (alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict)
+        (alphaL, alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict)
     );
 
     
@@ -121,7 +124,8 @@ public:
         //- Construct from components
         condensationModel
         (
-            volScalarField& alpha,
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& alphaRhoPhi,
@@ -137,7 +141,8 @@ public:
         //- Return a reference to the selected condensation model
         static autoPtr<condensationModel> New
         (
-            volScalarField& alpha,
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
             const surfaceScalarField& alphaRhoPhi,

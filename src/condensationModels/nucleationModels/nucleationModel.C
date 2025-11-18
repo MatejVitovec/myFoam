@@ -140,7 +140,7 @@ Foam::WetSteam::nucleationModel::sigma() const
                 IOobject::NO_WRITE
             ),
             mesh,
-            dimensionedScalar("zero", dimMass/dimTime/dimTime, 0.0)
+            dimensionedScalar("sigmaZero", dimMass/dimTime/dimTime, 0.0)
         )
     );
 

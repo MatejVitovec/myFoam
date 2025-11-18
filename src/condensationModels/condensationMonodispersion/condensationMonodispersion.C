@@ -41,7 +41,8 @@ addToRunTimeSelectionTable(condensationModel, condensationMonodispersion, params
 
 condensationMonodispersion::condensationMonodispersion
 (
-    volScalarField& alpha,
+    volScalarField& alphaL,
+    const volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
     const surfaceScalarField& alphaRhoPhi,
@@ -51,7 +52,7 @@ condensationMonodispersion::condensationMonodispersion
     const dictionary& dict
 )
 :
-    condensationModel(alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict),
+    condensationModel(alphaL, alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict),
 
     n_(
         IOobject
@@ -75,9 +76,9 @@ condensationMonodispersion::condensationMonodispersion
 void condensationMonodispersion::constrainN()
 {
     const volScalarField& J = nucleation_.J();
-    forAll(alpha_, i)
+    forAll(alphaL_, i)
     {
-        if (alpha_[i] <= 1e-29 && J[i] <= 0)
+        if (alphaL_[i] <= 1e-29 && J[i] <= 0)
         {
             n_[i] = 0;
         }
@@ -220,10 +221,10 @@ void condensationMonodispersion::correct()
 
         fvScalarMatrix nEqn
         (
-            fvm::ddt(rho_, n_)
+            fvm::ddt(alpha_, rho_, n_)
             + fvm::div(alphaRhoPhi_, n_)
             ==
-            nucleation_.J()
+            alpha_*nucleation_.J()
         );
 
 	    nEqn.relax();
@@ -238,8 +239,8 @@ tmp<volScalarField> condensationMonodispersion::dropletRadius() const
     const scalar pi = constant::mathematical::pi;
     const dimensionedScalar alphaMin = dimensionedScalar("alphaMin", dimless, 1e-28);
 
-    return pos(alpha_ - alphaMin)*pow((3*alpha_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
-    //return pos(alpha_ - alphaMin)*pow((3*alpha_)/(4*pi*(n_ + dimensionedScalar("nVSMALL", dimensionSet(0, -3, 0, 0, 0, 0, 0), VSMALL))), 1/3);
+    return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
+    //return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*(n_ + dimensionedScalar("nVSMALL", dimensionSet(0, -3, 0, 0, 0, 0, 0), VSMALL))), 1/3);
 }
 
 tmp<volScalarField> condensationMonodispersion::dropletDiameter() const
@@ -258,7 +259,7 @@ tmp<volScalarField> condensationMonodispersion::growthRateMassSource() const
 {
     const scalar pi = constant::mathematical::pi;
 
-    return 4*pi*rho_*n_*sqr(dropletRadius())*growth_.rDot()*liquidThermo_.rho();
+    return 4*pi*alpha_*rho_*n_*sqr(dropletRadius())*growth_.rDot()*liquidThermo_.rho();
     //return 4*pi*(alpha_*rho_*n_)*sqr(dropletRadius())*growth_.rDot()*liquidThermo_.rho();
 }
 

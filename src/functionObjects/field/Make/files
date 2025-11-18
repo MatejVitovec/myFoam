@@ -1,0 +1,4 @@
+relaxationLoss/relaxationLoss.C
+totalLoss/totalLoss.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmyfieldFunctionObjects
