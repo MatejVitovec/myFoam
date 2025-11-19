@@ -149,6 +149,7 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::nucleationRa
     const volScalarField& T_s = saturation_.Ts();
 
     const volScalarField rhos_l = saturation_.rhosl();
+    //const volScalarField rho_l = liquidThermo_.rho();
 
     const scalar pi = constant::mathematical::pi;
     const dimensionedScalar kB = constant::physicoChemical::k;
