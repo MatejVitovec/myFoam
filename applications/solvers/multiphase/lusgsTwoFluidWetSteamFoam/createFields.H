@@ -80,7 +80,7 @@ saturation satur = saturation(fluid.subDict("condensation"), thermo1);
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
     fluid.alpha2(),
-    alpha,
+    alphaM,
     rhoM,
     fluid.U2(),
     rhoMPhi2,

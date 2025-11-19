@@ -224,7 +224,7 @@ void condensationMonodispersion::correct()
             fvm::ddt(alpha_, rho_, n_)
             + fvm::div(alphaRhoPhi_, n_)
             ==
-            alpha_*nucleation_.J()
+            nucleation_.J()
         );
 
 	    nEqn.relax();

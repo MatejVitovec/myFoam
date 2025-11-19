@@ -91,7 +91,7 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::CNTNucleationModel::kantrowitzCo
     const volScalarField& T_g = gasThermo_.T();
     const volScalarField& L = saturation_.L();
     
-    return 1/(1 + 2*(gamma - 1)/(gamma + 1)*L/(Rg*T_g)*(L/(Rg*T_g) - 0.5));    
+    return 1.0/(1.0 + 2.0*(gamma - 1.0)/(gamma + 1.0)*L/(Rg*T_g)*(L/(Rg*T_g) - 0.5));    
 }
 
 

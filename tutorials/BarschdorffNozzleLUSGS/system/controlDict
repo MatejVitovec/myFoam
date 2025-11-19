@@ -69,7 +69,7 @@ functions
         type relaxationLoss;
         libs ("libmyfieldFunctionObjects.so");
 
-	executeControl  writeTime;
+        executeControl  writeTime;
         writeControl    writeTime;
     }
 }

@@ -147,7 +147,7 @@ void condensationMomentum::correct()
             fvm::ddt(alpha_, rho_, Q2_)
             + mvConvection->fvmDiv(alphaRhoPhi_, Q2_)
             ==
-            alpha_*sqr(nucleation_.rc())*nucleation_.J() + 2*alpha_*rho_*Q1_*growth_.rDot()
+            sqr(nucleation_.rc())*nucleation_.J() + 2*alpha_*rho_*Q1_*growth_.rDot()
         );
 
         Q2Eqn.relax();
@@ -160,7 +160,7 @@ void condensationMomentum::correct()
             fvm::ddt(alpha_, rho_, Q1_) 
             + mvConvection->fvmDiv(alphaRhoPhi_, Q1_)
             ==
-            alpha_*nucleation_.rc()*nucleation_.J() + alpha_*rho_*Q0_*growth_.rDot()
+            nucleation_.rc()*nucleation_.J() + alpha_*rho_*Q0_*growth_.rDot()
         );
 
         Q1Eqn.relax();
@@ -173,7 +173,7 @@ void condensationMomentum::correct()
             fvm::ddt(alpha_, rho_, Q0_) 
             + mvConvection->fvmDiv(alphaRhoPhi_, Q0_)
             ==
-            alpha_*nucleation_.J()
+            nucleation_.J()
         );
 
         Q0Eqn.relax();

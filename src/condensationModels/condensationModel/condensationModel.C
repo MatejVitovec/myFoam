@@ -98,11 +98,11 @@ condensationModel::condensationModel
     alphaRhoPhi_(alphaRhoPhi),
     gasThermo_(gasThermo),
     liquidThermo_(liquidThermo),
+    saturation_(satur),
     pGasProps_(gasProperties::New(gasThermo)),
     gasProps_(pGasProps_()),
     pliquidProps_(liquidProperties::New(dict.lookupOrDefault<word>("liquidProperties", "H2O"))),
-    liquidProps_(pliquidProps_()),
-    saturation_(satur)
+    liquidProps_(pliquidProps_())
 {}
 
 
