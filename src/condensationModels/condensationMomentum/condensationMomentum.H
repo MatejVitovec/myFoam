@@ -122,12 +122,14 @@ public:
 
         virtual tmp<volScalarField> growthRateMassSource() const;
 
-        tmp<volScalarField> r32() const;
-        
-        tmp<volScalarField> r30() const;
-        
+        tmp<volScalarField> r10() const;
+
         tmp<volScalarField> r20() const;
-        
+
+        tmp<volScalarField> r30() const;
+
+        tmp<volScalarField> r32() const;
+
         tmp<volScalarField> rg() const;
         
         tmp<volScalarField> sigmaG() const;

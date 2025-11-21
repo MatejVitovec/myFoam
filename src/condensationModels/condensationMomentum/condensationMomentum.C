@@ -215,11 +215,15 @@ tmp<volScalarField> condensationMomentum::growthRateMassSource() const
     return 4*pi*alpha_*rho_*Q2_*growth_.rDot()*liquidThermo_.rho();
 }
 
-tmp<volScalarField> condensationMomentum::r32() const
+tmp<volScalarField> condensationMomentum::r10() const
 {
-    const scalar pi = constant::mathematical::pi;
+    return Q1_/(Q0_ + dimensionedScalar("Q0SMALL", Q0_.dimensions(), SMALL));
+}
 
-    return (3.0*alphaL_)/(4.0*pi*rho_*Q0_*Q2_); // TODO poresit alpha, takto je to pro mixture
+
+tmp<volScalarField> condensationMomentum::r20() const
+{
+    return sqrt(Q2_/(Q0_ + dimensionedScalar("Q0SMALL", Q0_.dimensions(), SMALL)));
 }
 
 tmp<volScalarField> condensationMomentum::r30() const
@@ -229,18 +233,21 @@ tmp<volScalarField> condensationMomentum::r30() const
     return pow((3*alphaL_)/(4*pi*rho_*(Q0_ + dimensionedScalar("Q0VSMALL", dimless/dimMass, VSMALL))), 1.0/3.0); // TODO poresit alpha, takto je to pro mixture
 }
 
-tmp<volScalarField> condensationMomentum::r20() const
+tmp<volScalarField> condensationMomentum::r32() const
 {
-    return Q2_/(Q0_ + dimensionedScalar("Q0SMALL", Q0_.dimensions(), SMALL));
+    return pow(r30(), 3.0)/sqr(r20());
 }
+
 
 tmp<volScalarField> condensationMomentum::rg() const
 {
+    //return r20()/(exp(0.5*log(Q0_*Q2_/sqr(Q1_))));
     return r20()/(exp(0.5*sqr(log(sigmaG()))));
 }
 
 tmp<volScalarField> condensationMomentum::sigmaG() const
 {
+    //return exp(sqrt(log(Q0_*Q2_/sqr(Q1_))));
     return exp(sqrt(log(sqr(cv()) + 1.0)));
 }
 

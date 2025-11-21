@@ -58,7 +58,7 @@ Foam::WetSteam::growthModel::growthModel
     (
         "rMin",
         dimLength,
-        dict.lookupOrDefault<scalar>("rMin", 1e-9)
+        dict.lookupOrDefault<scalar>("rMin", 2e-10)
     ),
     rDot_
     (

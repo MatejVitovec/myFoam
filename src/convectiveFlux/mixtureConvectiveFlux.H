@@ -70,11 +70,8 @@ class mixtureConvectiveFlux
             //- Velocity
             const volVectorField& U_;
             
-            //- Static vapor temperature
-            const volScalarField& T1_;
-
-            //- Static liquid temperature
-            const volScalarField& T2_;
+            //- Static temperature
+            const volScalarField& T_;
 
         
         //- Reference to the thermophysicalModel
@@ -145,8 +142,7 @@ public:
             const volScalarField& alpha,
             const volScalarField& p,
             const volVectorField& U,
-            const volScalarField& T1,
-            const volScalarField& T2,
+            const volScalarField& T,
             const psiThermo& thermo1,
             const psiThermo& thermo2
         );

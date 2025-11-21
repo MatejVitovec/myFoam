@@ -236,7 +236,8 @@
         "fieldExpression.C": "cpp",
         "functionObject.C": "cpp",
         "fvcVolumeIntegrate.C": "cpp",
-        "totalLoss.C": "cpp"
+        "totalLoss.C": "cpp",
+        "gyarmathyMixtureGrowthModel.C": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
