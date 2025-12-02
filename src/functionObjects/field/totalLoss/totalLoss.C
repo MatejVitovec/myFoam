@@ -93,7 +93,7 @@ bool Foam::functionObjects::totalLoss::write()
     (
         IOobject
         (
-            scopedName("zRelax"),
+            scopedName("zTotal"),
             time_.timeName(),
             mesh_
         ),
