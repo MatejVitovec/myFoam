@@ -237,7 +237,8 @@
         "functionObject.C": "cpp",
         "fvcVolumeIntegrate.C": "cpp",
         "totalLoss.C": "cpp",
-        "gyarmathyMixtureGrowthModel.C": "cpp"
+        "gyarmathyMixtureGrowthModel.C": "cpp",
+        "queue": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

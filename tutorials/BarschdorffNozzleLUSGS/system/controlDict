@@ -34,7 +34,7 @@ deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   1000;
+writeInterval   250;
 
 purgeWrite      0;
 
@@ -52,7 +52,7 @@ graphFormat     raw;
 
 runTimeModifiable true;
 
-maxCo 0.03;
+maxCo 0.1;
 
 adjustTimeStep yes;
 
@@ -64,10 +64,15 @@ adjustTimeStep yes;
 
 functions
 {
-    relaxationLoss
+    totalLoss
     {
-        type relaxationLoss;
+        type totalLoss;
         libs ("libmyfieldFunctionObjects.so");
+
+        xMin    -0.2;
+        xMax    0.1;
+        Npoints 480;
+        sigma   0.0025;
 
         executeControl  writeTime;
         writeControl    writeTime;

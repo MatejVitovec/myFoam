@@ -42,6 +42,7 @@ SourceFiles
 #define functionObjects_totalLoss_H
 
 #include "fvMeshFunctionObject.H"
+#include "volFields.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,6 +59,11 @@ class totalLoss
 :
     public fvMeshFunctionObject
 {
+private:
+    scalar xMin_, xMax_;
+    label Npoints_;
+    scalar sigma_;
+
 public:
 
     //- Runtime type information
@@ -96,6 +102,8 @@ public:
 
         //- Write the reaction rate fields
         virtual bool write();
+
+        List<scalar> computeIntegral(const volScalarField& field) const;
 
 };
 

@@ -65,8 +65,8 @@
                     rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1                    - alpha2[own]*rho2[own])                  - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
                     rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1               - alpha1[own]*rho1[own]*U1[own])          - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
                     rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 + pInt[own]) - alpha1[own]*(rho1[own]*E1 + pInt[own])) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[own]) - alpha2[own]*(rho2[own]*E2 + pInt[own])) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
+                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 /*+ pInt[own]*/) - alpha1[own]*(rho1[own]*E1 /*+ pInt[own]*/)) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
+                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 /*+ pInt[own]*/) - alpha2[own]*(rho2[own]*E2 /*+ pInt[own]*/)) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
 
                 if (nei != celli)
@@ -110,8 +110,8 @@
                     rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1                    - alpha2[nei]*rho2[nei])                  + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
                     rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1               - alpha1[nei]*rho1[nei]*U1[nei])          + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
                     rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[nei]*rho2[nei]*U2[nei])          + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 + pInt[nei]) - alpha1[nei]*(rho1[nei]*E1 + pInt[nei])) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 + pInt[nei]) - alpha2[nei]*(rho2[nei]*E2 + pInt[nei])) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
+                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 /*+ pInt[nei]*/) - alpha1[nei]*(rho1[nei]*E1 /*+ pInt[nei]*/)) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
+                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 /*+ pInt[nei]*/) - alpha2[nei]*(rho2[nei]*E2 /*+ pInt[nei]*/)) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
             }
         }

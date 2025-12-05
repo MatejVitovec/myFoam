@@ -30,6 +30,9 @@ License
 #include "fluidThermo.H"
 #include "fvcVolumeIntegrate.H"
 #include "addToRunTimeSelectionTable.H"
+#include "OFstream.H"
+#include "Pstream.H"
+#include "ListOps.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -52,7 +55,11 @@ Foam::functionObjects::totalLoss::totalLoss
     const dictionary& dict
 )
 :
-    fvMeshFunctionObject(name, runTime, dict)
+    fvMeshFunctionObject(name, runTime, dict),
+    xMin_(readScalar(dict.lookup("xMin"))),
+    xMax_(readScalar(dict.lookup("xMax"))),
+    Npoints_(readLabel(dict.lookup("Npoints"))),
+    sigma_(readScalar(dict.lookup("sigma")))
 {
     read(dict);
 }
@@ -93,19 +100,75 @@ bool Foam::functionObjects::totalLoss::write()
     (
         IOobject
         (
-            scopedName("zTotal"),
+            scopedName("zRelax"),
             time_.timeName(),
             mesh_
         ),
         mDot*(h1 - h2)*(1.0/T1 - 1.0/T2)*(T1 + T2)/2.0
     );
 
-    Log << "    Relaxation losses field " << zRelax.name()
-        << " to " << time_.timeName() << ", total losses: " << fvc::domainIntegrate(zRelax) << endl;
+    //Log << "    Relaxation losses field " << zRelax.name()
+    //    << " to " << time_.timeName() << ", total losses: " << fvc::domainIntegrate(zRelax) << endl;
 
-    zRelax.write();
+
+    List<scalar> cumulativeLoses = computeIntegral(zRelax);
+    List<scalar> globalCumulativeLoses = cumulativeLoses;
+
+    for (label i = 0; i < globalCumulativeLoses.size(); ++i)
+    {
+        scalar v = globalCumulativeLoses[i];
+        reduce(v, sumOp<scalar>());
+        globalCumulativeLoses[i] = v;
+    }
+
+    if (Pstream::master())
+    {
+        const scalar dx = (xMax_ - xMin_)/(Npoints_ - 1);
+
+        OFstream out(fileName(mesh_.runTime().path()/"postProcessing"/"relaxationLoss"/mesh_.runTime().timeName()));
+        out << "# X  Integral\n";
+
+        for (label k = 0; k < Npoints_; k++)
+        {
+            out << xMin_ + dx*scalar(k) << " " << globalCumulativeLoses[k] << "\n";
+        }
+    }
 
     return true;
+}
+
+
+Foam::List<Foam::scalar> Foam::functionObjects::totalLoss::computeIntegral(const Foam::volScalarField& field) const
+{
+    Info << "GaussianVolumeIntegral: computing smooth cumulative integral…" << endl;
+
+    const vectorField& C = mesh_.C(); // cell centres
+    const scalarField& V = mesh_.V(); // cell volumes
+
+    const scalar sqrt2sigma = Foam::sqrt(2.0)*sigma_;
+
+    List<scalar> out(Npoints_, 0.0);
+
+    for (label k = 0; k < Npoints_; k++)
+    {
+        const scalar X = xMin_ + (xMax_ - xMin_)*(scalar(k)/(Npoints_-1));
+        scalar Ik = 0.0;
+
+        forAll(C, i)
+        {
+            scalar dx = (X - C[i].x())/sqrt2sigma;
+
+            // Smooth heaviside: 0.5*(1+erf())
+            scalar w = 0.5*(1.0 + erf(dx));
+
+            Ik += field[i]*V[i]*w;
+        }
+        reduce(Ik, sumOp<scalar>());
+
+        out[k] = Ik;
+    }
+
+    return out;
 }
 
 
