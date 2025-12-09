@@ -26,7 +26,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         3e-5;
+endTime         1;
 
 deltaT          1.25e-9;
 
@@ -48,9 +48,9 @@ timePrecision   6;
 
 runTimeModifiable yes;
 
-adjustTimeStep  no;
+adjustTimeStep  yes;
 
-maxCo 0.1;
+maxCo 0.2;
 
 rDeltaTSmoothingCoeff 0.1;
 

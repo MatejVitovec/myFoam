@@ -96,6 +96,8 @@ private:
         const vector& normalVector
     ) const;
 
+    const scalar epsilon_;
+
 
 public:
 
@@ -103,9 +105,9 @@ public:
 
     // Constructors
 
-        mslau2() : riemannSolver() {};
+        mslau2();
 
-        mslau2(const dictionary& dict) : riemannSolver(dict) {};
+        mslau2(const dictionary& dict);
 
     // Destructor - default
     virtual ~mslau2() {};

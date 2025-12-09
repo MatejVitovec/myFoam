@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
         ++runTime;
 
+        Info << "Iter = " << runTime.timeIndex() << endl;
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         dimensionedScalar dt = runTime.deltaT();

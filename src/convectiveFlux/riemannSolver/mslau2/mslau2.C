@@ -45,6 +45,21 @@ namespace Foam
     addToRunTimeSelectionTable(riemannSolver, mslau2, dict);
 }
 
+Foam::mslau2::mslau2()
+:
+    riemannSolver(),
+    epsilon_(1.0e-6) //TODO
+{}
+
+Foam::mslau2::mslau2
+(
+    const dictionary& dict
+)
+:
+    riemannSolver(dict),
+    epsilon_(1.0e-6) //TODO
+{}
+
 scalar Foam::mslau2::massFlux
 (
     const scalar& alphaLeft,
@@ -84,8 +99,7 @@ scalar Foam::mslau2::massFlux
     scalar massFlux = 0.5*(rhoLeft*(qLeft + magVnBarPlus)
         + rhoRight*(qRight - magVnBarMinus));
 
-    constexpr scalar epsilon = 1e-30;
-    if(abs(alphaLeft - alphaRight) > 5*epsilon)
+    if(abs(alphaLeft - alphaRight) > 5*epsilon_)
     {
         return massFlux + ((max(pLeft, pRight)/min(pLeft, pRight))*(1.0 - Chi) + 1)*(pLeft - pRight)/aTilde;
     }
@@ -132,8 +146,7 @@ scalar Foam::mslau2::pressureFlux
     scalar pressureFlux = 0.5*(pLeft + pRight)
         + 0.5*(PPlusLeft - PMinusRight)*(pLeft - pRight);
 
-    constexpr scalar epsilon = 1e-30;
-    if(abs(alphaLeft - alphaRight) > 5*epsilon)
+    if(abs(alphaLeft - alphaRight) > 5*epsilon_)
     {
         return pressureFlux + lambdaMr*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
     }
