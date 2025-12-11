@@ -36,7 +36,7 @@ Description
 #include "unitConversion.H"
 
 //{{{ begin codeInclude
-#line 22 "/home/matejv/myFoam/tutorials/waterCollum/0/alpha/#codeStream"
+#line 22 "/home/matej/myFoam/tutorials/waterCollum/0/alpha/#codeStream"
 #include "fvCFD.H"
 //}}} end codeInclude
 
@@ -57,7 +57,7 @@ namespace Foam
 extern "C" void codeStream_efce25ed6e0bb9c813fe3bebc892f53ae1114b6e(Foam::Ostream& os, const Foam::dictionary& dict)
 {
 //{{{ begin code
-    #line 39 "/home/matejv/myFoam/tutorials/waterCollum/0/alpha/#codeStream"
+    #line 39 "/home/matej/myFoam/tutorials/waterCollum/0/alpha/#codeStream"
 const scalar epsilon = 1e-5;
 
         const IOdictionary& d = static_cast<const IOdictionary&>(dict);

@@ -125,7 +125,7 @@ bool Foam::functionObjects::totalLoss::write()
     {
         const scalar dx = (xMax_ - xMin_)/(Npoints_ - 1);
 
-        OFstream out(fileName(mesh_.runTime().path()/"postProcessing"/"relaxationLoss"/mesh_.runTime().timeName()));
+        OFstream out(fileName(mesh_.time().path()/"postProcessing"/"relaxationLoss"/mesh_.time().timeName()));
         out << "# X  Integral\n";
 
         for (label k = 0; k < Npoints_; k++)
