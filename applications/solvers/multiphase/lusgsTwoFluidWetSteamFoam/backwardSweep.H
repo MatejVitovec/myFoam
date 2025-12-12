@@ -39,7 +39,9 @@
                             max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
                                 mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
 
-                    //const scalar ac = lusgsOmega*(max(mag(U1[nei] & Sf[facei]), mag(U2[nei] & Sf[facei])) + max(a1[nei] * magSf[facei], a2[nei] * magSf[facei]));
+                    /*const scalar ac = lusgsOmega*max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei], mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
+                    const scalar ac1 = ac;
+                    const scalar ac2 = ac;*/
 
                     const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
                     const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
@@ -68,12 +70,12 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1                    - alpha1[nei]*rho1[nei])                  + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1                    - alpha2[nei]*rho2[nei])                  + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1               - alpha1[nei]*rho1[nei]*U1[nei])          + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[nei]*rho2[nei]*U2[nei])          + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 /*+ pInt[nei]*/) - alpha1[nei]*(rho1[nei]*E1 /*+ pInt[nei]*/)) + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 /*+ pInt[nei]*/) - alpha2[nei]*(rho2[nei]*E2 /*+ pInt[nei]*/)) + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
+                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1      - alpha1[nei]*rho1[nei])         + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1      - alpha2[nei]*rho2[nei])         + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[nei]*rho1[nei]*U1[nei]) + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[nei]*rho2[nei]*U2[nei]) + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[nei]*rho1[nei]*E1)      + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
+                    rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[nei]*rho2[nei]*E2)      + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
 
                 if (own != celli)
@@ -84,7 +86,9 @@
                     //        max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
                     //            mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));
 
-                    //const scalar ac = lusgsOmega*(max(mag(U1[own] & Sf[facei]), mag(U2[own] & Sf[facei])) + max(a1[own] * magSf[facei], a2[own] * magSf[facei]));
+                    /*const scalar ac = lusgsOmega*max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei], mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
+                    const scalar ac1 = ac;
+                    const scalar ac2 = ac;*/
 
                     const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
                     const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
@@ -113,12 +117,12 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1                    - alpha1[own]*rho1[own])                  - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1                    - alpha2[own]*rho2[own])                  - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1               - alpha1[own]*rho1[own]*U1[own])          - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1               - alpha2[own]*rho2[own]*U2[own])          - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*(rho1_1*E1_1 /*+ pInt[own]*/) - alpha1[own]*(rho1[own]*E1 /*+ pInt[own]*/)) - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*(rho2_1*E2_1 /*+ pInt[own]*/) - alpha2[own]*(rho2[own]*E2 /*+ pInt[own]*/)) - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
+                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1      - alpha1[own]*rho1[own])         - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
+                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1      - alpha2[own]*rho2[own])         - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
+                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[own]*rho1[own]*U1[own]) - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
+                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[own]*rho2[own]*U2[own]) - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
+                    rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[own]*rho1[own]*E1)      - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
+                    rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[own]*rho2[own]*E2)      - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
                 }
             }
         }
