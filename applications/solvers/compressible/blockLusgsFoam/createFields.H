@@ -90,8 +90,7 @@ convectiveFlux flux
     p,
     U,
     T,
-    thermo,
-    gasProps
+    thermo
 );
 
 surfaceScalarField amaxSf

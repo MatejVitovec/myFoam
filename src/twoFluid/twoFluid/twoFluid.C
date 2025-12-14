@@ -640,7 +640,7 @@ void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
     p_.correctBoundaryConditions();
     alpha2_.correctBoundaryConditions();
     alpha1_ = 1.0 - alpha2_;
-    //alpha1_.boundaryFieldRef() = 1.0 - alpha2_.boundaryField();
+    alpha1_.boundaryFieldRef() = 1.0 - alpha2_.boundaryField();
     U1_.correctBoundaryConditions();
     U2_.correctBoundaryConditions();
     T1_.correctBoundaryConditions();
@@ -700,8 +700,11 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
 
 tmp<surfaceScalarField> Foam::TwoFluidFoam::twoFluid::amaxSf() const
 {
-    return max(mag(fvc::interpolate(U1_) & mesh_.Sf()), mag(fvc::interpolate(U2_) & mesh_.Sf()))
-         + max(mesh_.magSf()*fvc::interpolate(a1_), mesh_.magSf()*fvc::interpolate(a2_));
+    //return max(mag(fvc::interpolate(U1_) & mesh_.Sf()), mag(fvc::interpolate(U2_) & mesh_.Sf()))
+    //     + max(mesh_.magSf()*fvc::interpolate(a1_), mesh_.magSf()*fvc::interpolate(a2_));
+
+    return max(mag(fvc::interpolate(U1_) & mesh_.Sf()) + mesh_.magSf()*fvc::interpolate(a1_),
+               mag(fvc::interpolate(U2_) & mesh_.Sf()) + mesh_.magSf()*fvc::interpolate(a2_));
 }
 
 // ************************************************************************* //

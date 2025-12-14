@@ -77,9 +77,9 @@ relaxationFactors
 
 LUSGS
 {
-    internalIterations 6;
+    internalIterations 3;
     localTimestepping false;
-    omega 1.4;
+    omega 2;
 }
 
 // ************************************************************************* //

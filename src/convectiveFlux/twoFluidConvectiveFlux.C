@@ -90,7 +90,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi1L",
+            "alphaRhoPhi1L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -103,7 +103,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi1R",
+            "alphaRhoPhi1R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -116,7 +116,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi2L",
+            "alphaRhoPhi2L",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -129,7 +129,7 @@ Foam::twoFluidConvectiveFlux::twoFluidConvectiveFlux
     (
         IOobject
         (
-            "alphaPhi2R",
+            "alphaRhoPhi2R",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,

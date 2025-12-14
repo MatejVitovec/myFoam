@@ -205,20 +205,11 @@ void condensationMonodispersion::correct()
         }
     }*/
 
-    //correctDropletRadius();
 
     nucleation_.correct();
     growth_.correct(dropletRadius());
     
     {
-        /*fvScalarMatrix nEqn
-        (
-            fvm::ddt(alpha_, rho_, n_)
-            + fvm::div(alphaRhoPhi_, n_)
-            ==
-            J
-        );*/
-
         fvScalarMatrix nEqn
         (
             fvm::ddt(alpha_, rho_, n_)
@@ -231,16 +222,34 @@ void condensationMonodispersion::correct()
         nEqn.solve();
     }
 
+    if (mesh_.time().outputTime())
+    {
+        volScalarField r(
+            IOobject
+            (
+                "r",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            dropletRadius()
+        );
+
+        r.write();
+    }
+
     constrainN();
 }
 
 tmp<volScalarField> condensationMonodispersion::dropletRadius() const
 {
     const scalar pi = constant::mathematical::pi;
-    const dimensionedScalar alphaMin = dimensionedScalar("alphaMin", dimless, 1e-28);
+    
+    return pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
 
-    return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
-    //return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*(n_ + dimensionedScalar("nVSMALL", dimensionSet(0, -3, 0, 0, 0, 0, 0), VSMALL))), 1/3);
+    //const dimensionedScalar alphaMin = dimensionedScalar("alphaMin", dimless, 1e-28);
+    //return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
 }
 
 tmp<volScalarField> condensationMonodispersion::dropletDiameter() const

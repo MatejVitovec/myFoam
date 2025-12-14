@@ -322,6 +322,7 @@ makeGasProperties(
 optimizePerfectGas(hConstThermo, constTransport, sensibleEnthalpy);
 optimizePerfectGas(hConstThermo, sutherlandTransport, sensibleEnthalpy);
 optimizePerfectGas(eConstThermo, constTransport, sensibleInternalEnergy);
+optimizePerfectGas(eConstThermo, sutherlandPolynomialTransport, sensibleInternalEnergy);
 
 
 // =============== Optimization of Stiffened gas model

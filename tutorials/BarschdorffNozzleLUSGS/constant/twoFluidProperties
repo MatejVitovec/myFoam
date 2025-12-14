@@ -16,9 +16,9 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-epsilon         1.0e-30;
-epsilonMin      1.0e-30;
-epsilonMax      1.0e-20;
+epsilon         1.0e-20;
+epsilonMin      1.0e-20;
+epsilonMax      1.0e-18;
 
 drag
 {
@@ -27,7 +27,7 @@ drag
 
 condensation
 {
-    condensationModel   momentum;
+    condensationModel   monodispersion;
     nucleationModel     CNTNucleationModel;
     growthModel         gyarmathyGrowthModel;
     saturationCurve     IF97;

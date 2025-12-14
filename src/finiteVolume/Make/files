@@ -1,5 +1,6 @@
 fields/fvPatchFields/derived/isentropicInletVelocity/isentropicInletVelocityFvPatchVectorField.C
 fields/fvPatchFields/derived/isentropicTemperature/isentropicTemperatureFvPatchScalarField.C
+fields/fvPatchFields/derived/transonicPressureOutlet/transonicPressureOutletFvPatchScalarField.C
 
 ddtSchemes = finiteVolume/finiteVolume/ddtSchemes
 
