@@ -131,6 +131,19 @@ volScalarField nucleationMassSource
     condensation.nucleationRateMassSource()
 );
 
+volScalarField growthMassSource
+(
+    IOobject
+    (
+        "mDotGrowth",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    condensation.growthRateMassSource()
+);
+
 volScalarField s1
 (
     IOobject

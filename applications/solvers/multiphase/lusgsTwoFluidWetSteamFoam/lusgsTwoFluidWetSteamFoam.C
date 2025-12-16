@@ -92,12 +92,6 @@ int main(int argc, char *argv[])
         
         dimensionedScalar dt = runTime.deltaT();
 
-        /*volVectorField dragSource
-        (
-            "dragS",
-            drag.K(condensation.dropletDiameter())*(U1 - U2)
-        );*/
-
         //for (int intIter = 0; intIter < lusgsIntIters; intIter++)
         {
             twoFluidFlux.computeFlux();
@@ -114,9 +108,7 @@ int main(int argc, char *argv[])
 
             condensationMassSource = condensation.condensationRateMassSource();
             nucleationMassSource = condensation.nucleationRateMassSource(); //DOCASNE
-            //volVectorField condensationMomentumSource = Uint*condensationMassSource;
-            //volScalarField condensationEnergyVaporSource = condensationMassSource*(Hvint - satur.L());
-            //volScalarField condensationEnergyLiquidSource = condensationMassSource*Hlint;
+            growthMassSource = condensation.growthRateMassSource(); //DOCASNE
 
             volScalarField rezAlphaRho1(-dt*(
                 /*fvc::ddt(conservative.alphaRho1())
@@ -179,8 +171,8 @@ int main(int argc, char *argv[])
             T2    += dT2;
 
             //fluid.correct();
-            fluid.blendVanishingFluid();
-            //fluid.blendVanishingFluid(Ts);
+            //fluid.blendVanishingFluid();
+            fluid.blendVanishingFluid(Ts);
             //fluid.bound();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();

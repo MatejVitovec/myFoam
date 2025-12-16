@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-riemannSolver	mslau2;
+riemannSolver           mslau2;
 
 ddtSchemes
 {
@@ -26,18 +26,18 @@ gradSchemes
 {
     default             Gauss linear;
     limitedGauss        cellLimited Gauss linear 1;
-    venkatakrishnan     cellLimited<cubic> 1.5 leastSquares 1;
+    venkatakrishnan     cellLimited edgeCellsLeastSquares 1;
 }
 
 divSchemes
 {
-    default                  none;
+    default             none;
     div(alphaRhoPhi2,w_Q)    Gauss multivariateIndependent
     {
         "Q.*" upwind;
     };
 
-    div(alphaRhoPhi2L,n)     Gauss upwind;
+    div(alphaRhoPhi2L,n)	Gauss upwind;
 }
 
 laplacianSchemes
@@ -50,11 +50,18 @@ interpolationSchemes
     default         linear;
 
     reconstruct(p)      linearUpwind  venkatakrishnan;
-    reconstruct(alpha)  upwind;
+    //reconstruct(alpha)  linearUpwind  venkatakrishnan;
     reconstruct(U.1)    linearUpwindV venkatakrishnan;
     reconstruct(U.2)    linearUpwindV venkatakrishnan;
     reconstruct(T.1)    linearUpwind  venkatakrishnan;
     reconstruct(T.2)    linearUpwind  venkatakrishnan;
+
+    //reconstruct(p)      upwind;
+    reconstruct(alpha)  upwind;
+    //reconstruct(U.1)    upwind;
+    //reconstruct(U.2)    upwind;
+    //reconstruct(T.1)    upwind;
+    //reconstruct(T.2)    upwind;
 }
 
 snGradSchemes

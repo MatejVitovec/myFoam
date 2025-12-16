@@ -246,7 +246,8 @@ tmp<volScalarField> condensationMonodispersion::dropletRadius() const
 {
     const scalar pi = constant::mathematical::pi;
     
-    return pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
+    return pow((3*alphaL_)/(4*pi*alpha_*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, SMALL))), 1.0/3.0);
+    //return pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);
 
     //const dimensionedScalar alphaMin = dimensionedScalar("alphaMin", dimless, 1e-28);
     //return pos(alphaL_ - alphaMin)*pow((3*alphaL_)/(4*pi*rho_*(n_ + dimensionedScalar("nVSMALL", dimless/dimMass, VSMALL))), 1.0/3.0);

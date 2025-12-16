@@ -51,18 +51,34 @@ surfaceScalarField rhoMPhi2
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
 TwoFluidFoam::dragModel& drag = pDrag();
 
+saturation satur = saturation(fluid.subDict("condensation"), thermo1);
+
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
 (
     fluid.alpha2(),
+    fluid.alpha2(),
     fluid.thermo2().rho(),
     fluid.U2(),
-    rhoMPhi2,
+    twoFluidFlux.alphaRhoFlux2_pos(),
     fluid.thermo1(),
     fluid.thermo2(),
+    satur,
     fluid
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();
 
+volScalarField condensationMassSource
+(
+    IOobject
+    (
+        "mDotCondensation",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    condensation.condensationRateMassSource()
+);
 
 //Pro ukladani
 volScalarField rho1

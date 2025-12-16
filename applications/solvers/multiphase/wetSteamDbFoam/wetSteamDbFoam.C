@@ -44,8 +44,8 @@ Description
 #include "twoFluidConvectiveFlux.H"
 #include "twoFluidFvc.H"
 #include "dragModel.H"
-#include "saturationCurve.H"
 #include "condensationModel.H"
+#include "saturation.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -97,24 +97,19 @@ int main(int argc, char *argv[])
             drag.K(condensation.dropletDiameter())*(U1 - U2)
         );
 
-        //volScalarField dragCoeff = drag.K(condensation.dropletDiameter());
-
         for (size_t i = 0; i < 3; i++)
         {
             twoFluidFlux.computeFlux();
 
             volVectorField Uint = (alpha1*rho1*U1 + alpha2*rho2*U2)/(alpha1*rho1 + alpha2*rho2);
 
-            volScalarField Ts = condensation.saturation().Ts(p);
-            volScalarField Hvint = condensation.saturation().hsv(Ts) + (Uint & U1) - 0.5*magSqr(U1);
-            volScalarField Hlint = condensation.saturation().hsl(Ts) + (Uint & U2) - 0.5*magSqr(U2);
+            const volScalarField& Ts = satur.Ts();
+            volScalarField Hvint = satur.hsv() + (Uint & U1) - 0.5*magSqr(U1);
+            volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
             dragSource = drag.K(condensation.dropletDiameter())*(U1 - U2);
 
-            volScalarField condensationMassSource = condensation.condensationRateMassSource();
-            volVectorField condensationMomentumSource = Uint*condensation.condensationRateMassSource();
-            volScalarField condensationEnergyVaporSource = condensation.condensationRateMassSource()*(Hvint - condensation.L());
-            volScalarField condensationEnergyLiquidSource = condensation.condensationRateMassSource()*Hlint;
+            condensationMassSource = condensation.condensationRateMassSource();
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
@@ -130,29 +125,30 @@ int main(int argc, char *argv[])
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
-                                          + dragSource + condensationMomentumSource);
+                                          + dragSource + Uint*condensationMassSource);
           
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
-                                          - dragSource - condensationMomentumSource);
+                                          - dragSource - Uint*condensationMassSource);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                        + (dragSource & Uint) + condensationEnergyVaporSource);
+                                        + (dragSource & U1) + condensationMassSource*(Hvint - satur.L()));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                                        - (dragSource & Uint) - condensationEnergyLiquidSource);
+                                        - (dragSource & U2) - condensationMassSource*Hlint);
 
             fluid.correct();
 
-            fluid.blendVanishingFluid(condensation.saturation().Ts(p));
+            fluid.blendVanishingFluid(Ts);
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
+            satur.correct();
             if(i == 2) fluid.correctInterfacialPressure();
             fluid.correctConservative();
         }

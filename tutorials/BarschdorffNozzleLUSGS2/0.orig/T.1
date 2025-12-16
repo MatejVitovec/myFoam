@@ -1,8 +1,7 @@
-
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2412                                 |
+|  \\    /   O peration     | Version:  2406                                  |
 |   \\  /    A nd           | Website:  www.openfoam.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,33 +9,41 @@ FoamFile
 {
     version     2.0;
     format      ascii;
-    class       dictionary;
-    object      phaseProperties;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0";
+    object      T.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+dimensions      [0 0 0 1 0 0 0];
 
-epsilon         1.0e-30;
-epsilonMin      1.0e-30;
-epsilonMax      1.0e-20;
+internalField   uniform 350;
 
-drag
+boundaryField
 {
-    type        viscousDrag;
+    inlet
+    {
+        type            isentropicTemperature;
+        T0.1            uniform 373.1;
+        p0              uniform 78390;
+        value           uniform 350;
+    }
+    outlet
+    {
+        type            zeroGradient;
+    }
+    
+    wall
+    {
+        type            zeroGradient;
+    }
+
+    emptyPlanes
+    {
+        type            empty;
+    }
 }
 
-condensation
-{
-    condensationModel   monodispersion;
-    nucleationModel     CNTNucleationModel;
-    growthModel         gyarmathyGrowthModel;
-    saturationCurve     IF97;
-    liquidProperties    H2O_IAPWS97reg1;
-
-    surfaceTensionCorrection 1.194;
-
-    Kantrowitz on;
-    //Courtney on;
-}
 
 // ************************************************************************* //

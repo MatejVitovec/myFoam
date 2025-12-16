@@ -19,7 +19,7 @@ thermoType
 {
     type            heRhoThermo;
     mixture         pureMixture;
-    transport       sutherlandPolynomial;
+    transport       const;
     thermo          eConst;
     equationOfState perfectGas;
     specie          specie;
@@ -31,20 +31,19 @@ mixture
     specie
     {
         nMoles      1;
-        molWeight   18.0154644;
+        molWeight   18.21551552;
     }
     thermodynamics
     {
-        Cv          1387.471;
+        Cv          1673.57;
         Hf          0;
         Tref        0;
-        Eref        1995917;
+        Eref        1886950;
     }
     transport
     {
-        As          1.823e-6;
-        Ts          673.0;
-        kappaCoeffs<4>  ( 7.341e-3 -1.013e-5 1.801e-7 -9.1e-11);
+        mu           0;
+        Pr           0.72;
     }
 }
 
