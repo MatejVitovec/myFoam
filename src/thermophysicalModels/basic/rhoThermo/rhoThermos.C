@@ -109,6 +109,18 @@ makeThermos
     rhoThermo,
     heRhoThermo,
     pureMixture,
+    sutherlandPolynomialTransport,
+    sensibleInternalEnergy,
+    IAPWSIF97metaThermo,
+    IAPWSIF97metaGas,
+    specie
+);
+
+makeThermos
+(
+    rhoThermo,
+    heRhoThermo,
+    pureMixture,
     IAPWSIF97Transport,
     sensibleInternalEnergy,
     IAPWSIF97metaThermo,

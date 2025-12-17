@@ -700,9 +700,6 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
 
 tmp<surfaceScalarField> Foam::TwoFluidFoam::twoFluid::amaxSf() const
 {
-    //return max(mag(fvc::interpolate(U1_) & mesh_.Sf()), mag(fvc::interpolate(U2_) & mesh_.Sf()))
-    //     + max(mesh_.magSf()*fvc::interpolate(a1_), mesh_.magSf()*fvc::interpolate(a2_));
-
     return max(mag(fvc::interpolate(U1_) & mesh_.Sf()) + mesh_.magSf()*fvc::interpolate(a1_),
                mag(fvc::interpolate(U2_) & mesh_.Sf()) + mesh_.magSf()*fvc::interpolate(a2_));
 }
