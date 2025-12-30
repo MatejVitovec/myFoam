@@ -32,13 +32,13 @@ Author
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef mixtureConvectiveFlux_H
-#define mixtureConvectiveFlux_H
+#ifndef compressibleMixtureConvectiveFlux_H
+#define compressibleMixtureConvectiveFlux_H
 
 #include "volFieldsFwd.H"
 #include "surfaceFieldsFwd.H"
 #include "riemannSolver.H"
-#include "psiThermo.H"
+#include "rhoThermo.H"
 #include "gasProperties.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -47,10 +47,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class mixtureConvectiveFlux Declaration
+                        Class compressibleMixtureConvectiveFlux Declaration
 \*---------------------------------------------------------------------------*/
 
-class mixtureConvectiveFlux
+class compressibleMixtureConvectiveFlux
 {
     // Private data
 
@@ -60,9 +60,6 @@ class mixtureConvectiveFlux
         const fvMesh& mesh_;
         
         // Reference to primitive fields
-
-            //- Volume fraction (nebo mass fraction)
-            const volScalarField& alpha_;
         
             //- Static pressure
             const volScalarField& p_;
@@ -73,15 +70,18 @@ class mixtureConvectiveFlux
             //- Static temperature
             const volScalarField& T_;
 
+            //- Mass fraction (wetness)
+            const volScalarField& w_;
+
         
         //- Reference to the thermophysicalModel
         //psiThermo& thermo1_;
         //psiThermo& thermo2_;
 
-        autoPtr<gasProperties> gasProps1_;
-        autoPtr<gasProperties> gasProps2_;
-        //gasProperties& gasProps1_;
-        //gasProperties& gasProps2_;
+        autoPtr<gasProperties> pgasProps1_;
+        autoPtr<gasProperties> pgasProps2_;
+        gasProperties& gasProps1_;
+        gasProperties& gasProps2_;
     
 
         // Fluxes
@@ -94,14 +94,17 @@ class mixtureConvectiveFlux
             
             //- Energy flux
             surfaceScalarField rhoEFlux_;
+
+            //- Wetness flux
+            surfaceScalarField rhowFlux_;
     
     // Private Member Functions
     
         //- Disallow default bitwise copy construct
-        mixtureConvectiveFlux(const mixtureConvectiveFlux&);
+        compressibleMixtureConvectiveFlux(const compressibleMixtureConvectiveFlux&);
         
         //- Disallow default bitwise assignment
-        void operator=(const mixtureConvectiveFlux&);
+        void operator=(const compressibleMixtureConvectiveFlux&);
         
         //- Return internal field of mass flux
         const scalarField& rhoFluxI() const
@@ -121,14 +124,20 @@ class mixtureConvectiveFlux
             return rhoEFlux_.internalField();
         }
 
+        //- Return access to internal field of wetness flux
+        const scalarField& rhowFluxI() const
+        {
+            return rhowFlux_.internalField();
+        }
+
         const gasProperties& gasProps1() const
         {
-            return *gasProps1_;
+            return gasProps1_;
         }
         
         const gasProperties& gasProps2() const
         {
-            return *gasProps2_;
+            return gasProps2_;
         }
     
 
@@ -137,19 +146,19 @@ public:
     // Constructors
 
         //- Construct from components
-        mixtureConvectiveFlux
+        compressibleMixtureConvectiveFlux
         (
-            const volScalarField& alpha,
             const volScalarField& p,
             const volVectorField& U,
             const volScalarField& T,
-            const psiThermo& thermo1,
-            const psiThermo& thermo2
+            const volScalarField& w,
+            const rhoThermo& thermo1,
+            const rhoThermo& thermo2
         );
 
 
     //- Destructor
-    virtual ~mixtureConvectiveFlux()
+    virtual ~compressibleMixtureConvectiveFlux()
     {}
 
 
@@ -180,6 +189,12 @@ public:
                 return rhoEFlux_;
             }
 
+            //- Return wetness equation flux
+            const surfaceScalarField& rhowFlux() const
+            {
+                return rhowFlux_;
+            }
+
 
         // Return residuals
 
@@ -199,6 +214,12 @@ public:
             tmp<scalarField> rhoEResidual() const
             {
                 return fvc::div(rhoEFlux_)().internalField();
+            }
+
+            //- Return wetness residual
+            tmp<scalarField> rhowResidual() const
+            {
+                return fvc::div(rhowFlux_)().internalField();
             }
 
 

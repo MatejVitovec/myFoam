@@ -83,6 +83,26 @@ public:
 
 
     // Member Functions
+
+        virtual void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            bool& leftState,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const;
     
         //- Update fluxes based on current left and right states
         virtual void calculateFlux
@@ -116,6 +136,28 @@ public:
             const scalar eRight,
             const scalar aLeft,
             const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const;
+
+        virtual void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            scalar& rhoQFlux,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const scalar QLeft,
+            const scalar QRight,
             const vector Sf,
             const scalar magSf
         ) const;

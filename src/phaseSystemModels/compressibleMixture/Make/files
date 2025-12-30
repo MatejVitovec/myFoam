@@ -1,0 +1,5 @@
+./compressibleMixture.C
+./compressibleMixtureConservative/compressibleMixtureConservative.C
+./compressibleMixtureConvectiveFlux/compressibleMixtureConvectiveFlux.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmyMixtureFoam

@@ -69,15 +69,6 @@ public:
 
     TypeName("riemannSolver");
 
-    /*declareRunTimeSelectionTable
-    (
-        autoPtr,
-        riemannSolver,
-        dictionary,
-        (const fvMesh& mesh, const dictionary& dict),
-        (mesh, dict)
-    );*/
-
     declareRunTimeSelectionTable
     (
         autoPtr,
@@ -127,8 +118,11 @@ public:
             const scalar& magSf,
             const gasProperties& gas
         ) const
-        {}
+        {
+            FatalError << "Rieman solver not implemented" << endl;
+        }
 
+        //- Update fluxes based on current left and right states
         virtual void calculateFlux
         (
             scalar& rhoFlux,
@@ -144,6 +138,32 @@ public:
             const scalar eRight,
             const scalar aLeft,
             const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const
+        {
+            FatalError << "Rieman solver not implemented" << endl;
+        }
+
+        //- Update fluxes based on current left and right states, with passive scalar
+        virtual void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            scalar& rhoQFlux,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const scalar QLeft,
+            const scalar QRight,
             const vector Sf,
             const scalar magSf
         ) const
@@ -171,7 +191,9 @@ public:
             const gasProperties& gas1,
             const gasProperties& gas2
         ) const
-        {}
+        {
+            FatalError << "Rieman solver not implemented" << endl;
+        }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
