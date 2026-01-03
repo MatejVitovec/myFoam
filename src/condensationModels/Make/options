@@ -11,12 +11,14 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I../thermophysicalModels/lnInclude \
     -I./condensationModel \
+    -I./condensationNone \
     -I./condensationMonodispersion \
     -I./condensationMomentum \
     -I./nucleationModels \
     -I./nucleationModels/CNTNucleationModel \
     -I./growthModels \
     -I./growthModels/gyarmathyGrowthModel \
+    -I./growthModels/gyarmathyMixtureGrowthModel \
     -I./../applyFunctions
 
 

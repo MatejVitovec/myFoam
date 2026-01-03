@@ -100,10 +100,13 @@ public:
     // Member Functions
 
         //- Calculate the growth rate
-        virtual tmp<volScalarField> growthRate(const volScalarField& r) const;
+        virtual tmp<volScalarField> growthRate(const volScalarField& r, const volScalarField& rc) const;
 
         //- Correct gyarmathy growth rate
         virtual void correct(const volScalarField& r);
+
+        //- Correct gyarmathy growth rate
+        virtual void correct(const volScalarField& r, const volScalarField& rc);
 
 };
 

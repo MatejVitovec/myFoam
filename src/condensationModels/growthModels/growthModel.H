@@ -140,6 +140,9 @@ public:
         //- correct growth rate
         virtual void correct(const volScalarField& r) = 0;
 
+        //- correct growth rate
+        virtual void correct(const volScalarField& r, const volScalarField& rc) = 0;
+
 };
 
 

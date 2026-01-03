@@ -59,7 +59,7 @@ Foam::compressibleMixtureConvectiveFlux::compressibleMixtureConvectiveFlux
     (
         IOobject
         (
-            "phi",
+            "rhoPhi",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
@@ -246,7 +246,7 @@ void Foam::compressibleMixtureConvectiveFlux::computeFlux()
                 const scalar prho2 = gasProps2().rho(pp[facei], pT[facei]);
                 const scalar prho  = 1.0/((1.0 - pw[facei])/prho1 + pw[facei]/prho2);
                 const scalar pe = (1.0 - pw[facei])*gasProps1().Es(pp[facei], pT[facei]) + pw[facei]*gasProps2().Es(pp[facei], pT[facei]);
-                const scalar pa = gasProps1().c(pp[facei], pT[facei])*sqrt(1.0 - pw[facei]) + gasProps2().c(pp[facei], pT[facei])*sqrt(pw[facei]);
+                const scalar pa = gasProps1_.c(pp[facei], pT[facei])*sqrt(1.0 - pw[facei]);
 
                 // Calculate fluxes
                 fluxSolver_->calculateFlux

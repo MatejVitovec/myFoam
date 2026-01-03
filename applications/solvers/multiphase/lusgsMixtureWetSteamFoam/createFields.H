@@ -20,18 +20,30 @@ volScalarField& T = fluid.T();
 volScalarField& w = fluid.w();
 
 volScalarField alpha = fluid.alpha();
-volScalarField rho = fluid.rho();
 
 rhoThermo& thermo1 = fluid.thermo1();
 rhoThermo& thermo2 = fluid.thermo2();
 
 const volScalarField& a = fluid.a();
 
-const volScalarField& e1 = thermo1.he();
-const volScalarField& e2 = thermo2.he();
+const volScalarField& ev = thermo1.he();
+const volScalarField& el = thermo2.he();
 
-const volScalarField& rho1 = thermo1.rho();
-const volScalarField& rho2 = thermo2.rho();
+const volScalarField& rhov = thermo1.rho();
+const volScalarField& rhol = thermo2.rho();
+
+volScalarField rho
+(
+    IOobject
+    (
+        "rho",
+        mesh.time().timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    fluid.rho()
+);
 
 surfaceScalarField amaxSf
 (
@@ -83,37 +95,12 @@ volScalarField condensationMassSource
     condensation.condensationRateMassSource()
 );
 
-volScalarField nucleationMassSource
-(
-    IOobject
-    (
-        "mDotNucleation",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    condensation.nucleationRateMassSource()
-);
 
-volScalarField growthMassSource
+/*volScalarField s1
 (
     IOobject
     (
-        "mDotGrowth",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::AUTO_WRITE
-    ),
-    condensation.growthRateMassSource()
-);
-
-volScalarField s1
-(
-    IOobject
-    (
-        "s.1",
+        "s",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -127,7 +114,7 @@ volScalarField h1
 (
     IOobject
     (
-        "h.1",
+        "h",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
@@ -135,7 +122,8 @@ volScalarField h1
     ),
     mesh,
     dimensionedScalar("h1", dimEnergy/dimMass, 0.0)
-);
+);*/
+
 
 
 volScalarField dp
@@ -152,7 +140,6 @@ volScalarField dp
     dimensionedScalar("dp", dimPressure, 0.0)
 );
 
-
 volVectorField dU
 (
     IOobject
@@ -166,8 +153,6 @@ volVectorField dU
     mesh,
     dimensionedVector("dU", dimVelocity, vector(0, 0, 0))
 );
-
-
 
 volScalarField dT
 (

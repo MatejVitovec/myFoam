@@ -112,8 +112,8 @@ Foam::compressibleMixture::compressibleMixture(const fvMesh& mesh)
     epsilon_(this->lookupOrDefault<scalar>("epsilon", 1.0e-10)),
     epsilonMin_(this->lookupOrDefault<scalar>("epsilonMin", epsilon_*0.1)),
     epsilonMax_(this->lookupOrDefault<scalar>("epsilonMax", epsilon_*100)),
-    pthermo1_(rhoThermo::New(mesh_, "", "gasThermo")),
-    pthermo2_(rhoThermo::New(mesh_, "", "liquidThermo")),
+    pthermo1_(rhoThermo::New(mesh_, "", "thermophysicalProperties")),
+    pthermo2_(rhoThermo::New(mesh_, "2", "thermophysicalProperties.2")),
     thermo1_(pthermo1_()),
     thermo2_(pthermo2_()),
     pGasProps1_(gasProperties::New(thermo1_)),
@@ -304,10 +304,21 @@ void Foam::compressibleMixture::correctConservative()
 {
     conservative_.rho() = rho();
     conservative_.rhoU() = conservative_.rho()*U_;
-    conservative_.rhoE() = (1.0 - w_)*thermo1_.he() + conservative_.rho()*w_*thermo2_.he() + 0.5*Foam::magSqr(U_);
+    conservative_.rhoE() = conservative_.rho()*((1.0 - w_)*thermo1_.he() + w_*thermo2_.he() + 0.5*Foam::magSqr(U_));
     conservative_.rhow() = conservative_.rho()*w_;
 
-    //nejspise nepotrebuji - neni blending - netreba korece
+    //nejspise nepotrebuji - neni blending - netreba korekce
+}
+
+void Foam::compressibleMixture::constrainW()
+{
+    forAll(w_, i)
+    {
+        if (w_[i] <= 1e-20)
+        {
+            w_[i] = 1e-20;
+        }
+    }
 }
 
 tmp<surfaceScalarField> Foam::compressibleMixture::amaxSf() const

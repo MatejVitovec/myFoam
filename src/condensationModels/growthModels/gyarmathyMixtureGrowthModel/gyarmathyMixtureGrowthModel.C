@@ -77,7 +77,7 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::knu
     return 1.5*gasThermo_.mu()*sqrt(Rg*gasThermo_.T())/(2*(r + dimensionedScalar("rVSMALL", dimLength, VSMALL))*gasThermo_.p());
 }
 
-Foam::tmp<volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::liquidTemperature(const volScalarField& r, const volScalarField& rc) const
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::liquidTemperature(const volScalarField& r, const volScalarField& rc) const
 {
     const volScalarField& T_g = gasThermo_.T();
     const volScalarField& Ts = saturation_.Ts();
@@ -85,9 +85,8 @@ Foam::tmp<volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::liquidTem
     return Ts - (Ts - T_g)*(rc/r);
 }
 
-Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::growthRate(const volScalarField& r) const
+Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::growthRate(const volScalarField& r, const volScalarField& rc) const
 {
-    volScalarField rc = r; //TODO
 
     const volScalarField& T_g = gasThermo_.T();
     const volScalarField& rho_l = liquidThermo_.rho();
@@ -96,17 +95,21 @@ Foam::tmp<Foam::volScalarField> Foam::WetSteam::gyarmathyMixtureGrowthModel::gro
     tmp<volScalarField> T_l = liquidTemperature(r, rc);
     tmp<volScalarField> Kn = knudsenNumber(r);
 
-    //const volScalarField lambda_g = gasThermo_.kappa();
     const scalar Pr = 1.0; //TODO - mozna odstranit
 
-    //return pos(r - rMin_)*((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
-    return ((gasThermo_.kappa()*(liquidTemperature(r, rc) - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
+    //return ((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
+    return ((gasThermo_.kappa()*(T_l - T_g))/(rho_l*L*(r + dimensionedScalar("rSmall", dimLength, VSMALL))*(1 + 3.18*Kn/Pr)));
 }
 
 
 void Foam::WetSteam::gyarmathyMixtureGrowthModel::correct(const volScalarField& r)
 {
-    rDot_ = growthRate(r);
+    Info << "Not implemented" << endl;
+}
+
+void Foam::WetSteam::gyarmathyMixtureGrowthModel::correct(const volScalarField& r, const volScalarField& rc)
+{
+    rDot_ = growthRate(r, rc);
 }
 
 

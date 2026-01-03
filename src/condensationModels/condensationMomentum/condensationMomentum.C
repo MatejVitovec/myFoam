@@ -122,7 +122,7 @@ void condensationMomentum::constrainMoments()
 void condensationMomentum::correct()
 {
     nucleation_.correct();
-    growth_.correct(dropletRadius());
+    growth_.correct(dropletRadius(), nucleation_.rc());
 
     const fvMesh& mesh = gasThermo_.p().mesh();
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields;

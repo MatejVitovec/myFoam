@@ -99,4 +99,9 @@ void Foam::WetSteam::gyarmathyGrowthModel::correct(const volScalarField& r)
     rDot_ = growthRate(r);
 }
 
+void Foam::WetSteam::gyarmathyGrowthModel::correct(const volScalarField& r, const volScalarField& rc)
+{
+    rDot_ = growthRate(r);
+}
+
 // ************************************************************************* //

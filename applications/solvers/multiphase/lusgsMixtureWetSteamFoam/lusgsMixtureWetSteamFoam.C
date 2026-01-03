@@ -43,8 +43,6 @@ Description
 #include "condensationModel.H"
 #include "saturation.H"
 
-#include <eigen3/Eigen/Dense>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -93,19 +91,12 @@ int main(int argc, char *argv[])
         {
             mixtureFlux.computeFlux();
 
-            const volScalarField& Ts = satur.Ts();
-
             condensationMassSource = condensation.condensationRateMassSource();
-            nucleationMassSource = condensation.nucleationRateMassSource(); //DOCASNE
-            growthMassSource = condensation.growthRateMassSource(); //DOCASNE
 
-            volScalarField resRho(-dt*(fvc::div(mixtureFlux.rhoFlux())));
-
+            volScalarField resRho (-dt*(fvc::div(mixtureFlux.rhoFlux())));
             volVectorField resRhoU(-dt*(fvc::div(mixtureFlux.rhoUFlux())));
-
             volScalarField resRhoE(-dt*(fvc::div(mixtureFlux.rhoEFlux())));
-
-            volScalarField resRhow(-dt*(fvc::div(mixtureFlux.rhowFlux()) /*+ TODO*/));
+            volScalarField resRhow(-dt*(fvc::div(mixtureFlux.rhowFlux()) - condensationMassSource));
 
             dp  = dimensionedScalar("pzero", dimPressure, 0.0);
             dU  = dimensionedVector("Uzero", dimVelocity, vector(0, 0, 0));
@@ -114,19 +105,25 @@ int main(int argc, char *argv[])
 
             #include "lusgsSweep.H"
 
-            p   += dp;
-            U   += dU;
-            T   += dT;
-            w   += dw;
+            p += dp;
+            U += dU;
+            T += dT;
+            w += dw;
+
+            //Info << dp << endl;
+            //std::cin.ignore();
 
             //fluid.correct();
             //fluid.bound();
+            fluid.constrainW();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             //fluid.correctConservative();
 
             rho   = fluid.rho();
             alpha = fluid.alpha();
+
+            //Info << "alpha min: " << gMin(alpha) << " alpha max: " << gMax(alpha) << " w min: " <<gMin(fluid.w()) << " w max: " << gMax(fluid.w()) << endl;
 
             satur.correct();
 
@@ -147,8 +144,9 @@ int main(int argc, char *argv[])
 
         if (mesh.time().outputTime())
         {
-            rho1.write();
-            rho2.write();
+            rhov.write();
+            rhol.write();
+            rho.write();
             //e1.write();
             //e2.write();
         }

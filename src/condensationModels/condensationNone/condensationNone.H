@@ -67,13 +67,19 @@ public:
         
     // Constructors
 
-    //- Construct from components
-    condensationNone(
+        //- Construct from components
+        condensationNone
+        (
+            volScalarField& alphaL,
+            const volScalarField& alpha,
             const volScalarField& rho,
             const volVectorField& U,
-            const surfaceScalarField& phi,
-            wetSteamSystem& steam
-    );
+            const surfaceScalarField& alphaRhoPhi,
+            const fluidThermo& gasThermo,
+            const fluidThermo& liquidThermo,
+            const saturation& satur,
+            const dictionary& dict
+        );
     
     //- Destructor
     virtual ~condensationNone() {};
@@ -81,9 +87,14 @@ public:
 
     // Member Functions
 
-    //- Main update/correction routine
-    virtual void correct();
-    
+        //- Main update/correction routine
+        virtual void correct();
+
+        //- return condensation nucleation rate source
+        virtual tmp<volScalarField> nucleationRateMassSource() const;
+
+        //- return condensation droplet growth rate source
+        virtual tmp<volScalarField> growthRateMassSource() const;
 };
 
 

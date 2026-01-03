@@ -221,8 +221,8 @@ public:
 
     tmp<volScalarField> rho() const
     {
-        //return 1.0/(w_/thermo1_.rho() + (1.0 - w)/thermo2_.rho());
-        return thermo1_.rho()/(1.0 - w_);
+        return 1.0/(w_/thermo2_.rho() + (1.0 - w_)/thermo1_.rho());
+        //return thermo1_.rho()/(1.0 - w_);
     }
 
     tmp<volScalarField> alpha() const
@@ -278,6 +278,8 @@ public:
     void correctThermo();
 
     void correctConservative();
+
+    void constrainW();
 
     tmp<surfaceScalarField> amaxSf() const;
 };

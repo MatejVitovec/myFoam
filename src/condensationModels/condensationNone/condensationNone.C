@@ -34,19 +34,65 @@ namespace WetSteam
 defineTypeNameAndDebug(condensationNone, 0);
 addToRunTimeSelectionTable(condensationModel, condensationNone, params);
 
-condensationNone::condensationNone(
+
+condensationNone::condensationNone
+(
+    volScalarField& alphaL,
+    const volScalarField& alpha,
     const volScalarField& rho,
     const volVectorField& U,
-    const surfaceScalarField& phi,
-    wetSteamSystem& steam
-):
-    condensationModel(rho, U, phi, steam)
+    const surfaceScalarField& alphaRhoPhi,
+    const fluidThermo& gasThermo,
+    const fluidThermo& liquidThermo,
+    const saturation& satur,
+    const dictionary& dict
+)
+:
+    condensationModel(alphaL, alpha, rho, U, alphaRhoPhi, gasThermo, liquidThermo, satur, dict)
 {
+
 }
 
 
 void condensationNone::correct()
 {
+
+}
+
+
+
+tmp<volScalarField> condensationNone::nucleationRateMassSource() const
+{
+    return tmp<volScalarField>::New
+    (
+        IOobject
+        (
+            "zero",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimMass/dimTime/dimVolume, 0.0)
+    );
+}
+
+tmp<volScalarField> condensationNone::growthRateMassSource() const
+{
+    return tmp<volScalarField>::New
+    (
+        IOobject
+        (
+            "zero",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimMass/dimTime/dimVolume, 0.0)
+    );
 }
 
 

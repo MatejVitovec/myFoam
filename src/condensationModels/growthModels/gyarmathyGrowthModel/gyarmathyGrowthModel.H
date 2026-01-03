@@ -102,6 +102,9 @@ public:
         //- Correct gyarmathy growth rate
         virtual void correct(const volScalarField& r);
 
+        //- Correct gyarmathy growth rate
+        virtual void correct(const volScalarField& r, const volScalarField& rc);
+
 };
 
 

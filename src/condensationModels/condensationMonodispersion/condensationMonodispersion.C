@@ -207,7 +207,7 @@ void condensationMonodispersion::correct()
 
 
     nucleation_.correct();
-    growth_.correct(dropletRadius());
+    growth_.correct(dropletRadius(), nucleation_.rc());
     
     {
         fvScalarMatrix nEqn
