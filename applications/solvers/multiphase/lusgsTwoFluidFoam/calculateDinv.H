@@ -1,9 +1,13 @@
 {
     //volScalarField::Internal D = mesh.V()/dt;
 
-    volScalarField::Internal D1 = mesh.V()/dt;
-    volScalarField::Internal D2 = mesh.V()/dt;
+    volScalarField::Internal dVdt = mesh.V()/dt;
 
+    volScalarField::Internal D1 = 0.0*dVdt;
+    volScalarField::Internal D2 = 0.0*dVdt;
+
+
+    
     forAll(owner, faceI)
     {
         /*const scalar ac = 0.5*lusgsOmega*( 
@@ -36,9 +40,12 @@
     forAll(mesh.cells(), celli)
     {
         //DRAG
-        const double K = dragK[celli]*mesh.V()[celli];
+        const double K = dragK[celli];
 
-        Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
+        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, K, d[celli]);
+        Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
+
+        /*Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
         
         dragJ(1, 2) = K;
         dragJ(4, 2) = K*(2*U1[celli].x() - U2[celli].x());
@@ -69,10 +76,11 @@
         dragJ(3, 7) = -K;
         dragJ(4, 7) = -K*U1[celli].z(); 
         dragJ(8, 7) = K;
-        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());
+        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());*/
         //END DRAG
 
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
+        Eigen::Matrix<double, 10, 10> pIntAdditionJ = Eigen::Matrix<double, 10, 10>::Zero();
 
         J(0, 0) += alpha1[celli]*drhodp1[celli];
         J(1, 0) += alpha1[celli]*drhodp1[celli]*U1[celli].x();
@@ -89,12 +97,15 @@
         J(1, 1) += -rho1[celli]*U1[celli].x();
         J(2, 1) += -rho1[celli]*U1[celli].y();
         J(3, 1) += -rho1[celli]*U1[celli].z();
-        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli])) - fluid.pInt()[celli];
+        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli])); //- fluid.pInt()[celli];
         J(5, 1) +=  rho2[celli];
         J(6, 1) +=  rho2[celli]*U2[celli].x();
         J(7, 1) +=  rho2[celli]*U2[celli].y();
         J(8, 1) +=  rho2[celli]*U2[celli].z();
-        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli])) + fluid.pInt()[celli];
+        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli])); //+ fluid.pInt()[celli];
+
+        pIntAdditionJ(4, 1) += -fluid.pInt()[celli];
+        pIntAdditionJ(9, 1) +=  fluid.pInt()[celli];
 
         J(1, 2) += alpha1[celli]*rho1[celli];
         J(4, 2) += alpha1[celli]*rho1[celli]*U1[celli].x();
@@ -129,7 +140,8 @@
 
         D_inv[celli].setThreshold(1e-300);
         //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
-        D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
+        //D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
+        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
 
         //if (runTime.timeIndex() > 8000)
         //{

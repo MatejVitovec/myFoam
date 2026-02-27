@@ -148,7 +148,23 @@ public:
         //    ddt(alpha2*rho2*U2) + ... = ... K*(U2-U1)
         virtual tmp<volScalarField> K(const volScalarField& d) const;
 
-        //virtual std::array<double, 100> dKdpUT(const label celli) const;
+        //- Return the drag term
+        //  used in the momentum equations
+        //    ddt(alpha1*rho1*U1) + ... = ...  S
+        //    ddt(alpha2*rho2*U2) + ... = ... -S
+        //virtual tmp<volVectorField> SalphaRhoU1(const volScalarField& d) const;
+        //virtual tmp<volVectorField> SalphaRhoU2(const volScalarField& d) const;
+        //virtual tmp<volScalarField> SalphaRhoE1(const volScalarField& d) const;
+        //virtual tmp<volScalarField> SalphaRhoE2(const volScalarField& d) const;
+
+        scalar dKdp(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKdalpha(const label celli, const scalar d, const scalar Cd) const;
+        vector dKdU1(const label celli, const scalar d, const scalar Cd) const;
+        vector dKdU2(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKdT1(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKdT2(const label celli, const scalar d, const scalar Cd) const;
+
+        std::array<double, 100> dSdpUT(const label celli, const scalar K, const scalar d) const;
 
         //- Dummy write for regIOobject
         bool writeData(Ostream& os) const;

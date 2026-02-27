@@ -201,7 +201,7 @@ mapFieldU2ToU1FixedValueFvPatchVectorField::updateCoeffs()
     }
 
 //{{{ begin code
-    #line 38 "/home/matej/myFoam/tutorials/SE1050lusgs2/0/U.2/boundaryField/inlet"
+    #line 38 "/home/matejv/myFoam/tutorials/SE1050lusgs2/0/U.2/boundaryField/inlet"
 const volVectorField& sourceField = db().lookupObject<volVectorField>("U.1");
             operator== (sourceField.boundaryField()[patch().index()]);
 //}}} end code

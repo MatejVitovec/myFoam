@@ -95,6 +95,7 @@ int main(int argc, char *argv[])
             /*volScalarField rho = alpha1*rho1 + alpha2*rho2;
             volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
             volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());*/
+            volScalarField dragK = drag.K(d);
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
@@ -108,23 +109,23 @@ int main(int argc, char *argv[])
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
-                                          /*+ dragTerm*/);
+                                          + dragK*(fluid.U1() - fluid.U2()));
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
-                                          /*- dragTerm*/);
+                                          + dragK*(fluid.U2() - fluid.U1()));
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                        /*+ (dragTerm & virtualVelocity)*/);
+                                    + ((dragK*(fluid.U1() - fluid.U2())) & U1));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                                        /*- (dragTerm & virtualVelocity)*/);
+                                    + ((dragK*(fluid.U2() - fluid.U1())) & U2));
 
             fluid.correct();
             fluid.blendVanishingFluid();
