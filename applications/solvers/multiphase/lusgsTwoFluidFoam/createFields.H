@@ -4,6 +4,8 @@ Info<< "Reading thermophysical properties\n" << endl;
 
 TwoFluidFoam::twoFluid fluid(mesh);
 
+twoFluidConservative& conservative = fluid.conservative();
+
 twoFluidConvectiveFlux twoFluidFlux
 (
     fluid.p(),

@@ -3,6 +3,9 @@ dictionary lusgsDict = mesh.solutionDict().subDict("LUSGS");
 label lusgsIntIters = 
     lusgsDict.lookupOrDefault<label>("internalIterations", 1);
 
+ label lusgsIters = 
+    lusgsDict.lookupOrDefault<label>("iterations", 1);
+
 scalar lusgsTolerance =
     lusgsDict.lookupOrDefault<scalar>("tolerance", 0.0);
 

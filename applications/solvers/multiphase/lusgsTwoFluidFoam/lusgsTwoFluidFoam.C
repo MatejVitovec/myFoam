@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
         dimensionedScalar dt = runTime.deltaT();
 
 
-        //for (int intIter = 0; intIter < lusgsIntIters; intIter++)
+        for (int intIter = 0; intIter < lusgsIters; intIter++)
         {
             twoFluidFlux.computeFlux();
 
@@ -102,39 +102,39 @@ int main(int argc, char *argv[])
             //volVectorField virtualMassTerm= -0.5*rho*alpha1*alpha2*(DU2 - DU1);
 
             volScalarField rezAlphaRho1(-dt*(
-                /*fvc::ddt(conservative.alphaRho1()) +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
+                fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
             ));
 
             volScalarField rezAlphaRho2(-dt*(
-                /*fvc::ddt(conservative.alphaRho2()) +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+                fvc::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
             ));
 
             volVectorField rezAlphaRhoU1(-dt*(
-                /*fvc::ddt(conservative.alphaRhoU1())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+                fvc::ddt(conservative.alphaRhoU1())
+                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                 + dragK*(fluid.U1() - fluid.U2())
                 //+ virtualMassTerm
             ));
 
             volVectorField rezAlphaRhoU2(-dt*(
-                /*fvc::ddt(conservative.alphaRhoU2())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                fvc::ddt(conservative.alphaRhoU2())
+                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 + dragK*(fluid.U2() - fluid.U1())
                 //- virtualMassTerm
             ));
 
             volScalarField rezEpsilon1(-dt*(
-                /*fvc::ddt(conservative.epsilon1())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                fvc::ddt(conservative.epsilon1())
+                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 + ((dragK*(fluid.U1() - fluid.U2())) & U1)
                 //+ ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
             volScalarField rezEpsilon2(-dt*(
-                /*fvc::ddt(conservative.epsilon2())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                fvc::ddt(conservative.epsilon2())
+                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 + ((dragK*(fluid.U2() - fluid.U1())) & U2)
                 //- ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
@@ -168,8 +168,8 @@ int main(int argc, char *argv[])
             }*/
 
             fluid.correctThermo();
-            fluid.correctInterfacialPressure();
-            //fluid.correctConservative();
+            if(intIter == lusgsIters - 1) fluid.correctInterfacialPressure();
+            fluid.correctConservative();
 
             //DU1 = fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1);
             //DU2 = fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2);
@@ -181,12 +181,12 @@ int main(int argc, char *argv[])
             scalar finalRezT1    = fvc::domainIntegrate(mag(dT1)   /dt).value();
             scalar finalRezT2    = fvc::domainIntegrate(mag(dT2)   /dt).value();
 
-            Info << "LUSGS:  Solving for p,     " << "Final residual = " << finalRezp     << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for alpha, " << "Final residual = " << finalRezalpha << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for U1,    " << "Final residual = " << finalRezU1    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for U2,    " << "Final residual = " << finalRezU2    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for T1,    " << "Final residual = " << finalRezT1    << ", No Iterations 1" << nl;
-            Info << "LUSGS:  Solving for T2,    " << "Final residual = " << finalRezT2    << ", No Iterations 1" << nl;
+            Info << "LUSGS:  Solving for p,     " << "Final residual = " << finalRezp     << ", No Iterations = " << intIter << nl;
+            Info << "LUSGS:  Solving for alpha, " << "Final residual = " << finalRezalpha << ", No Iterations = " << intIter << nl;
+            Info << "LUSGS:  Solving for U1,    " << "Final residual = " << finalRezU1    << ", No Iterations = " << intIter << nl;
+            Info << "LUSGS:  Solving for U2,    " << "Final residual = " << finalRezU2    << ", No Iterations = " << intIter << nl;
+            Info << "LUSGS:  Solving for T1,    " << "Final residual = " << finalRezT1    << ", No Iterations = " << intIter << nl;
+            Info << "LUSGS:  Solving for T2,    " << "Final residual = " << finalRezT2    << ", No Iterations = " << intIter << nl;
 
             /*bool lastIteration = ((intIter + 1) == lusgsIntIters);
 
