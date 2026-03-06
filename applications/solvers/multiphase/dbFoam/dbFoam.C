@@ -133,6 +133,36 @@ int main(int argc, char *argv[])
             fluid.correctThermo();
             if(i == 2) fluid.correctInterfacialPressure();
             fluid.correctConservative();
+
+
+
+            /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
+            const fvPatch& patch = U1.boundaryField()[patchI].patch();
+            const labelUList& faceCells = patch.faceCells();
+
+            const vectorField& Upatch = U2.boundaryField()[patchI];
+            const vectorField& normals = patch.nf();
+
+            scalarField Un(Upatch.size());
+
+            forAll(Upatch, faceI)
+            {
+                Un[faceI] = mag(Upatch[faceI] & normals[faceI]);
+            }
+            const vectorField& internal = U2.internalField();
+            vectorField BCneighborValues(patch.size());
+            vectorField bcIntDiff(patch.size());
+
+            forAll(patch, faceI)
+            {
+                label cellI = faceCells[faceI];
+
+                BCneighborValues[faceI] = internal[cellI];
+                bcIntDiff[faceI] = internal[cellI] - Upatch[faceI];
+            }
+
+            Info << bcIntDiff << endl;*/
+
         }
 
         rho1.ref() = thermo1.rho();

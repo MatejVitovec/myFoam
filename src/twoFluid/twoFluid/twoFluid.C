@@ -637,6 +637,15 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid(const volScalarField& T2b
 
 void Foam::TwoFluidFoam::twoFluid::correctBoundaryCondition()
 {
+    //p_.boundaryFieldRef().setUpdated(false);
+
+    forAll(p_.boundaryField(), patchI) { p_.boundaryFieldRef()[patchI].setUpdated(false); }
+    forAll(alpha2_.boundaryField(), patchI) { alpha2_.boundaryFieldRef()[patchI].setUpdated(false); }
+    forAll(U1_.boundaryField(), patchI) { U1_.boundaryFieldRef()[patchI].setUpdated(false); }
+    forAll(U2_.boundaryField(), patchI) { U2_.boundaryFieldRef()[patchI].setUpdated(false); }
+    forAll(T1_.boundaryField(), patchI) { T1_.boundaryFieldRef()[patchI].setUpdated(false); }
+    forAll(T2_.boundaryField(), patchI) { T2_.boundaryFieldRef()[patchI].setUpdated(false); }
+
     p_.correctBoundaryConditions();
     alpha2_.correctBoundaryConditions();
     alpha1_ = 1.0 - alpha2_;
@@ -690,12 +699,12 @@ void Foam::TwoFluidFoam::twoFluid::correctConservative()
     conservative_.epsilon2() = alpha2_*(rho2*E2 + pInt_);
 
     //nejspise nepotrebuji konzervativní pole staci pouze jako INTERNAL FIELD
-    /*conservative_.alphaRho1().boundaryFieldRef() = alpha1_.boundaryField()*rho1.boundaryField();
-    conservative_.alphaRho2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*rho2.boundaryField();
-    conservative_.alphaRhoU1().boundaryFieldRef() = alpha1_.boundaryField()*rho1.boundaryField()*U1_.boundaryField();
-    conservative_.alphaRhoU2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*rho2.boundaryField()*U2_.boundaryField();
-    conservative_.epsilon1().boundaryFieldRef() = alpha1_.boundaryField()*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
-    conservative_.epsilon2().boundaryFieldRef() = (1.0 - alpha1_.boundaryField())*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
+    /*conservative_.alphaRho1().boundaryFieldRef() = (1.0 - alpha2_.boundaryField())*rho1.boundaryField();
+    conservative_.alphaRho2().boundaryFieldRef() = alpha2_.boundaryField()*rho2.boundaryField();
+    conservative_.alphaRhoU1().boundaryFieldRef() = (1.0 - alpha2_.boundaryField())*rho1.boundaryField()*U1_.boundaryField();
+    conservative_.alphaRhoU2().boundaryFieldRef() = alpha2_.boundaryField()*rho2.boundaryField()*U2_.boundaryField();
+    conservative_.epsilon1().boundaryFieldRef() = (1.0 - alpha2_.boundaryField())*(rho1.boundaryField()*E1.boundaryField() + pInt_.boundaryField());
+    conservative_.epsilon2().boundaryFieldRef() = alpha2_.boundaryField()*(rho2.boundaryField()*E2.boundaryField() + pInt_.boundaryField());*/
 }
 
 tmp<surfaceScalarField> Foam::TwoFluidFoam::twoFluid::amaxSf() const
