@@ -49,7 +49,7 @@ solvers
 }
 
 LUSGS {
-    iterations 12;
+    iterations 6;
     internalIterations 3;
     localTimestepping false;
     omega 1.2;

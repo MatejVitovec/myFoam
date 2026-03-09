@@ -22,7 +22,7 @@ libs (
 
 startFrom       startTime;
 
-startTime       0.000267453;
+startTime       0;
 
 stopAt          endTime;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 0.3;
+maxCo 0.8;
 
 rDeltaTSmoothingCoeff 0.1;
 
