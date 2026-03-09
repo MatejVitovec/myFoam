@@ -136,12 +136,12 @@ int main(int argc, char *argv[])
 
             #include "calculateDeltaPrimitive.H"
 
-            p     += coeff[i][0]*p.oldTime()     + coeff[i][1]*p     + coeff[i][2]*dp;
-            alpha += coeff[i][0]*alpha.oldTime() + coeff[i][1]*alpha + coeff[i][2]*dalpha;
-            U1    += coeff[i][0]*U1.oldTime()    + coeff[i][1]*U1    + coeff[i][2]*dU1;
-            U2    += coeff[i][0]*U2.oldTime()    + coeff[i][1]*U2    + coeff[i][2]*dU2;
-            T1    += coeff[i][0]*T1.oldTime()    + coeff[i][1]*T1    + coeff[i][2]*dT1;
-            T2    += coeff[i][0]*T2.oldTime()    + coeff[i][1]*T2    + coeff[i][2]*dT2;
+            p     = coeff[i][0]*p.oldTime()     + coeff[i][1]*p     + coeff[i][2]*dp;
+            alpha = coeff[i][0]*alpha.oldTime() + coeff[i][1]*alpha + coeff[i][2]*dalpha;
+            U1    = coeff[i][0]*U1.oldTime()    + coeff[i][1]*U1    + coeff[i][2]*dU1;
+            U2    = coeff[i][0]*U2.oldTime()    + coeff[i][1]*U2    + coeff[i][2]*dU2;
+            T1    = coeff[i][0]*T1.oldTime()    + coeff[i][1]*T1    + coeff[i][2]*dT1;
+            T2    = coeff[i][0]*T2.oldTime()    + coeff[i][1]*T2    + coeff[i][2]*dT2;
 
             fluid.blendVanishingFluid();
             fluid.correctBoundaryCondition();
