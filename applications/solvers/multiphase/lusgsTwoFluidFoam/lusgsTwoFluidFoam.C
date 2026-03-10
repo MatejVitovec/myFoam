@@ -156,7 +156,8 @@ int main(int argc, char *argv[])
             T2    += dT2;
 
             //fluid.correct();
-            fluid.blendVanishingFluid();
+           // fluid.blendVanishingFluid();
+            fluid.boundAlpha();
             //fluid.bound();
             fluid.correctBoundaryCondition();
 

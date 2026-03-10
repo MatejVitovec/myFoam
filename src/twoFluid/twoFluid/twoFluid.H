@@ -194,6 +194,8 @@ public:
         const scalar& T2vanished
     ) const;
 
+    void boundAlpha(scalar& alpha) const;
+
     void fluxFromConservative
     (
         scalar& fluxAlphaRho1,
@@ -375,6 +377,8 @@ public:
     void blendVanishingFluid(const volScalarField& T2blend);
 
     void bound();
+
+    void boundAlpha();
 
     void correctBoundaryCondition();
 

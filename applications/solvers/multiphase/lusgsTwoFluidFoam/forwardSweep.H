@@ -45,6 +45,8 @@
                     scalar T2_1      = T2[own]    + dT2Star[own];
 
                     //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //if (alpha_1 >= 1.0 || alpha_1 < 0) Info << "ERR forOwn celli: " << celli << ", alpha: " << dalpha[own] << " dp: " << dp[own] << " dU1: " << dU1[own] << " dU2: " << dU2[own] << " dT1: " << dT1[own] << " dT2: " << dT2[own] << endl;
+                    fluid.boundAlpha(alpha_1);
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
                     const scalar alpha2_1 = alpha_1;
@@ -90,6 +92,8 @@
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
                     //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //if (alpha_1 >= 1.0 || alpha_1 < 0) Info << "ERR forNei celli: " << celli << ", alpha: " << dalpha[nei] << " dp: " << dp[nei] << " dU1: " << dU1[nei] << " dU2: " << dU2[nei] << " dT1: " << dT1[nei] << " dT2: " << dT2[nei] << endl;
+                    fluid.boundAlpha(alpha_1);
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
                     const scalar alpha2_1 = alpha_1;

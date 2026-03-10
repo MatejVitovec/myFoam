@@ -25,7 +25,7 @@ License
 
 #include "fvCFD.H"
 #include "twoFluid.H"
-//#include "boundMinMax.H"
+#include "boundMinMax.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -159,7 +159,7 @@ conservative_
     pInt_
 )
 {
-    blendVanishingFluid();
+    //blendVanishingFluid();
     correctBoundaryCondition();
     correctThermo();
     correctInterfacialPressure();
@@ -355,6 +355,18 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
 
         U2 = gFunc*U2 + (1.0 - gFunc)*U1;
         T2 = gFunc*T2 + (1.0 - gFunc)*T2vanished;
+    }
+}
+
+void Foam::TwoFluidFoam::twoFluid::boundAlpha(scalar& alpha) const
+{
+    if(alpha > 1.0)
+    {
+        alpha = 1.0;
+    }
+    else if (alpha < 0.0)
+    {
+        alpha = 0.0;
     }
 }
 
@@ -631,6 +643,13 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid(const volScalarField& T2b
         }
     }
     
+    alpha1_ = 1.0 - alpha2_;
+}
+
+void Foam::TwoFluidFoam::twoFluid::boundAlpha()
+{
+    boundMinMax(alpha2_, 0.0, 1.0);
+
     alpha1_ = 1.0 - alpha2_;
 }
 

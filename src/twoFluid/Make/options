@@ -31,4 +31,5 @@ EXE_LIBS = \
     -ldynamicFvMesh \
     -ltopoChangerFvMesh \
     -L$(FOAM_USER_LIBBIN) \
-    -lmyThermophysicalModels
+    -lmyThermophysicalModels \
+    -lmyBoundFoam
