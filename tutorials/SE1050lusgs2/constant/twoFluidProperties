@@ -17,7 +17,7 @@ FoamFile
 
 
 epsilon         1.0e-10;
-epsilonMin      1.0e-11;
+epsilonMin      0;
 epsilonMax      1.0e-8;
 
 drag

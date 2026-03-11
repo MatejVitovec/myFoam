@@ -27,8 +27,42 @@
         cp2[celli] = gasProps2.Cp(p[celli], T2[celli]);
     }
 
-    std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
-    //std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells()); 
+
+    surfaceScalarField ac
+    (
+        IOobject
+        (
+            "ac",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("ac", dimLength/dimTime, 0.0)
+    );
+
+    forAll(owner, faceI)
+    {
+        ac[faceI] = lusgsOmega*max(max(mag(U1[owner[faceI]]     & Sf[faceI]) + a1[owner[faceI]]    *magSf[faceI],
+                                       mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI]),
+                                   max(mag(U2[owner[faceI]]     & Sf[faceI]) + a2[owner[faceI]]    *magSf[faceI],
+                                       mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]));
+    }
+
+    forAll(mesh.boundary(), patchi)
+    {
+        const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
+
+        forAll(mesh.boundary()[patchi], faceI)
+        {
+            ac[pFaceCells[faceI]] = lusgsOmega*max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI],
+                                                   mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]);
+        }
+    }
+
+    //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+    std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells()); 
     
     #include "calculateDinv.H"
 

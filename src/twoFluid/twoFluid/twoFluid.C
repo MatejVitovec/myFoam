@@ -360,13 +360,13 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
 
 void Foam::TwoFluidFoam::twoFluid::boundAlpha(scalar& alpha) const
 {
-    if(alpha > 1.0)
+    if(alpha > 1.0 - epsilonMin_)
     {
-        alpha = 1.0;
+        alpha = 1.0 - epsilonMin_;
     }
-    else if (alpha < 0.0)
+    else if (alpha < epsilonMin_)
     {
-        alpha = 0.0;
+        alpha = epsilonMin_;
     }
 }
 
@@ -648,7 +648,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid(const volScalarField& T2b
 
 void Foam::TwoFluidFoam::twoFluid::boundAlpha()
 {
-    boundMinMax(alpha2_, 0.0, 1.0);
+    boundMinMax(alpha2_, epsilonMin_, 1.0 - epsilonMin_);
 
     alpha1_ = 1.0 - alpha2_;
 }

@@ -90,7 +90,7 @@ volScalarField rho2
     thermo2.rho()
 );
 
-volVectorField DU1
+/*volVectorField DU1
 (
     IOobject
     (
@@ -114,7 +114,7 @@ volVectorField DU2
         IOobject::AUTO_WRITE
     ),
     fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2)
-);
+);*/
 
 
 volScalarField dp

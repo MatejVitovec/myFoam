@@ -1,39 +1,45 @@
 {
-    //volScalarField::Internal D = mesh.V()/dt;
-
     volScalarField::Internal dVdt = mesh.V()/dt;
+
+    volScalarField::Internal acSum = 0.0*dVdt;
 
     volScalarField::Internal D1 = 0.0*dVdt;
     volScalarField::Internal D2 = 0.0*dVdt;
 
-
+    volScalarField::Internal ac1 = 0.0*dVdt;
+    volScalarField::Internal ac2 = 0.0*dVdt;
     
-    forAll(owner, faceI)
+    forAll(owner, facei)
     {
         /*const scalar ac = 0.5*lusgsOmega*( 
-                            max(max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],
-                                    mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]),
-                                max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI],
-                                    mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI])));*/
+                            max(max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],
+                                    mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]),
+                                max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei],
+                                    mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei])));*/
 
-        //D[owner[faceI]]     += 0.5*lusgsOmega*max(mag(U1[owner[faceI]] & Sf[faceI])     + a1[owner[faceI]]*magSf[faceI],     mag(U2[owner[faceI]] & Sf[faceI])     + a2[owner[faceI]]*magSf[faceI]);
-        //D[neighbour[faceI]] += 0.5*lusgsOmega*max(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI], mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
+        //acSum[owner[facei]]     += 0.5*lusgsOmega*max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],     mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]);
+        //acSum[neighbour[facei]] += 0.5*lusgsOmega*max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei], mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
 
-        D1[owner[faceI]]     += 0.5*lusgsOmega*(mag(U1[owner[faceI]]     & Sf[faceI]) + a1[owner[faceI]]    *magSf[faceI]);
-        D2[owner[faceI]]     += 0.5*lusgsOmega*(mag(U2[owner[faceI]]     & Sf[faceI]) + a2[owner[faceI]]    *magSf[faceI]);
-        D1[neighbour[faceI]] += 0.5*lusgsOmega*(mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI]);
-        D2[neighbour[faceI]] += 0.5*lusgsOmega*(mag(U2[neighbour[faceI]] & Sf[faceI]) + a2[neighbour[faceI]]*magSf[faceI]);
+        acSum[owner[facei]]     += 0.5*ac[facei];
+        acSum[neighbour[facei]] += 0.5*ac[facei];
+
+        //D1[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]]     & Sf[facei]) + a1[owner[facei]]    *magSf[facei]);
+        //D2[owner[facei]]     += 0.5*lusgsOmega*(mag(U2[owner[facei]]     & Sf[facei]) + a2[owner[facei]]    *magSf[facei]);
+        //D1[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
+        //D2[neighbour[facei]] += 0.5*lusgsOmega*(mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
     }
+
     forAll(mesh.boundary(), patchi)
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
 
-        forAll(mesh.boundary()[patchi], faceI)
+        forAll(mesh.boundary()[patchi], facei)
         {
-            //D[pFaceCells[faceI]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI], mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]));
+            //acSum[pFaceCells[facei]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[facei]] & Sf[facei]) + a1[pFaceCells[facei]]*magSf[facei], mag(U2[pFaceCells[facei]] & Sf[facei]) + a2[pFaceCells[facei]]*magSf[facei]));
+            //acSum[pFaceCells[facei]] += 0.5*ac[facei];
 
-            D1[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI]);
-            D2[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]);
+            //D1[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[facei]] & Sf[facei]) + a1[pFaceCells[facei]]*magSf[facei]);
+            //D2[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[facei]] & Sf[facei]) + a2[pFaceCells[facei]]*magSf[facei]);
         }
     }
 
@@ -141,7 +147,9 @@
         D_inv[celli].setThreshold(1e-300);
         //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
         //D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
-        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+        
+        //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
 
         //if (runTime.timeIndex() > 8000)
         //{

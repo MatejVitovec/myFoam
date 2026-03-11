@@ -28,7 +28,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         10;
 
 deltaT          1e-6;
 
@@ -52,7 +52,7 @@ graphFormat     raw;
 
 runTimeModifiable true;
 
-maxCo 0.05;
+maxCo 0.1;
 
 adjustTimeStep yes;
 
