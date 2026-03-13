@@ -62,6 +62,19 @@ volScalarField d
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
 
+volScalarField dragK
+(
+    IOobject
+    (
+        "dragTermK",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    drag.K(d)
+);
+
 
 //Pro ukladani
 volScalarField rho1
@@ -90,7 +103,7 @@ volScalarField rho2
     thermo2.rho()
 );
 
-/*volVectorField DU1
+volVectorField DU1
 (
     IOobject
     (
@@ -114,7 +127,20 @@ volVectorField DU2
         IOobject::AUTO_WRITE
     ),
     fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2)
-);*/
+);
+
+volVectorField virtualMassTerm
+(
+    IOobject
+    (
+        "virtualMassTerm",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    -0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1)
+);
 
 
 volScalarField dp
