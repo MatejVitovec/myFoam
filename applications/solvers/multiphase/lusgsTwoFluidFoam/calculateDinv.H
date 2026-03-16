@@ -46,9 +46,9 @@
     forAll(mesh.cells(), celli)
     {
         //DRAG
-        const double K = dragK[celli];
+        const double Ki = dragKi[celli];
 
-        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, K, d[celli]);
+        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, Ki, d[celli]);
         Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
 
         /*Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
@@ -144,12 +144,18 @@
 
         //D_inv[celli].compute((D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J);
 
-        D_inv[celli].setThreshold(1e-300);
+        D_inv[celli].setThreshold(1e-30);
         //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
         //D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
         
         //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
         D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+
+        //alpha1zero[celli] = (alpha1[celli] < 1.0e-20) ? 0.0 : 1.0;
+        //alpha2zero[celli] = (alpha2[celli] < 1.0e-20) ? 0.0 : 1.0;
+
+        //D_inv[celli]->setThreshold(1e-20);
+        //D_inv[celli]->compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]), Eigen::ComputeFullU | Eigen::ComputeFullV);
 
         //if (runTime.timeIndex() > 8000)
         //{

@@ -103,8 +103,9 @@ int main(int argc, char *argv[])
             volScalarField Hvint = satur.hsv() + (Uint & U1) - 0.5*magSqr(U1);
             volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
-            volScalarField dragK = drag.K(condensation.dropletDiameter());
-            volVectorField dragSource = dragK*(U1 - U2);
+            volScalarField d = condensation.dropletDiameter();
+            volScalarField dragKi = drag.Ki(d);
+            volVectorField dragSource = dragKi*alpha*(U1 - U2);
 
             condensationMassSource = condensation.condensationRateMassSource();
             nucleationMassSource = condensation.nucleationRateMassSource(); //DOCASNE

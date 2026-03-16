@@ -94,7 +94,7 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdR
                     IOobject::NO_WRITE
                 ),
                 fluid_.mesh(),
-                0.0
+                dimensionedScalar("viscousDragCoeff", dimless, 0.0)
             )
         );
 }
@@ -109,6 +109,37 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Ki(
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::K(const volScalarField& d) const
 {
     return Ki(d)*fluid_.alpha();//*pos(fluid_.alpha() - 1e-26);
+}
+
+
+Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidp(const label celli, const scalar d, const scalar Cd) const
+{
+    return 0.0;
+}
+
+Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidalpha(const label celli, const scalar d, const scalar Cd) const
+{
+    return 0.0;
+}
+
+Foam::vector Foam::TwoFluidFoam::dragModels::viscousDrag::dKidU1(const label celli, const scalar d, const scalar Cd) const
+{
+    return vector::zero;
+}
+
+Foam::vector Foam::TwoFluidFoam::dragModels::viscousDrag::dKidU2(const label celli, const scalar d, const scalar Cd) const
+{
+    return vector::zero;
+}
+
+Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidT1(const label celli, const scalar d, const scalar Cd) const
+{
+    return 0.0;
+}
+
+Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidT2(const label celli, const scalar d, const scalar Cd) const
+{
+    return 0.0;
 }
 
 

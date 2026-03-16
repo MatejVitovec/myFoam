@@ -137,6 +137,16 @@
     
         Eigen::Vector<double,10> b;
         b << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2;
+        /*b << rAlphaRho1*alpha1zero[celli],
+             rAlphaRhoU1.x()*alpha1zero[celli],
+             rAlphaRhoU1.y()*alpha1zero[celli],
+             rAlphaRhoU1.z()*alpha1zero[celli],
+             rEpsilon1*alpha1zero[celli],
+             rAlphaRho2*alpha2zero[celli],
+             rAlphaRhoU2.x()*alpha2zero[celli],
+             rAlphaRhoU2.y()*alpha2zero[celli],
+             rAlphaRhoU2.z()*alpha2zero[celli],
+             rEpsilon2*alpha2zero[celli];*/
 
         //Eigen::Vector<double,10> starState = D_inv[celli].solve((Eigen::Vector<double,10>() << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2).finished());
         Eigen::Vector<double,10> starState = D_inv[celli].solve(b);
@@ -147,5 +157,12 @@
         dU2Star[celli]    = vector(starState(5), starState(6), starState(7));
         dT1Star[celli]    = starState(8);
         dT2Star[celli]    = starState(9);
+
+        if(celli == 1834 && dT1Star[celli] > 1e-10)
+        {
+            Info << "for iter: " << runTime.timeIndex() << " ---------------" << endl;
+            std::cout << starState << std::endl;
+            Info << " p: " << p[celli] << " alpha: " << alpha[celli] << " U1: " << U1[celli] << " U2: " << U2[celli] << " T1: " << T1[celli] << " T2: " << T2[celli] << endl;
+        }
     }
 }

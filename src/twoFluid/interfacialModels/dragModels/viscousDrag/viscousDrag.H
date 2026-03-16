@@ -93,6 +93,13 @@ public:
         virtual tmp<volScalarField> Ki(const volScalarField& d) const;
 
         virtual tmp<volScalarField> K(const volScalarField& d) const;
+
+        scalar dKidp(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKidalpha(const label celli, const scalar d, const scalar Cd) const;
+        vector dKidU1(const label celli, const scalar d, const scalar Cd) const;
+        vector dKidU2(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKidT1(const label celli, const scalar d, const scalar Cd) const;
+        scalar dKidT2(const label celli, const scalar d, const scalar Cd) const;
 };
 
 

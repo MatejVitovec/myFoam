@@ -62,17 +62,17 @@ volScalarField d
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
 
-volScalarField dragK
+volScalarField dragKi
 (
     IOobject
     (
-        "dragTermK",
+        "dragTermKi",
         runTime.timeName(),
         mesh,
         IOobject::NO_READ,
         IOobject::AUTO_WRITE
     ),
-    drag.K(d)
+    drag.Ki(d)
 );
 
 

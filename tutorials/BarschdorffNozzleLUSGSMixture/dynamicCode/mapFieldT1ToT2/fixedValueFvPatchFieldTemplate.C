@@ -54,11 +54,11 @@ namespace Foam
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 // dynamicCode:
-// SHA1 = bf766773243118fdfeb54c6f9d87d057e8e10002
+// SHA1 = 7b45920900006f2e0af41ee33a0c0d75de2ecece
 //
 // unique function name that can be checked if the correct library version
 // has been loaded
-extern "C" void mapFieldU2ToU1_bf766773243118fdfeb54c6f9d87d057e8e10002(bool load)
+extern "C" void mapFieldT1ToT2_7b45920900006f2e0af41ee33a0c0d75de2ecece(bool load)
 {
     if (load)
     {
@@ -74,8 +74,8 @@ extern "C" void mapFieldU2ToU1_bf766773243118fdfeb54c6f9d87d057e8e10002(bool loa
 
 makeRemovablePatchTypeField
 (
-    fvPatchVectorField,
-    mapFieldU2ToU1FixedValueFvPatchVectorField
+    fvPatchScalarField,
+    mapFieldT1ToT2FixedValueFvPatchScalarField
 );
 
 } // End namespace Foam
@@ -84,29 +84,29 @@ makeRemovablePatchTypeField
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
     const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF
+    const DimensionedField<scalar, volMesh>& iF
 )
 :
     parent_bctype(p, iF)
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/DimensionedField");
+        printMessage("Construct mapFieldT1ToT2 : patch/DimensionedField");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs,
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs,
     const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
+    const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
 )
 :
@@ -114,17 +114,17 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/DimensionedField/mapper");
+        printMessage("Construct mapFieldT1ToT2 : patch/DimensionedField/mapper");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
     const fvPatch& p,
-    const DimensionedField<vector, volMesh>& iF,
+    const DimensionedField<scalar, volMesh>& iF,
     const dictionary& dict
 )
 :
@@ -132,16 +132,16 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : patch/dictionary");
+        printMessage("Construct mapFieldT1ToT2 : patch/dictionary");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs
 )
 :
     parent_bctype(rhs),
@@ -149,24 +149,24 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 {
     if (false)
     {
-        printMessage("Copy construct mapFieldU2ToU1");
+        printMessage("Copy construct mapFieldT1ToT2");
     }
 }
 
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-mapFieldU2ToU1FixedValueFvPatchVectorField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const mapFieldU2ToU1FixedValueFvPatchVectorField& rhs,
-    const DimensionedField<vector, volMesh>& iF
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs,
+    const DimensionedField<scalar, volMesh>& iF
 )
 :
     parent_bctype(rhs, iF)
 {
     if (false)
     {
-        printMessage("Construct mapFieldU2ToU1 : copy/DimensionedField");
+        printMessage("Construct mapFieldT1ToT2 : copy/DimensionedField");
     }
 }
 
@@ -174,12 +174,12 @@ mapFieldU2ToU1FixedValueFvPatchVectorField
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::
-~mapFieldU2ToU1FixedValueFvPatchVectorField()
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+~mapFieldT1ToT2FixedValueFvPatchScalarField()
 {
     if (false)
     {
-        printMessage("Destroy mapFieldU2ToU1");
+        printMessage("Destroy mapFieldT1ToT2");
     }
 }
 
@@ -188,7 +188,7 @@ mapFieldU2ToU1FixedValueFvPatchVectorField::
 
 void
 Foam::
-mapFieldU2ToU1FixedValueFvPatchVectorField::updateCoeffs()
+mapFieldT1ToT2FixedValueFvPatchScalarField::updateCoeffs()
 {
     if (this->updated())
     {
@@ -197,12 +197,12 @@ mapFieldU2ToU1FixedValueFvPatchVectorField::updateCoeffs()
 
     if (false)
     {
-        printMessage("updateCoeffs mapFieldU2ToU1");
+        printMessage("updateCoeffs mapFieldT1ToT2");
     }
 
 //{{{ begin code
-    #line 39 "/home/matej/myFoam/tutorials/SE1050lusgs/0/U.2/boundaryField/inlet"
-const volVectorField& sourceField = db().lookupObject<volVectorField>("U.1");
+    #line 31 "/home/matejv/myFoam/tutorials/BarschdorffNozzleLUSGSMixture/0/T.2/boundaryField/inlet"
+const volScalarField& sourceField = db().lookupObject<volScalarField>("T.1");
             operator== (sourceField.boundaryField()[patch().index()]);
 //}}} end code
 

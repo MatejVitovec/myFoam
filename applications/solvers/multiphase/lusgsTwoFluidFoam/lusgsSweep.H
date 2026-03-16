@@ -62,7 +62,17 @@
     }
 
     //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
-    std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells()); 
+    std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+
+    //std::vector<scalar> alpha1zero(mesh.nCells());
+    //std::vector<scalar> alpha2zero(mesh.nCells());
+
+    /*std::vector<std::unique_ptr<Eigen::JacobiSVD<Eigen::Matrix<double,10,10>>>> D_inv(mesh.nCells());
+    for(int celli = 0; celli < D_inv.size(); celli++)
+    {
+        D_inv[celli] = (std::make_unique<Eigen::JacobiSVD<Eigen::Matrix<double,10,10>>>());
+    }*/
+
     
     #include "calculateDinv.H"
 

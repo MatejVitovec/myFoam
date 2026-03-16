@@ -157,14 +157,14 @@ public:
         //virtual tmp<volScalarField> SalphaRhoE1(const volScalarField& d) const;
         //virtual tmp<volScalarField> SalphaRhoE2(const volScalarField& d) const;
 
-        scalar dKdp(const label celli, const scalar d, const scalar Cd) const;
-        scalar dKdalpha(const label celli, const scalar d, const scalar Cd) const;
-        vector dKdU1(const label celli, const scalar d, const scalar Cd) const;
-        vector dKdU2(const label celli, const scalar d, const scalar Cd) const;
-        scalar dKdT1(const label celli, const scalar d, const scalar Cd) const;
-        scalar dKdT2(const label celli, const scalar d, const scalar Cd) const;
+        virtual scalar dKidp(const label celli, const scalar d, const scalar Cd) const;
+        virtual scalar dKidalpha(const label celli, const scalar d, const scalar Cd) const;
+        virtual vector dKidU1(const label celli, const scalar d, const scalar Cd) const;
+        virtual vector dKidU2(const label celli, const scalar d, const scalar Cd) const;
+        virtual scalar dKidT1(const label celli, const scalar d, const scalar Cd) const;
+        virtual scalar dKidT2(const label celli, const scalar d, const scalar Cd) const;
 
-        std::array<double, 100> dSdpUT(const label celli, const scalar K, const scalar d) const;
+        std::array<double, 100> dSdpUT(const label celli, const scalar Ki, const scalar d) const;
 
         //- Dummy write for regIOobject
         bool writeData(Ostream& os) const;

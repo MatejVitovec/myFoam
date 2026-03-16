@@ -176,65 +176,57 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K(const volScalar
 
 
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKdp(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidp(const label celli, const scalar d, const scalar Cd) const
 {
     const volScalarField rho1 = fluid_.thermo1().rho();
 
-    const scalar alpha = fluid_.alpha()[celli];
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
     const scalar drho1dp = rho1[celli]*fluid_.gasProps1().beta_T(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*Cd*(alpha/d)*drho1dp*mag(U1 - U2);
+    return 0.75*(Cd/d)*drho1dp*mag(U1 - U2);
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKdalpha(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidalpha(const label celli, const scalar d, const scalar Cd) const
+{
+    return 0.0;
+}
+
+Foam::vector Foam::TwoFluidFoam::dragModel::dKidU1(const label celli, const scalar d, const scalar Cd) const
 {
     const volScalarField rho1 = fluid_.thermo1().rho();
-    
+
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
-    return 0.75*Cd*(rho1[celli]/d)*mag(U1 - U2);
+    return 0.75*(Cd/d)*rho1[celli]*(U1 - U2)/(mag(U1 - U2) + VSMALL);
 }
 
-Foam::vector Foam::TwoFluidFoam::dragModel::dKdU1(const label celli, const scalar d, const scalar Cd) const
+Foam::vector Foam::TwoFluidFoam::dragModel::dKidU2(const label celli, const scalar d, const scalar Cd) const
+{
+    return -dKidU1(celli, d, Cd);
+}
+
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT1(const label celli, const scalar d, const scalar Cd) const
 {
     const volScalarField rho1 = fluid_.thermo1().rho();
 
-    const scalar alpha = fluid_.alpha()[celli];
-    const vector U1 = fluid_.U1()[celli];
-    const vector U2 = fluid_.U2()[celli];
-
-    return 0.75*(Cd/d)*alpha*rho1[celli]*(U1 - U2)/(mag(U1 - U2) + VSMALL);
-}
-
-Foam::vector Foam::TwoFluidFoam::dragModel::dKdU2(const label celli, const scalar d, const scalar Cd) const
-{
-    return -dKdU1(celli, d, Cd);
-}
-
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKdT1(const label celli, const scalar d, const scalar Cd) const
-{
-    const volScalarField rho1 = fluid_.thermo1().rho();
-
-    const scalar alpha = fluid_.alpha()[celli];
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
     const scalar drho1dT = -rho1[celli]*fluid_.gasProps1().beta_p(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*Cd*(alpha/d)*drho1dT*mag(U1 - U2);
+    return 0.75*(Cd/d)*drho1dT*mag(U1 - U2);
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKdT2(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT2(const label celli, const scalar d, const scalar Cd) const
 {
     return 0.0;
 }
 
 
-std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label celli, const scalar K, const scalar d) const
+std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label celli, const scalar Ki, const scalar d) const
 {
     constexpr auto idx = [](std::size_t i, std::size_t j) constexpr
     {
@@ -250,6 +242,8 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     const scalar T1 = fluid_.T1()[celli];
     const scalar T2 = fluid_.T2()[celli];
 
+    const scalar K = Ki*alpha;
+
     const vector U1mU2 = U1 - U2;
     const scalar U1mU2dotU1 = U1mU2 & U1;
     const scalar U2mU1dotU2 = (-U1mU2) & U2;
@@ -258,12 +252,12 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     const volScalarField CdRe_ = CdRe();
     const scalar Cd = CdRe_[celli];
 
-    const scalar dKdp_ = dKdp(celli, d, Cd);
-    const scalar dKdalpha_ = dKdalpha(celli, d, Cd);
-    const vector dKdU1_ = dKdU1(celli, d, Cd);
-    const vector dKdU2_ = dKdU2(celli, d, Cd);
-    const scalar dKdT1_ = dKdT1(celli, d, Cd);
-    const scalar dKdT2_ = dKdT2(celli, d, Cd);
+    const scalar dKdp_      = alpha*dKidp(celli, d, Cd);
+    const scalar dKdalpha_  = alpha*dKidalpha(celli, d, Cd) + Ki;
+    const vector dKdU1_     = alpha*dKidU1(celli, d, Cd);
+    const vector dKdU2_     = alpha*dKidU2(celli, d, Cd);
+    const scalar dKdT1_     = alpha*dKidT1(celli, d, Cd);
+    const scalar dKdT2_     = alpha*dKidT2(celli, d, Cd);
 
     //const scalar dKdp_ = 0.0;
     //const scalar dKdalpha_ = 0.0;
