@@ -127,6 +127,15 @@
                     rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[nei]*rho2[nei]*E2)      + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
             }
+            /*else
+            {
+                const polyPatch& pp = mesh.boundaryMesh()[mesh.whichPatch(facei)];
+
+                if (isA<wallPolyPatch>(pp))
+                {
+                    Info << "This patch is a wall." << endl;
+                }
+            }*/
         }
 
         /*if(rAlphaRho2 != 0)

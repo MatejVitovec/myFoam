@@ -44,6 +44,9 @@
 
     forAll(owner, faceI)
     {
+        //scalar cm_own = 1.0 / sqrt((1.0 - alpha[owner[faceI]])/(rho1[owner[faceI]]*a1[owner[faceI]]*a1[owner[faceI]]) + alpha[owner[faceI]]/(rho2[owner[faceI]]*a2[owner[faceI]]*a2[owner[faceI]]));
+        //scalar cm_nei = 1.0 / sqrt((1.0 - alpha[neighbour[faceI]])/(rho1[neighbour[faceI]]*a1[neighbour[faceI]]*a1[neighbour[faceI]]) + alpha[neighbour[faceI]]/(rho2[neighbour[faceI]]*a2[neighbour[faceI]]*a2[neighbour[faceI]]));
+
         ac[faceI] = lusgsOmega*max(max(mag(U1[owner[faceI]]     & Sf[faceI]) + a1[owner[faceI]]    *magSf[faceI],
                                        mag(U1[neighbour[faceI]] & Sf[faceI]) + a1[neighbour[faceI]]*magSf[faceI]),
                                    max(mag(U2[owner[faceI]]     & Sf[faceI]) + a2[owner[faceI]]    *magSf[faceI],
