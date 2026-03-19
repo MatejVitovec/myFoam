@@ -68,6 +68,7 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(ptf, p, iF, mapper),
+    fluidName_(ptf.fluidName_),
     pName_(ptf.pName_),
     TName_(ptf.TName_),
     hasInletDir_(ptf.hasInletDir_),
@@ -135,6 +136,7 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(pivpvf),
+    fluidName_(pivpvf.fluidName_),
     pName_(pivpvf.pName_),
     TName_(pivpvf.TName_),
     hasInletDir_(pivpvf.hasInletDir_),
@@ -152,6 +154,7 @@ isentropicInletVelocityFvPatchVectorField
 )
 :
     mixedFvPatchVectorField(pivpvf, iF),
+    fluidName_(pivpvf.fluidName_),
     pName_(pivpvf.pName_),
     TName_(pivpvf.TName_),
     hasInletDir_(pivpvf.hasInletDir_),

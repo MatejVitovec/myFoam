@@ -48,7 +48,7 @@ namespace Foam
 Foam::mslau2::mslau2()
 :
     riemannSolver(),
-    epsilon_(1.0e-10) //TODO
+    epsilon_(1.0e-20) //TODO
 {}
 
 Foam::mslau2::mslau2
@@ -57,7 +57,7 @@ Foam::mslau2::mslau2
 )
 :
     riemannSolver(dict),
-    epsilon_(1.0e-10) //TODO
+    epsilon_(1.0e-20) //TODO
 {}
 
 scalar Foam::mslau2::massFlux
@@ -154,25 +154,6 @@ scalar Foam::mslau2::pressureFlux
     return pressureFlux + sqrtUDash*(PPlusLeft + PMinusRight - 1.0)*rhoTilde*aTilde;
 }
 
-
-void Foam::mslau2::calculateFlux
-(
-    scalar& rhoFlux,
-    vector& rhoUFlux,
-    scalar& rhoEFlux,
-    const scalar& pLeft,
-    const scalar& pRight,
-    const vector& ULeft,
-    const vector& URight,
-    const scalar& TLeft,
-    const scalar& TRight,
-    const vector& Sf,
-    const scalar& magSf,
-    const gasProperties& gas
-) const
-{
-    Info << "Modified slau2 is not an option for single fluid" << endl;
-}
 
 void Foam::mslau2::calculateFlux
 (

@@ -1,10 +1,10 @@
 {
     volScalarField::Internal dVdt = mesh.V()/dt;
 
-    volScalarField::Internal acSum = 0.0*dVdt;
+    //volScalarField::Internal acSum = 0.0*dVdt;
 
-    volScalarField::Internal D1 = 0.0*dVdt;
-    volScalarField::Internal D2 = 0.0*dVdt;
+    volScalarField::Internal acSum1 = 0.0*dVdt;
+    volScalarField::Internal acSum2 = 0.0*dVdt;
 
     volScalarField::Internal ac1 = 0.0*dVdt;
     volScalarField::Internal ac2 = 0.0*dVdt;
@@ -17,29 +17,33 @@
                                 max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei],
                                     mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei])));*/
 
+        //acSum[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei]);
+        //acSum[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
+        //acSum[owner[facei]]     += 0.5*ac[facei];
+        //acSum[neighbour[facei]] += 0.5*ac[facei];
+        //-----------
+
         //acSum[owner[facei]]     += 0.5*lusgsOmega*max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],     mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]);
         //acSum[neighbour[facei]] += 0.5*lusgsOmega*max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei], mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
 
-        acSum[owner[facei]]     += 0.5*ac[facei];
-        acSum[neighbour[facei]] += 0.5*ac[facei];
-
-        //D1[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]]     & Sf[facei]) + a1[owner[facei]]    *magSf[facei]);
-        //D2[owner[facei]]     += 0.5*lusgsOmega*(mag(U2[owner[facei]]     & Sf[facei]) + a2[owner[facei]]    *magSf[facei]);
-        //D1[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
-        //D2[neighbour[facei]] += 0.5*lusgsOmega*(mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
+        acSum1[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]]     & Sf[facei]) + a1[owner[facei]]    *magSf[facei]);
+        acSum2[owner[facei]]     += 0.5*lusgsOmega*(mag(U2[owner[facei]]     & Sf[facei]) + a2[owner[facei]]    *magSf[facei]);
+        acSum1[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
+        acSum2[neighbour[facei]] += 0.5*lusgsOmega*(mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
     }
 
     forAll(mesh.boundary(), patchi)
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
+        const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
+        const scalarField& pMagSf = mesh.magSf().boundaryField()[patchi];
 
         forAll(mesh.boundary()[patchi], facei)
         {
-            //acSum[pFaceCells[facei]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[facei]] & Sf[facei]) + a1[pFaceCells[facei]]*magSf[facei], mag(U2[pFaceCells[facei]] & Sf[facei]) + a2[pFaceCells[facei]]*magSf[facei]));
-            //acSum[pFaceCells[facei]] += 0.5*ac[facei];
+            //acSum[pFaceCells[facei]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[facei]] & pSf[facei]) + a1[pFaceCells[facei]]*pMagSf[facei], mag(U2[pFaceCells[facei]] & pSf[facei]) + a2[pFaceCells[facei]]*pMagSf[facei]));
 
-            //D1[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[facei]] & Sf[facei]) + a1[pFaceCells[facei]]*magSf[facei]);
-            //D2[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[facei]] & Sf[facei]) + a2[pFaceCells[facei]]*magSf[facei]);
+            acSum1[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[facei]] & pSf[facei]) + a1[pFaceCells[facei]]*pMagSf[facei]);
+            acSum2[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[facei]] & pSf[facei]) + a2[pFaceCells[facei]]*pMagSf[facei]);
         }
     }
 
@@ -47,43 +51,8 @@
     {
         //DRAG
         const double Ki = dragKi[celli];
-
         std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, Ki, d[celli]);
         Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
-
-        /*Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
-        
-        dragJ(1, 2) = K;
-        dragJ(4, 2) = K*(2*U1[celli].x() - U2[celli].x());
-        dragJ(6, 2) = -K;
-        dragJ(9, 2) = -K*U2[celli].x();
-
-        dragJ(2, 3) = K;
-        dragJ(4, 3) = K*(2*U1[celli].y() - U2[celli].y());
-        dragJ(7, 3) = -K;
-        dragJ(9, 3) = -K*U2[celli].y();
-
-        dragJ(3, 4) = K;
-        dragJ(4, 4) = K*(2*U1[celli].z() - U2[celli].z());
-        dragJ(8, 4) = -K;
-        dragJ(9, 4) = -K*U2[celli].z();
-
-
-        dragJ(1, 5) = -K;
-        dragJ(4, 5) = -K*U1[celli].x(); 
-        dragJ(6, 5) = K;
-        dragJ(9, 5) = K*(2*U2[celli].x() - U1[celli].x());
-
-        dragJ(2, 6) = -K;
-        dragJ(4, 6) = -K*U1[celli].y(); 
-        dragJ(7, 6) = K;
-        dragJ(9, 6) = K*(2*U2[celli].y() - U1[celli].y());
-
-        dragJ(3, 7) = -K;
-        dragJ(4, 7) = -K*U1[celli].z(); 
-        dragJ(8, 7) = K;
-        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());*/
-        //END DRAG
 
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
         Eigen::Matrix<double, 10, 10> pIntAdditionJ = Eigen::Matrix<double, 10, 10>::Zero();
@@ -103,12 +72,12 @@
         J(1, 1) += -rho1[celli]*U1[celli].x();
         J(2, 1) += -rho1[celli]*U1[celli].y();
         J(3, 1) += -rho1[celli]*U1[celli].z();
-        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli])); //- fluid.pInt()[celli];
+        J(4, 1) += -rho1[celli]*(e1[celli] + 0.5*magSqr(U1[celli]));
         J(5, 1) +=  rho2[celli];
         J(6, 1) +=  rho2[celli]*U2[celli].x();
         J(7, 1) +=  rho2[celli]*U2[celli].y();
         J(8, 1) +=  rho2[celli]*U2[celli].z();
-        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli])); //+ fluid.pInt()[celli];
+        J(9, 1) +=  rho2[celli]*(e2[celli] + 0.5*magSqr(U2[celli]));
 
         pIntAdditionJ(4, 1) += -fluid.pInt()[celli];
         pIntAdditionJ(9, 1) +=  fluid.pInt()[celli];
@@ -139,39 +108,19 @@
         J(8, 9) += alpha2[celli]*drhodT2[celli]*U2[celli].z();
         J(9, 9) += alpha2[celli]*drhodT2[celli]*H2[celli] + alpha2[celli]*rho2[celli]*gasProps2.Cp(p[celli], T2[celli]);
 
+
+        D_inv[celli].setThreshold(1e-60);     
         //Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
         //D_inv[celli].compute(A);
-
-        //D_inv[celli].compute((D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J);
-
-        D_inv[celli].setThreshold(1e-30);
-        //Eigen::Matrix<long double, 10, 10> A = (Eigen::Vector<long double, 10>() << Eigen::Vector<long double, 5>::Constant(D1[celli]), Eigen::Vector<long double, 5>::Constant(D2[celli])).finished().asDiagonal() * J;
-        //D_inv[celli].compute(((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + dragJ);
-        
-        //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(D1[celli]), Eigen::Vector<double, 5>::Constant(D2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
-        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+   
+        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(acSum1[celli]), Eigen::Vector<double, 5>::Constant(acSum2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+        //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
 
         //alpha1zero[celli] = (alpha1[celli] < 1.0e-20) ? 0.0 : 1.0;
         //alpha2zero[celli] = (alpha2[celli] < 1.0e-20) ? 0.0 : 1.0;
 
+        //SVD
         //D_inv[celli]->setThreshold(1e-20);
         //D_inv[celli]->compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]), Eigen::ComputeFullU | Eigen::ComputeFullV);
-
-        //if (runTime.timeIndex() > 8000)
-        //{
-            //if (celli > 498)
-            //{
-            /*    std::cout << A << std::endl << std::endl;
-
-                Eigen::Matrix<long double, 10, 10> aux = D_inv[celli].inverse();
-                std::cout << aux << std::endl << std::endl;
-
-                std::cout << "alpha: " << alpha2[celli] << std::endl;
-                std::cout << "D1: " << D1[celli] << std::endl;
-                std::cout << "D2: " << D2[celli] << std::endl << std::endl;
-
-                std::cin.ignore();*/
-            //}
-        //}
     }
 }

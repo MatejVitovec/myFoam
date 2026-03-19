@@ -15,6 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+riemannSolver       mslau2;
+
 ddtSchemes
 {
     default         Euler;
@@ -24,6 +26,7 @@ gradSchemes
 {
     default         Gauss linear;
     limitedGauss    cellLimited Gauss linear 1;
+    //venkatakrishnan cellLimited<cubic> 1.5 leastSquares 1;
     venkatakrishnan cellLimited<cubic> 1.5 leastSquares 1;
     grad(U) Gauss linear;
     grad(h) Gauss linear;
@@ -32,6 +35,8 @@ gradSchemes
 divSchemes
 {
     default         none;
+    div(interpolate(U.1),U.1)   Gauss linear;
+    div(interpolate(U.2),U.2)   Gauss linear;
 }
 
 laplacianSchemes
@@ -42,19 +47,19 @@ laplacianSchemes
 interpolationSchemes
 {
     default        linear;
-    //reconstruct(p)      upwind;
-    //reconstruct(alpha)  upwind;
-    //reconstruct(U.1)    upwind;
-    //reconstruct(U.2)    upwind;
-    //reconstruct(T.1)    upwind;
-    //reconstruct(T.2)    upwind;
+    reconstruct(p)      upwind;
+    reconstruct(alpha)  upwind;
+    reconstruct(U.1)    upwind;
+    reconstruct(U.2)    upwind;
+    reconstruct(T.1)    upwind;
+    reconstruct(T.2)    upwind;
 
-    reconstruct(p)      linearUpwind  venkatakrishnan;
-    reconstruct(alpha)  linearUpwind  venkatakrishnan;
-    reconstruct(U.1)    linearUpwindV venkatakrishnan;
-    reconstruct(U.2)    linearUpwindV venkatakrishnan;
-    reconstruct(T.1)    linearUpwind  venkatakrishnan;
-    reconstruct(T.2)    linearUpwind  venkatakrishnan;
+    //reconstruct(p)      linearUpwind  venkatakrishnan;
+    //reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    //reconstruct(U.1)    linearUpwindV venkatakrishnan;
+    //reconstruct(U.2)    linearUpwindV venkatakrishnan;
+    //reconstruct(T.1)    linearUpwind  venkatakrishnan;
+    //reconstruct(T.2)    linearUpwind  venkatakrishnan;
 }
 
 snGradSchemes

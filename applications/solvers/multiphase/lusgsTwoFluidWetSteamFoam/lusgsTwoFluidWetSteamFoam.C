@@ -175,6 +175,7 @@ int main(int argc, char *argv[])
             //fluid.blendVanishingFluid();
             fluid.blendVanishingFluid(Ts);
             //fluid.bound();
+            //fluid.boundAlpha();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             fluid.correctInterfacialPressure();

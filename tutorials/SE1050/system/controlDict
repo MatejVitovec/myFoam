@@ -26,13 +26,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         3e-1;
+endTime         100;
 
 deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   250;
+writeInterval   100;
 
 purgeWrite      0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 0.6;
+maxCo 5;
 
 rDeltaTSmoothingCoeff 0.1;
 

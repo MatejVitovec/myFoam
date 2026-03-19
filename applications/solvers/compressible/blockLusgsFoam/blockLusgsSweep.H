@@ -45,10 +45,12 @@
     forAll(mesh.boundary(), patchi)
     {
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
+        const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
+        const scalarField& pMagSf = mesh.magSf().boundaryField()[patchi];
 
         forAll(mesh.boundary()[patchi], faceI)
         {
-            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U[pFaceCells[faceI]] & Sf[faceI]) + a[pFaceCells[faceI]]*magSf[faceI]);
+            D[pFaceCells[faceI]] += 0.5*lusgsOmega*(mag(U[pFaceCells[faceI]] & pSf[faceI]) + a[pFaceCells[faceI]]*pMagSf[faceI]);
         }
     }
 

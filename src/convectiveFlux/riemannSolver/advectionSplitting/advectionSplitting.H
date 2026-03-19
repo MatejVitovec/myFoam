@@ -122,6 +122,50 @@ public:
             const scalar& magSf,
             const gasProperties& gas
         ) const;
+
+
+        void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const;
+
+
+        void calculateFlux
+        (
+            scalar& rhoFlux,
+            vector& rhoUFlux,
+            scalar& rhoEFlux,
+            scalar& rhoQFlux,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const scalar QLeft,
+            const scalar QRight,
+            const vector Sf,
+            const scalar magSf
+        ) const;
+        
         
         void calculateFlux
         (

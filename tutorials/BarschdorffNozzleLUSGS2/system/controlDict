@@ -28,13 +28,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         100;
 
 deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   10000;
+writeInterval   10;
 
 purgeWrite      0;
 
@@ -52,7 +52,7 @@ graphFormat     raw;
 
 runTimeModifiable true;
 
-maxCo 0.05;
+maxCo 2;
 
 adjustTimeStep yes;
 
@@ -62,21 +62,21 @@ adjustTimeStep yes;
 //    #includeFunc axisLine
 //}
 
-functions
-{
-    totalLoss
-    {
-        type totalLoss;
-        libs ("libmyfieldFunctionObjects.so");
-
-        xMin    -0.2;
-        xMax    0.1;
-        Npoints 480;
-        sigma   0.0025;
-
-        executeControl  writeTime;
-        writeControl    writeTime;
-    }
-}
+//functions
+//{
+//    totalLoss
+//    {
+//       type totalLoss;
+//        libs ("libmyfieldFunctionObjects.so");
+//
+//        xMin    -0.2;
+//        xMax    0.1;
+//        Npoints 480;
+//        sigma   0.0025;
+//
+//        executeControl  writeTime;
+//        writeControl    writeTime;
+//    }
+//}
 
 // ************************************************************************* //

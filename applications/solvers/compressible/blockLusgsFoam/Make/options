@@ -28,5 +28,4 @@ EXE_LIBS = \
     -L$(FOAM_USER_LIBBIN) \
     -lmyThermophysicalModels \
     -lmyFiniteVolumeFoam \
-    -lmyConvectiveFlux \
-    -lmyFoam
+    -lmyConvectiveFlux

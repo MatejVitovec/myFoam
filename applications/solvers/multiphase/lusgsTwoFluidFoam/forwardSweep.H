@@ -26,20 +26,10 @@
 
                 if (own != celli)
                 {
-                    /*const scalar ac = lusgsOmega*( 
-                        max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
-                                mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
-                            max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
-                                mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));*/
-
-                    //const scalar ac = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
-                    const scalar acf = ac[facei];
-                    const scalar ac1 = acf;
-                    const scalar ac2 = acf;
-
-
-                    //const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
-                    //const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
+                    //const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
+                    //const scalar ac2 = ac1;
+                    const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
+                    const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
                     
                     const scalar p_1 = p[own]     + dpStar[own];
                     scalar alpha_1   = alpha[own] + dalphaStar[own];
@@ -49,9 +39,8 @@
                     scalar T2_1      = T2[own]    + dT2Star[own];
 
                     //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    //if (alpha_1 >= 1.0 || alpha_1 < 0) Info << "ERR forOwn celli: " << celli << ", alpha: " << dalpha[own] << " dp: " << dp[own] << " dU1: " << dU1[own] << " dU2: " << dU2[own] << " dT1: " << dT1[own] << " dT2: " << dT2[own] << endl;
-                    //if (dalphaStar[own] != 0) Info << "dAlpha not 0, celli: " << celli << ", facei: " << facei << endl;
                     fluid.boundAlpha(alpha_1);
+
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
                     const scalar alpha2_1 = alpha_1;
@@ -68,29 +57,20 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1      - alpha1[own]*rho1[own])         - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1      - alpha2[own]*rho2[own])         - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[own]*rho1[own]*U1[own]) - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[own]*rho2[own]*U2[own]) - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[own]*rho1[own]*E1)      - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[own]*rho2[own]*E2)      - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own]));
+                    rAlphaRho1  += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1      - alpha1[own]*rho1[own])         + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1));
+                    rAlphaRho2  += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1      - alpha2[own]*rho2[own])         + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2)); 
+                    rAlphaRhoU1 += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[own]*rho1[own]*U1[own]) + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[own] + alpha1[own]*p[own]*Sf[facei])));
+                    rAlphaRhoU2 += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[own]*rho2[own]*U2[own]) + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[own] + alpha2[own]*p[own]*Sf[facei])));
+                    rEpsilon1   += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[own]*rho1[own]*E1)      + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[own]/rho1[own])));
+                    rEpsilon2   += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[own]*rho2[own]*E2)      + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[own]/rho2[own])));
                 }
 
                 if (nei != celli)
                 {
-                    //const scalar ac = lusgsOmega*( 
-                    //    max(max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei],
-                    //            mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]),
-                    //        max(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei],
-                    //            mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei])));
-
-                    //const scalar ac = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
-                    const scalar acf = ac[facei];
-                    const scalar ac1 = acf;
-                    const scalar ac2 = acf;
-
-                    //const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
-                    //const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
+                    //const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
+                    //const scalar ac2 = ac2;
+                    const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
+                    const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
 
                     const scalar p_1 = p[nei]     + dp[nei];
                     scalar alpha_1   = alpha[nei] + dalpha[nei];
@@ -100,9 +80,8 @@
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
                     //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    //if (alpha_1 >= 1.0 || alpha_1 < 0) Info << "ERR forNei celli: " << celli << ", alpha: " << dalpha[nei] << " dp: " << dp[nei] << " dU1: " << dU1[nei] << " dU2: " << dU2[nei] << " dT1: " << dT1[nei] << " dT2: " << dT2[nei] << endl;
-                    //if (dalpha[nei] != 0) Info << "dAlpha not 0, celli: " << celli << ", facei: " << facei << endl;
                     fluid.boundAlpha(alpha_1);
+                    
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
                     const scalar alpha2_1 = alpha_1;
@@ -119,59 +98,89 @@
                     const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & Sf[facei]);
                     const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & Sf[facei]);
 
-                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1      - alpha1[nei]*rho1[nei])         + 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1);
-                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1      - alpha2[nei]*rho2[nei])         + 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2); 
-                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[nei]*rho1[nei]*U1[nei]) + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei]));
-                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[nei]*rho2[nei]*U2[nei]) + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei]));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[nei]*rho1[nei]*E1)      + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei]));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[nei]*rho2[nei]*E2)      + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
+                    rAlphaRho1  += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1      - alpha1[nei]*rho1[nei])         - 0.5*(alphaRhoPhi1_1                                 - alphaRhoPhi1));
+                    rAlphaRho2  += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1      - alpha2[nei]*rho2[nei])         - 0.5*(alphaRhoPhi2_1                                 - alphaRhoPhi2)); 
+                    rAlphaRhoU1 += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1[nei]*rho1[nei]*U1[nei]) - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*Sf[facei]) - (alphaRhoPhi1*U1[nei] + alpha1[nei]*p[nei]*Sf[facei])));
+                    rAlphaRhoU2 += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2[nei]*rho2[nei]*U2[nei]) - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*Sf[facei]) - (alphaRhoPhi2*U2[nei] + alpha2[nei]*p[nei]*Sf[facei])));
+                    rEpsilon1   += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1[nei]*rho1[nei]*E1)      - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)             - alphaRhoPhi1*(E1 + p[nei]/rho1[nei])));
+                    rEpsilon2   += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[nei]*rho2[nei]*E2)      - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei])));
                 }
             }
-            /*else
+            else
             {
-                const polyPatch& pp = mesh.boundaryMesh()[mesh.whichPatch(facei)];
+                label patchID = mesh.boundaryMesh().whichPatch(facei);
+                label localFaceID = facei - mesh.boundaryMesh()[patchID].start();
 
-                if (isA<wallPolyPatch>(pp))
+                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]))
                 {
-                    Info << "This patch is a wall." << endl;
-                }
-            }*/
-        }
+                    const vector pSf = mesh.Sf().boundaryField()[patchID][localFaceID];
+                    const scalar pMagSf = mag(pSf);
 
-        /*if(rAlphaRho2 != 0)
-        {
-            Info << "rAlphaRho2 not 0, forw, celli: " << celli << ", rAlphaRho1: " << rAlphaRho1 << ", rAlphaRho2: " << rAlphaRho2 << ", rEpsilon1: " << rEpsilon1 << ", rEpsilon2: " << rEpsilon2 << ", T2: " << T2[celli] << ", U2: " << U2[celli] <<  endl;
-            std::cin.ignore();
-        }*/
+                    const scalar p_1 = pStar.boundaryField()[patchID][localFaceID];
+                    scalar alpha_1   = alphaStar.boundaryField()[patchID][localFaceID];
+                    vector U1_1      = U1Star.boundaryField()[patchID][localFaceID];
+                    vector U2_1      = U2Star.boundaryField()[patchID][localFaceID];
+                    scalar T1_1      = T1Star.boundaryField()[patchID][localFaceID];
+                    scalar T2_1      = T2Star.boundaryField()[patchID][localFaceID];
+
+                    const scalar p_0        = p.boundaryField()[patchID][localFaceID];
+                    const scalar alpha_0    = alpha.boundaryField()[patchID][localFaceID];
+                    const vector U1_0       = U1.boundaryField()[patchID][localFaceID];
+                    const vector U2_0       = U2.boundaryField()[patchID][localFaceID];
+                    const scalar T1_0       = T1.boundaryField()[patchID][localFaceID];
+                    const scalar T2_0       = T2.boundaryField()[patchID][localFaceID];
+                    const scalar a1_0       = a1.boundaryField()[patchID][localFaceID];
+                    const scalar a2_0       = a2.boundaryField()[patchID][localFaceID];
+
+                    //const scalar ac1 = lusgsOmega*(max(mag(U1_0 & pSf) + (a1_0*pMagSf), mag(U2_0 & pSf) + (a2_0*pMagSf)));
+                    //const scalar ac2 = ac1;
+                    const scalar ac1 = lusgsOmega*(mag(U1_0 & pSf) + a1_0*pMagSf);
+                    const scalar ac2 = lusgsOmega*(mag(U2_0 & pSf) + a2_0*pMagSf);
+
+                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.boundAlpha(alpha_1);
+
+                    const scalar alpha1_0 = 1.0 - alpha_0;
+                    const scalar alpha2_0 = alpha_0;
+                    const scalar alpha1_1 = 1.0 - alpha_1;
+                    const scalar alpha2_1 = alpha_1;
+
+                    const scalar rho1_1 = gasProps1.rho(p_1, T1_1);
+                    const scalar rho2_1 = gasProps2.rho(p_1, T2_1);
+                    const scalar rho1_0 = gasProps1.rho(p_0, T1_0);
+                    const scalar rho2_0 = gasProps2.rho(p_0, T2_0);
+
+                    const scalar E1_0 = gasProps1.Es(p_0, T1_0) + 0.5*magSqr(U1_0);
+                    const scalar E2_0 = gasProps2.Es(p_0, T2_0) + 0.5*magSqr(U2_0);
+                    const scalar E1_1 = gasProps1.Es(p_1, T1_1) + 0.5*magSqr(U1_1);
+                    const scalar E2_1 = gasProps2.Es(p_1, T2_1) + 0.5*magSqr(U2_1);
+
+                    const scalar alphaRhoPhi1_0 = alpha1_0*rho1_0*(U1_0 & pSf);
+                    const scalar alphaRhoPhi2_0 = alpha2_0*rho2_0*(U2_0 & pSf);
+                    const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & pSf);
+                    const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & pSf);
+
+                    rAlphaRho1  += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1      - alpha1_0*rho1_0)         + 0.5*(alphaRhoPhi1_1                           - alphaRhoPhi1_0));
+                    rAlphaRho2  += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1      - alpha2_0*rho2_0)         + 0.5*(alphaRhoPhi2_1                           - alphaRhoPhi2_0)); 
+                    rAlphaRhoU1 += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1_0*rho1_0*U1_0)    + 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*pSf) - (alphaRhoPhi1_0*U1_0 + alpha1_0*p_0*pSf)));
+                    rAlphaRhoU2 += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2_0*rho2_0*U2_0)    + 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*pSf) - (alphaRhoPhi2_0*U2_0 + alpha2_0*p_0*pSf)));
+                    rEpsilon1   += lusgsRelax*(0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1_0*rho1_0*E1_0)    + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)       - alphaRhoPhi1_0*(E1_0 + p_0/rho1_0)));
+                    rEpsilon2   += lusgsRelax*(0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2_0*rho2_0*E2_0)    + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)       - alphaRhoPhi2_0*(E2_0 + p_0/rho2_0)));
+                }
+            }
+        }
     
         Eigen::Vector<double,10> b;
         b << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2;
-        /*b << rAlphaRho1*alpha1zero[celli],
-             rAlphaRhoU1.x()*alpha1zero[celli],
-             rAlphaRhoU1.y()*alpha1zero[celli],
-             rAlphaRhoU1.z()*alpha1zero[celli],
-             rEpsilon1*alpha1zero[celli],
-             rAlphaRho2*alpha2zero[celli],
-             rAlphaRhoU2.x()*alpha2zero[celli],
-             rAlphaRhoU2.y()*alpha2zero[celli],
-             rAlphaRhoU2.z()*alpha2zero[celli],
-             rEpsilon2*alpha2zero[celli];*/
 
         //Eigen::Vector<double,10> starState = D_inv[celli].solve((Eigen::Vector<double,10>() << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2).finished());
         Eigen::Vector<double,10> starState = D_inv[celli].solve(b);
 
-        dpStar[celli]     = starState(0);
-        dalphaStar[celli] = starState(1);
-        dU1Star[celli]    = vector(starState(2), starState(3), starState(4));
-        dU2Star[celli]    = vector(starState(5), starState(6), starState(7));
-        dT1Star[celli]    = starState(8);
-        dT2Star[celli]    = starState(9);
-
-        if(celli == 1834 && dT1Star[celli] > 1e-10)
-        {
-            Info << "for iter: " << runTime.timeIndex() << " ---------------" << endl;
-            std::cout << starState << std::endl;
-            Info << " p: " << p[celli] << " alpha: " << alpha[celli] << " U1: " << U1[celli] << " U2: " << U2[celli] << " T1: " << T1[celli] << " T2: " << T2[celli] << endl;
-        }
+        dpStar[celli]     = starState(0) - (lusgsRelax - 1.0)*dp[celli];
+        dalphaStar[celli] = starState(1) - (lusgsRelax - 1.0)*dalpha[celli];
+        dU1Star[celli]    = vector(starState(2), starState(3), starState(4)) - (lusgsRelax - 1.0)*dU1[celli];
+        dU2Star[celli]    = vector(starState(5), starState(6), starState(7)) - (lusgsRelax - 1.0)*dU2[celli];
+        dT1Star[celli]    = starState(8) - (lusgsRelax - 1.0)*dT1[celli];
+        dT2Star[celli]    = starState(9) - (lusgsRelax - 1.0)*dT2[celli];
     }
 }

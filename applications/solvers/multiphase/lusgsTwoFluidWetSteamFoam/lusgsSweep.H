@@ -32,16 +32,24 @@
     
     #include "calculateDinv.H"
 
-    Field<scalar> dpStar(mesh.nCells());
-    Field<scalar> dalphaStar(mesh.nCells());
-    Field<vector> dU1Star(mesh.nCells());
-    Field<vector> dU2Star(mesh.nCells());
-    Field<scalar> dT1Star(mesh.nCells());
-    Field<scalar> dT2Star(mesh.nCells());
+    volScalarField::Internal dpStar(IOobject("dpStar", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedScalar("dpStar", dimPressure, 0.0));
+    volScalarField::Internal dalphaStar(IOobject("dalphaStar", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedScalar("dalphaStar", dimless, 0.0));
+    volVectorField::Internal dU1Star(IOobject("dUStar.1", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedVector("dU1", dimVelocity, vector(0, 0, 0)));
+    volVectorField::Internal dU2Star(IOobject("dUStar.2", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedVector("dU1", dimVelocity, vector(0, 0, 0)));
+    volScalarField::Internal dT1Star(IOobject("dTStar.1", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedScalar("dT1Star", dimTemperature, 0.0));
+    volScalarField::Internal dT2Star(IOobject("dTStar.2", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedScalar("dT2Star", dimTemperature, 0.0));
+
+    volScalarField pStar(IOobject("pStar", p.time().timeName(), p.db(), IOobject::NO_READ, IOobject::NO_WRITE), p);
+    volScalarField alphaStar(IOobject("alphaStar", alpha.time().timeName(), alpha.db(), IOobject::NO_READ, IOobject::NO_WRITE), alpha);
+    volVectorField U1Star(IOobject("UStar.1", U1.time().timeName(), U1.db(), IOobject::NO_READ, IOobject::NO_WRITE), U1);
+    volVectorField U2Star(IOobject("UStar.2", U2.time().timeName(), U2.db(), IOobject::NO_READ, IOobject::NO_WRITE), U2);
+    volScalarField T1Star(IOobject("TStar.1", T1.time().timeName(), T1.db(), IOobject::NO_READ, IOobject::NO_WRITE), T1);
+    volScalarField T2Star(IOobject("TStar.2", T2.time().timeName(), T2.db(), IOobject::NO_READ, IOobject::NO_WRITE), T2);
 
     for (int intIter = 0; intIter < lusgsIntIters; intIter++)
     {
         #include "forwardSweep.H"
+        #include "boundarySweep.H"
         #include "backwardSweep.H"
     }
 }

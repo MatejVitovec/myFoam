@@ -92,6 +92,101 @@ void Foam::advectionSplitting::calculateFlux
     rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
 }
 
+
+void Foam::advectionSplitting::calculateFlux
+(
+    scalar& rhoFlux,
+    vector& rhoUFlux,
+    scalar& rhoEFlux,
+    const scalar pLeft,
+    const scalar pRight,
+    const vector ULeft,
+    const vector URight,
+    const scalar rhoLeft,
+    const scalar rhoRight,
+    const scalar eLeft,
+    const scalar eRight,
+    const scalar aLeft,
+    const scalar aRight,
+    const vector Sf,
+    const scalar magSf
+) const
+{
+    const vector normalVector = Sf/magSf;
+
+    const scalar HLeft  = eLeft  + pLeft/rhoLeft   + 0.5*magSqr(ULeft);
+    const scalar HRight = eRight + pRight/rhoRight + 0.5*magSqr(URight);
+
+    const scalar massFlux_ = massFlux(pLeft,    pRight,
+                                      ULeft,    URight,
+                                      rhoLeft,  rhoRight,
+                                      aLeft,    aRight,
+                                      normalVector);                               
+
+    const scalar leftMassFlux  = 0.5*(massFlux_ + mag(massFlux_));
+    const scalar rightMassFlux = 0.5*(massFlux_ - mag(massFlux_));                 
+
+    const scalar pressureFlux_ = pressureFlux(pLeft,    pRight,
+                                              ULeft,    URight,
+                                              rhoLeft,  rhoRight,
+                                              aLeft,    aRight,
+                                              normalVector);
+
+    rhoFlux  = (leftMassFlux       + rightMassFlux)*magSf;
+    rhoUFlux = (leftMassFlux*ULeft + rightMassFlux*URight + pressureFlux_*normalVector)*magSf;
+    rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
+}
+
+
+void Foam::advectionSplitting::calculateFlux
+(
+    scalar& rhoFlux,
+    vector& rhoUFlux,
+    scalar& rhoEFlux,
+    scalar& rhoQFlux,
+    const scalar pLeft,
+    const scalar pRight,
+    const vector ULeft,
+    const vector URight,
+    const scalar rhoLeft,
+    const scalar rhoRight,
+    const scalar eLeft,
+    const scalar eRight,
+    const scalar aLeft,
+    const scalar aRight,
+    const scalar QLeft,
+    const scalar QRight,
+    const vector Sf,
+    const scalar magSf
+) const
+{
+    const vector normalVector = Sf/magSf;
+
+    const scalar HLeft  = eLeft  + pLeft/rhoLeft   + 0.5*magSqr(ULeft);
+    const scalar HRight = eRight + pRight/rhoRight + 0.5*magSqr(URight);
+
+    const scalar massFlux_ = massFlux(pLeft,    pRight,
+                                      ULeft,    URight,
+                                      rhoLeft,  rhoRight,
+                                      aLeft,    aRight,
+                                      normalVector);                               
+
+    const scalar leftMassFlux  = 0.5*(massFlux_ + mag(massFlux_));
+    const scalar rightMassFlux = 0.5*(massFlux_ - mag(massFlux_));                 
+
+    const scalar pressureFlux_ = pressureFlux(pLeft,    pRight,
+                                              ULeft,    URight,
+                                              rhoLeft,  rhoRight,
+                                              aLeft,    aRight,
+                                              normalVector);
+
+    rhoFlux  = (leftMassFlux       + rightMassFlux)*magSf;
+    rhoUFlux = (leftMassFlux*ULeft + rightMassFlux*URight + pressureFlux_*normalVector)*magSf;
+    rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
+    rhoQFlux = (leftMassFlux*QLeft + rightMassFlux*QRight)*magSf;
+}
+
+
 void Foam::advectionSplitting::calculateFlux
 (
     scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,
@@ -169,8 +264,7 @@ void Foam::advectionSplitting::calculateFlux
 
     alphaRhoEFlux1Left  = (leftMassFlux1*(1.0 - alphaLeft)*H1Left + rightMassFlux1*(1.0 - alphaRight)*H1Right)*magSf;
     alphaRhoEFlux1Right = alphaRhoEFlux1Left;
-
-
+    
 
     alphaRhoFlux2Left   = (leftMassFlux2*alphaLeft + rightMassFlux2*alphaRight)*magSf;
     alphaRhoFlux2Right  = alphaRhoFlux2Left;

@@ -15,7 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-riemannSolver           mslau2;
+//riemannSolver           mslau2;
+riemannSolver           slau2;
 
 ddtSchemes
 {
@@ -26,7 +27,7 @@ gradSchemes
 {
     default             Gauss linear;
     limitedGauss        cellLimited Gauss linear 1;
-    venkatakrishnan     cellLimited edgeCellsLeastSquares 1;
+    venkatakrishnan     cellLimited<cubic> 2 edgeCellsLeastSquares 1;
 }
 
 divSchemes
@@ -38,6 +39,9 @@ divSchemes
     };
 
     div(alphaRhoPhi2L,n)	Gauss upwind;
+    div(rhoPhi,n)		Gauss upwind;
+    div(interpolate(U.1),U.1)   Gauss linear;
+    div(interpolate(U.2),U.2)   Gauss linear;
 }
 
 laplacianSchemes
@@ -50,14 +54,17 @@ interpolationSchemes
     default         linear;
 
     reconstruct(p)      linearUpwind  venkatakrishnan;
-    //reconstruct(alpha)  linearUpwind  venkatakrishnan;
+    reconstruct(alpha)  linearUpwind  venkatakrishnan;
     reconstruct(U.1)    linearUpwindV venkatakrishnan;
     reconstruct(U.2)    linearUpwindV venkatakrishnan;
     reconstruct(T.1)    linearUpwind  venkatakrishnan;
     reconstruct(T.2)    linearUpwind  venkatakrishnan;
 
     //reconstruct(p)      upwind;
-    reconstruct(alpha)  upwind;
+    //reconstruct(alpha)  upwind;
+    //reconstruct(U)      upwind;
+    //reconstruct(T)      upwind;
+    //reconstruct(w)      upwind;
     //reconstruct(U.1)    upwind;
     //reconstruct(U.2)    upwind;
     //reconstruct(T.1)    upwind;

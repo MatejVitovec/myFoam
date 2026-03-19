@@ -113,23 +113,6 @@ public:
     virtual ~mslau2() {};
 
     // Member Functions
-
-        // Update fluxes based on current left and right states
-        void calculateFlux
-        (
-            scalar& rhoFlux,
-            vector& rhoUFlux,
-            scalar& rhoEFlux,
-            const scalar& pLeft,
-            const scalar& pRight,
-            const vector& ULeft,
-            const vector& URight,
-            const scalar& TLeft,
-            const scalar& TRight,
-            const vector& Sf,
-            const scalar& magSf,
-            const gasProperties& gas
-        ) const;
         
         void calculateFlux
         (

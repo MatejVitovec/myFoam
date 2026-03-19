@@ -1,24 +1,27 @@
 dictionary lusgsDict = mesh.solutionDict().subDict("LUSGS");
 
-label lusgsIntIters = 
+lusgsIntIters = 
     lusgsDict.lookupOrDefault<label>("internalIterations", 1);
 
- label lusgsIters = 
+lusgsIters = 
     lusgsDict.lookupOrDefault<label>("iterations", 1);
 
-scalar lusgsTolerance =
+lusgsTolerance =
     lusgsDict.lookupOrDefault<scalar>("tolerance", 0.0);
 
-scalar lusgsRelTol =
+lusgsRelTol =
     lusgsDict.lookupOrDefault<scalar>("relTol", 0.0);
 
 // relaxation factor 1<omega<=2
-scalar lusgsOmega = 
-     lusgsDict.lookupOrDefault<scalar>("omega", 1.2);
+lusgsOmega = 
+    lusgsDict.lookupOrDefault<scalar>("omega", 1.2);
 
-bool LTS = 
+lusgsRelax = 
+    lusgsDict.lookupOrDefault<scalar>("relaxCoeff", 1.0);
+
+LTS = 
     lusgsDict.lookupOrDefault("localTimestepping", false);
 
-bool turbOnFinalIterOnly =
+turbOnFinalIterOnly =
     lusgsDict.lookupOrDefault<Switch>("turbOnFinalIterOnly", true);
     
