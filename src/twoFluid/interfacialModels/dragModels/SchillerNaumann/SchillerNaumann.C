@@ -25,7 +25,7 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantDrag.H"
+#include "SchillerNaumann.H"
 #include "twoFluid.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -37,8 +37,8 @@ namespace TwoFluidFoam
 {
 namespace dragModels
 {
-    defineTypeNameAndDebug(constantDrag, 0);
-    addToRunTimeSelectionTable(dragModel, constantDrag, dictionary);
+    defineTypeNameAndDebug(SchillerNaumann, 0);
+    addToRunTimeSelectionTable(dragModel, SchillerNaumann, dictionary);
 }
 }
 }
@@ -46,7 +46,7 @@ namespace dragModels
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModels::constantDrag::constantDrag
+Foam::TwoFluidFoam::dragModels::SchillerNaumann::SchillerNaumann
 (
     const dictionary& dict,
     const twoFluid& fluid,
@@ -54,37 +54,23 @@ Foam::TwoFluidFoam::dragModels::constantDrag::constantDrag
 )
 :
     dragModel(dict, fluid, registerObject),
-    dragCoeff_("dragCoeff", dimless, dict)
+    residualRe_("residualRe", dimless, dict)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModels::constantDrag::~constantDrag()
+Foam::TwoFluidFoam::dragModels::SchillerNaumann::~SchillerNaumann()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::constantDrag::CdRe(const volScalarField& d) const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::SchillerNaumann::CdRe(const volScalarField& d) const
 {
-    return
-        tmp<volScalarField>
-        (
-            new volScalarField
-            (
-                IOobject
-                (
-                    "constantDragCoeff",
-                    fluid_.mesh().time().timeName(),
-                    fluid_.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                fluid_.mesh(),
-                dragCoeff_
-            )
-        );
+    tmp<volScalarField> Re = mag(fluid_.U1() - fluid_.U2())*d/fluid_.thermo1().nu();
+
+    return neg(Re - 1000)*24.0*(1.0 + 0.15*pow(Re, 0.687)) + pos0(Re - 1000)*0.44*max(Re, residualRe_);
 }
 
 

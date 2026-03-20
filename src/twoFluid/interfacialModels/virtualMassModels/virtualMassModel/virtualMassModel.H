@@ -5,7 +5,7 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2014-2015 OpenFOAM Foundation
     Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
@@ -25,17 +25,17 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::dragModel
+    Foam::virtualMassModel
 
 Description
 
 SourceFiles
-    dragModel.C
+    virtualMassModel.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef dragModel_H
-#define dragModel_H
+#ifndef virtualMassModel_H
+#define virtualMassModel_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,24 +53,25 @@ namespace TwoFluidFoam
 class twoFluid;
 
 /*---------------------------------------------------------------------------*\
-                           Class dragModel Declaration
+                         Class virtualMassModel Declaration
 \*---------------------------------------------------------------------------*/
 
-class dragModel
+class virtualMassModel
 :
     public regIOobject
 {
 protected:
 
     // Protected Data
-    const TwoFluidFoam::twoFluid& fluid_;
 
-    const dimensionedScalar dropletDiameter_ = dimensionedScalar("dropletDiameter", dimLength, 1e-5);
+        //- twoFluid
+        const TwoFluidFoam::twoFluid& fluid_;
+
 
 public:
 
     //- Runtime type information
-    TypeName("dragModel");
+    TypeName("virtualMassModel");
 
 
     // Declare runtime construction
@@ -78,7 +79,7 @@ public:
         declareRunTimeSelectionTable
         (
             autoPtr,
-            dragModel,
+            virtualMassModel,
             dictionary,
             (
                 const dictionary& dict,
@@ -89,7 +90,7 @@ public:
         );
 
 
-    // Static data members
+    // Static Data Members
 
         //- Coefficient dimensions
         static const dimensionSet dimK;
@@ -97,15 +98,15 @@ public:
 
     // Constructors
 
-        // Construct without residual constants
-        dragModel
+        //- Construct from a dictionary and a phase pair
+        virtualMassModel
         (
             const twoFluid& fluid,
             const bool registerObject
         );
 
-        // Construct with residual constants
-        dragModel
+        //- Construct from a dictionary and a phase pair
+        virtualMassModel
         (
             const dictionary& dict,
             const twoFluid& fluid,
@@ -114,17 +115,17 @@ public:
 
 
     //- Destructor
-    virtual ~dragModel();
+    virtual ~virtualMassModel() = default;
 
 
     // Selectors
 
-        static autoPtr<dragModel> New
+        static autoPtr<virtualMassModel> New
         (
             const twoFluid& fluid
         );
 
-        static autoPtr<dragModel> New
+        static autoPtr<virtualMassModel> New
         (
             const dictionary& dict,
             const twoFluid& fluid
@@ -133,40 +134,26 @@ public:
 
     // Member Functions
 
-        //- Drag coefficient
-        virtual tmp<volScalarField> CdRe(const volScalarField& d) const = 0;
+        //- Return the virtual mass coefficient
+        virtual tmp<volScalarField> Cvm() const = 0;
 
-        //- Return the phase-intensive drag coefficient Ki
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ... alphad*K*(U1-U2)
-        //    ddt(alpha2*rho2*U2) + ... = ... alphad*K*(U2-U1)
-        virtual tmp<volScalarField> Ki(const volScalarField& d) const;
+        //- Return the phase-intensive virtual mass coefficient Ki
+        //  used in the momentum equation
+        //    ddt(alpha1*rho1*U1) + ... = ... alphad*K*(DU1_Dt - DU2_Dt)
+        //    ddt(alpha2*rho2*U2) + ... = ... alphad*K*(DU1_Dt - DU2_Dt)
+        virtual tmp<volScalarField> Ki() const;
 
-        //- Return the drag coefficient K
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ... K*(U1-U2)
-        //    ddt(alpha2*rho2*U2) + ... = ... K*(U2-U1)
-        virtual tmp<volScalarField> K(const volScalarField& d) const;
+        //- Return the virtual mass coefficient K
+        //  used in the momentum equation
+        //    ddt(alpha1*rho1*U1) + ... = ... K*(DU1_Dt - DU2_Dt)
+        //    ddt(alpha2*rho2*U2) + ... = ... K*(DU1_Dt - DU2_Dt)
+        virtual tmp<volScalarField> K() const;
 
-        //- Return the drag term
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ...  S
-        //    ddt(alpha2*rho2*U2) + ... = ... -S
-        //virtual tmp<volVectorField> SalphaRhoU1(const volScalarField& d) const;
-        //virtual tmp<volVectorField> SalphaRhoU2(const volScalarField& d) const;
-        //virtual tmp<volScalarField> SalphaRhoE1(const volScalarField& d) const;
-        //virtual tmp<volScalarField> SalphaRhoE2(const volScalarField& d) const;
+        //- Return the virtual mass coefficient Kf
+        //  used in the face-momentum equations
+        virtual tmp<surfaceScalarField> Kf() const;
 
-        virtual scalar dKidp(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidalpha(const label celli, const scalar d, const scalar Cd) const;
-        virtual vector dKidU1(const label celli, const scalar d, const scalar Cd) const;
-        virtual vector dKidU2(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidT1(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidT2(const label celli, const scalar d, const scalar Cd) const;
-
-        std::array<double, 100> dSdpUT(const label celli, const scalar Ki, const scalar d) const;
-
-        //- Dummy write for regIOobject
+        // Dummy write for regIOobject
         bool writeData(Ostream& os) const;
 };
 

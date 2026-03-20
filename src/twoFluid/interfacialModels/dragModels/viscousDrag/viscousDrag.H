@@ -88,7 +88,7 @@ public:
     // Member Functions
 
         //- Drag coefficient
-        virtual tmp<volScalarField> CdRe() const;
+        virtual tmp<volScalarField> CdRe(const volScalarField& d) const;
 
         virtual tmp<volScalarField> Ki(const volScalarField& d) const;
 

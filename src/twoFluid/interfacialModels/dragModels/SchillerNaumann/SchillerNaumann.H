@@ -24,18 +24,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::dragModels::constantDrag
+    Foam::dragModels::SchillerNaumann
 
 Description
     Schiller and Naumann drag model for dispersed bubbly flows.
 
 SourceFiles
-    constantDrag.C
+    SchillerNaumann.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef constantDrag_H
-#define constantDrag_H
+#ifndef SchillerNaumann_H
+#define SchillerNaumann_H
 
 #include "dragModel.H"
 
@@ -52,29 +52,28 @@ namespace dragModels
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class constantDrag Declaration
+                           Class SchillerNaumann Declaration
 \*---------------------------------------------------------------------------*/
 
-class constantDrag
+class SchillerNaumann
 :
     public dragModel
 {
     // Private data
 
-        //- Constant drag coefficient
-        const dimensionedScalar dragCoeff_;
-
+        //- Residual Reynolds Number
+        const dimensionedScalar residualRe_;
 
 public:
 
     //- Runtime type information
-    TypeName("constantDrag");
+    TypeName("SchillerNaumann");
 
 
     // Constructors
 
         //- Construct from a dictionary and a twoFluid
-        constantDrag
+        SchillerNaumann
         (
             const dictionary& dict,
             const twoFluid& fluid,
@@ -83,7 +82,7 @@ public:
 
 
     //- Destructor
-    virtual ~constantDrag();
+    virtual ~SchillerNaumann();
 
 
     // Member Functions

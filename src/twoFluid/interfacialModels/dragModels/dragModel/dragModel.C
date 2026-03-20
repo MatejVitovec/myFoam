@@ -163,7 +163,7 @@ Foam::TwoFluidFoam::dragModel::~dragModel()
 
 Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::Ki(const volScalarField& d) const
 {
-    return (0.75*CdRe()*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d;
+    return (0.75*CdRe(d)*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d;
 }
 
 
@@ -248,8 +248,9 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     const scalar U1mU2dotU1 = U1mU2 & U1;
     const scalar U2mU1dotU2 = (-U1mU2) & U2;
 
+    volScalarField d = dimensionedScalar("ddd", dimLength, d)
 
-    const volScalarField CdRe_ = CdRe();
+    const volScalarField CdRe_ = CdRe(d);
     const scalar Cd = CdRe_[celli];
 
     const scalar dKdp_      = alpha*dKidp(celli, d, Cd);

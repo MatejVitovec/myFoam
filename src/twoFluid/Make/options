@@ -14,7 +14,10 @@ EXE_INC = \
     -ItwoFluidConservative \
     -IinterfacialModels/dragModels/dragModel \
     -IinterfacialModels/dragModels/constantDrag \
-    -IinterfacialModels/dragModels/viscousDrag
+    -IinterfacialModels/dragModels/viscousDrag \
+    -IinterfacialModels/dragModels/SchillerNaumann \
+    -IinterfacialModels/virtualMassModels/virtualMassModel \
+    -IinterfacialModels/virtualMassModels/constantVirtualMass
 
 
 EXE_LIBS = \
