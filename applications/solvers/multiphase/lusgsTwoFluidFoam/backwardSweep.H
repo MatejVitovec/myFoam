@@ -38,8 +38,8 @@
                     scalar T1_1      = T1[nei]    + dT1[nei];
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
-                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    fluid.boundAlpha(alpha_1);
+                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.boundAlpha(alpha_1);
 
 
                     const scalar alpha1_1 = 1.0 - alpha_1;
@@ -79,8 +79,8 @@
                     scalar T1_1      = T1[own]    + dT1Star[own];
                     scalar T2_1      = T2[own]    + dT2Star[own];
 
-                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    fluid.boundAlpha(alpha_1);
+                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.boundAlpha(alpha_1);
 
 
                     const scalar alpha1_1 = 1.0 - alpha_1;

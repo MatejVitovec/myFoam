@@ -24,7 +24,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::dragModels::SchillerNaumann
+    Foam::SchillerNaumann
 
 Description
     Schiller and Naumann drag model for dispersed bubbly flows.
@@ -48,8 +48,6 @@ namespace TwoFluidFoam
 
 class twoFluid;
 
-namespace dragModels
-{
 
 /*---------------------------------------------------------------------------*\
                            Class SchillerNaumann Declaration
@@ -64,6 +62,15 @@ class SchillerNaumann
         //- Residual Reynolds Number
         const dimensionedScalar residualRe_;
 
+        // -Reynolds number
+        volScalarField Re_;
+
+        //- Drag coefficient
+        tmp<volScalarField> CdRe() const;
+
+        scalar dCdRedx(const scalar Re, const scalar dRedx) const;
+        vector dCdRedx(const scalar Re, const vector dRedx) const;
+
 public:
 
     //- Runtime type information
@@ -77,6 +84,7 @@ public:
         (
             const dictionary& dict,
             const twoFluid& fluid,
+            const volScalarField& dropletDiameter,
             const bool registerObject
         );
 
@@ -87,14 +95,20 @@ public:
 
     // Member Functions
 
-        //- Drag coefficient
-        virtual tmp<volScalarField> CdRe(const volScalarField& d) const;
+        virtual scalar dKidp(const label celli) const;
+        virtual scalar dKidalpha(const label celli) const;
+        virtual vector dKidU1(const label celli) const;
+        virtual vector dKidU2(const label celli) const;
+        virtual scalar dKidT1(const label celli) const;
+        virtual scalar dKidT2(const label celli) const;
+
+        virtual void correct();
+
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace dragModels
 }
 } // End namespace Foam
 

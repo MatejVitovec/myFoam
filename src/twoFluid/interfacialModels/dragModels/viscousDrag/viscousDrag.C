@@ -35,37 +35,35 @@ namespace Foam
 {
 namespace TwoFluidFoam
 {
-namespace dragModels
-{
     defineTypeNameAndDebug(viscousDrag, 0);
     addToRunTimeSelectionTable(dragModel, viscousDrag, dictionary);
-}
 }
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModels::viscousDrag::viscousDrag
+Foam::TwoFluidFoam::viscousDrag::viscousDrag
 (
     const dictionary& dict,
     const twoFluid& fluid,
+    const volScalarField& dropletDiameter,
     const bool registerObject
 )
 :
-    dragModel(dict, fluid, registerObject)
+    dragModel(dict, fluid, dropletDiameter, registerObject)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::dragModels::viscousDrag::~viscousDrag()
+Foam::TwoFluidFoam::viscousDrag::~viscousDrag()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(const volScalarField& d) const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::viscousDrag::Cc(const volScalarField& d) const
 {
     //const objectRegistry& db = fluid_.mesh();
     //const volScalarField& Kn = db.lookupObject<volScalarField>("Kn");
@@ -78,68 +76,41 @@ Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Cc(
     return 1.0 + 2*Kn*(1.257 + 0.4*exp(-1.1/(2.0*Kn + dimensionedScalar("dimlessNearZero", dimless, SMALL))));
 }
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::CdRe(const volScalarField& d) const
-{
-    return
-        tmp<volScalarField>
-        (
-            new volScalarField
-            (
-                IOobject
-                (
-                    "viscousDragCoeff",
-                    fluid_.mesh().time().timeName(),
-                    fluid_.mesh(),
-                    IOobject::NO_READ,
-                    IOobject::NO_WRITE
-                ),
-                fluid_.mesh(),
-                dimensionedScalar("viscousDragCoeff", dimless, 0.0)
-            )
-        );
-}
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::Ki(const volScalarField& d) const
-{
-    return ((9.0/2.0)*fluid_.thermo1().mu()/(sqr(d/2)*Cc(d)));//*pos(fluid_.alpha() - 1e-26);
-    //return 18*fluid_.thermo1().mu()/(sqr(max(d, dimensionedScalar("dMin", d.dimensions(), 10e-20)))*Cc(d));
-}
-
-
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModels::viscousDrag::K(const volScalarField& d) const
-{
-    return Ki(d)*fluid_.alpha();//*pos(fluid_.alpha() - 1e-26);
-}
-
-
-Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidp(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::viscousDrag::dKidp(const label celli) const
 {
     return 0.0;
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidalpha(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::viscousDrag::dKidalpha(const label celli) const
 {
     return 0.0;
 }
 
-Foam::vector Foam::TwoFluidFoam::dragModels::viscousDrag::dKidU1(const label celli, const scalar d, const scalar Cd) const
+Foam::vector Foam::TwoFluidFoam::viscousDrag::dKidU1(const label celli) const
 {
     return vector::zero;
 }
 
-Foam::vector Foam::TwoFluidFoam::dragModels::viscousDrag::dKidU2(const label celli, const scalar d, const scalar Cd) const
+Foam::vector Foam::TwoFluidFoam::viscousDrag::dKidU2(const label celli) const
 {
     return vector::zero;
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidT1(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::viscousDrag::dKidT1(const label celli) const
 {
     return 0.0;
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModels::viscousDrag::dKidT2(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::viscousDrag::dKidT2(const label celli) const
 {
     return 0.0;
+}
+
+
+void Foam::TwoFluidFoam::viscousDrag::correct()
+{
+    Ki_ = ((9.0/2.0)*fluid_.thermo1().mu()/(sqr(d_/2)*Cc(d_)));//*pos(fluid_.alpha() - 1e-26);
 }
 
 

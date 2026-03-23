@@ -42,6 +42,7 @@ SourceFiles
 #include "volFields.H"
 #include "dictionary.H"
 #include "runTimeSelectionTables.H"
+#include "twoFluid.H"
 
 namespace Foam
 {
@@ -98,14 +99,14 @@ public:
 
     // Constructors
 
-        //- Construct from a dictionary and a phase pair
+        //- Construct from a dictionary and a twoFluid
         virtualMassModel
         (
             const twoFluid& fluid,
             const bool registerObject
         );
 
-        //- Construct from a dictionary and a phase pair
+        //- Construct from a dictionary and a twoFluid
         virtualMassModel
         (
             const dictionary& dict,

@@ -100,9 +100,8 @@ int main(int argc, char *argv[])
 
             //volScalarField rho = alpha1*rho1 + alpha2*rho2;
             //volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
-            dragKi = drag.Ki(d);
 
-            virtualMassTerm = -0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1);
+            virtualMassTerm = -0.0*0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1);
 
             volScalarField rezAlphaRho1(-dt*(
                 fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
@@ -116,7 +115,7 @@ int main(int argc, char *argv[])
                 fvc::ddt(conservative.alphaRhoU1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
-                + dragKi*alpha*(fluid.U1() - fluid.U2())
+                + drag.K()*(fluid.U1() - fluid.U2())
                 + virtualMassTerm
             ));
 
@@ -124,14 +123,14 @@ int main(int argc, char *argv[])
                 fvc::ddt(conservative.alphaRhoU2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
-                + dragKi*alpha*(fluid.U2() - fluid.U1())
+                + drag.K()*(fluid.U2() - fluid.U1())
                 - virtualMassTerm
             ));
 
             volScalarField rezEpsilon1(-dt*(
                 fvc::ddt(conservative.epsilon1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                + ((dragKi*alpha*(fluid.U1() - fluid.U2())) & U1)
+                + ((drag.K()*(fluid.U1() - fluid.U2())) & U1)
                 + (virtualMassTerm & U1)
                 //+ ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
@@ -139,7 +138,7 @@ int main(int argc, char *argv[])
             volScalarField rezEpsilon2(-dt*(
                 fvc::ddt(conservative.epsilon2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                + ((dragKi*alpha*(fluid.U2() - fluid.U1())) & U2)
+                + ((drag.K()*(fluid.U2() - fluid.U1())) & U2)
                 - (virtualMassTerm & U2)
                 //- ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
@@ -165,6 +164,7 @@ int main(int argc, char *argv[])
             //fluid.boundAlpha();
             //fluid.bound();
             fluid.correctBoundaryCondition();
+            drag.correct();
 
             /*if (runTime.timeIndex() > 12570)
             {

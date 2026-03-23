@@ -65,7 +65,9 @@ protected:
     // Protected Data
     const TwoFluidFoam::twoFluid& fluid_;
 
-    const dimensionedScalar dropletDiameter_ = dimensionedScalar("dropletDiameter", dimLength, 1e-5);
+    const volScalarField& d_;
+
+    volScalarField Ki_;
 
 public:
 
@@ -83,9 +85,10 @@ public:
             (
                 const dictionary& dict,
                 const twoFluid& fluid,
+                const volScalarField& dropletDiameter,
                 const bool registerObject
             ),
-            (dict, fluid, registerObject)
+            (dict, fluid, dropletDiameter, registerObject)
         );
 
 
@@ -97,18 +100,12 @@ public:
 
     // Constructors
 
-        // Construct without residual constants
-        dragModel
-        (
-            const twoFluid& fluid,
-            const bool registerObject
-        );
-
         // Construct with residual constants
         dragModel
         (
             const dictionary& dict,
             const twoFluid& fluid,
+            const volScalarField& dropletDiameter,
             const bool registerObject
         );
 
@@ -121,50 +118,45 @@ public:
 
         static autoPtr<dragModel> New
         (
-            const twoFluid& fluid
+            const twoFluid& fluid,
+            const volScalarField& dropletDiameter
         );
 
         static autoPtr<dragModel> New
         (
             const dictionary& dict,
-            const twoFluid& fluid
+            const twoFluid& fluid,
+            const volScalarField& dropletDiameter
         );
 
 
     // Member Functions
 
         //- Drag coefficient
-        virtual tmp<volScalarField> CdRe(const volScalarField& d) const = 0;
+        //const volScalarField& CdRe() const;
 
         //- Return the phase-intensive drag coefficient Ki
         //  used in the momentum equations
         //    ddt(alpha1*rho1*U1) + ... = ... alphad*K*(U1-U2)
         //    ddt(alpha2*rho2*U2) + ... = ... alphad*K*(U2-U1)
-        virtual tmp<volScalarField> Ki(const volScalarField& d) const;
+        const volScalarField& Ki() const;
 
         //- Return the drag coefficient K
         //  used in the momentum equations
         //    ddt(alpha1*rho1*U1) + ... = ... K*(U1-U2)
         //    ddt(alpha2*rho2*U2) + ... = ... K*(U2-U1)
-        virtual tmp<volScalarField> K(const volScalarField& d) const;
+        virtual tmp<volScalarField> K() const;
 
-        //- Return the drag term
-        //  used in the momentum equations
-        //    ddt(alpha1*rho1*U1) + ... = ...  S
-        //    ddt(alpha2*rho2*U2) + ... = ... -S
-        //virtual tmp<volVectorField> SalphaRhoU1(const volScalarField& d) const;
-        //virtual tmp<volVectorField> SalphaRhoU2(const volScalarField& d) const;
-        //virtual tmp<volScalarField> SalphaRhoE1(const volScalarField& d) const;
-        //virtual tmp<volScalarField> SalphaRhoE2(const volScalarField& d) const;
+        virtual scalar dKidp(const label celli) const;
+        virtual scalar dKidalpha(const label celli) const;
+        virtual vector dKidU1(const label celli) const;
+        virtual vector dKidU2(const label celli) const;
+        virtual scalar dKidT1(const label celli) const;
+        virtual scalar dKidT2(const label celli) const;
 
-        virtual scalar dKidp(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidalpha(const label celli, const scalar d, const scalar Cd) const;
-        virtual vector dKidU1(const label celli, const scalar d, const scalar Cd) const;
-        virtual vector dKidU2(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidT1(const label celli, const scalar d, const scalar Cd) const;
-        virtual scalar dKidT2(const label celli, const scalar d, const scalar Cd) const;
+        std::array<double, 100> dSdpUT(const label celli) const;
 
-        std::array<double, 100> dSdpUT(const label celli, const scalar Ki, const scalar d) const;
+        virtual void correct() = 0;
 
         //- Dummy write for regIOobject
         bool writeData(Ostream& os) const;

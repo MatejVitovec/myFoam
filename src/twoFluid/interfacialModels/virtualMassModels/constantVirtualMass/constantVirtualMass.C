@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2017 OpenFOAM Foundation
+    Copyright (C) 2014-2015 OpenFOAM Foundation
+    Copyright (C) 2020-2021 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -25,9 +26,10 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "constantDrag.H"
+#include "constantVirtualMass.H"
 #include "twoFluid.H"
 #include "addToRunTimeSelectionTable.H"
+
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -35,36 +37,38 @@ namespace Foam
 {
 namespace TwoFluidFoam
 {
-    defineTypeNameAndDebug(constantDrag, 0);
-    addToRunTimeSelectionTable(dragModel, constantDrag, dictionary);
+    defineTypeNameAndDebug(constantVirtualMass, 0);
+    addToRunTimeSelectionTable(virtualMassModel, constantVirtualMass, dictionary);
 }
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::TwoFluidFoam::constantDrag::constantDrag
+Foam::TwoFluidFoam::constantVirtualMass::constantVirtualMass
 (
-    const dictionary& dict,
     const twoFluid& fluid,
-    const volScalarField& dropletDiameter,
     const bool registerObject
 )
 :
-    dragModel(dict, fluid, dropletDiameter, registerObject),
-    dragCoeff_("dragCoeff", dimless, dict)
+    virtualMassModel(fluid, registerObject)
 {}
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-Foam::TwoFluidFoam::constantDrag::~constantDrag()
+Foam::TwoFluidFoam::constantVirtualMass::constantVirtualMass
+(
+    const dictionary& dict,
+    const twoFluid& fluid,
+    const bool registerObject
+)
+:
+    virtualMassModel(dict, fluid, registerObject)
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-/*Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::constantDrag::Cd() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::constantVirtualMass::Cvm() const
 {
     return
         tmp<volScalarField>
@@ -73,22 +77,16 @@ Foam::TwoFluidFoam::constantDrag::~constantDrag()
             (
                 IOobject
                 (
-                    "constantDragCoeff",
+                    "constantVirtualMassCoeff",
                     fluid_.mesh().time().timeName(),
                     fluid_.mesh(),
                     IOobject::NO_READ,
                     IOobject::NO_WRITE
                 ),
                 fluid_.mesh(),
-                dragCoeff_
+                virtualMassCoeff_
             )
         );
-}*/
-
-
-void Foam::TwoFluidFoam::constantDrag::correct()
-{
-    Ki_ = (0.75*dragCoeff_*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d_;
 }
 
 

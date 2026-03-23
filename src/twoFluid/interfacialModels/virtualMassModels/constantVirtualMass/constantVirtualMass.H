@@ -5,7 +5,8 @@
     \\  /    A nd           | www.openfoam.com
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
-    Copyright (C) 2011-2014 OpenFOAM Foundation
+    Copyright (C) 2014-2015 OpenFOAM Foundation
+    Copyright (C) 2020 OpenCFD Ltd.
 -------------------------------------------------------------------------------
 License
     This file is part of OpenFOAM.
@@ -24,75 +25,74 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::viscousDrag
+    Foam::constantVirtualMass
 
 Description
-    Schiller and Naumann drag model for dispersed bubbly flows.
 
 SourceFiles
-    viscousDrag.C
+    constantVirtualMass.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef viscousDrag_H
-#define viscousDrag_H
-
-#include "dragModel.H"
+#ifndef constantVirtualMass_H
+#define constantVirtualMass_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "virtualMassModel.H"
+
 namespace Foam
 {
+
 namespace TwoFluidFoam
 {
 
-class twoFluid;
-
 /*---------------------------------------------------------------------------*\
-                           Class viscousDrag Declaration
+                         Class constantVirtualMass Declaration
 \*---------------------------------------------------------------------------*/
 
-class viscousDrag
+class constantVirtualMass
 :
-    public dragModel
+    public virtualMassModel
 {
     // Private data
-    
-    tmp<volScalarField> Cc(const volScalarField& d) const;
 
+        //- Constant virtualMass coefficient
+        const dimensionedScalar virtualMassCoeff_;
 
 public:
 
     //- Runtime type information
-    TypeName("viscousDrag");
+    TypeName("constantVirtualMass");
 
 
     // Constructors
 
         //- Construct from a dictionary and a twoFluid
-        viscousDrag
+        constantVirtualMass
+        (
+            const twoFluid& fluid,
+            const bool registerObject
+        );
+
+        //- Construct from a dictionary and a twoFluid
+        constantVirtualMass
         (
             const dictionary& dict,
             const twoFluid& fluid,
-            const volScalarField& dropletDiameter,
             const bool registerObject
         );
 
 
     //- Destructor
-    virtual ~viscousDrag();
+    virtual ~constantVirtualMass() = default;
 
 
     // Member Functions
 
-        scalar dKidp(const label celli) const;
-        scalar dKidalpha(const label celli) const;
-        vector dKidU1(const label celli) const;
-        vector dKidU2(const label celli) const;
-        scalar dKidT1(const label celli) const;
-        scalar dKidT2(const label celli) const;
+        //- Return the virtual mass coefficient
+        virtual tmp<volScalarField> Cvm() const;
 
-        virtual void correct();
 };
 
 

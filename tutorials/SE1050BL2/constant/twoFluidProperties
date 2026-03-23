@@ -22,8 +22,9 @@ epsilonMax      1.0e-17;
 
 drag
 {
-    type        constantDrag;
+    type        SchillerNaumann;
     dragCoeff   1.0;
+    residualRe	1e-2;
 }
 
 // ************************************************************************* //

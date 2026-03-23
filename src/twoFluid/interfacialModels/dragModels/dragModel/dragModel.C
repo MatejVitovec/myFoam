@@ -48,31 +48,9 @@ const Foam::dimensionSet Foam::TwoFluidFoam::dragModel::dimK(1, -3, -1, 0, 0);
 
 Foam::TwoFluidFoam::dragModel::dragModel
 (
-    const twoFluid& fluid,
-    const bool registerObject
-)
-:
-    regIOobject
-    (
-        IOobject
-        (
-            //IOobject::groupName(typeName, twoFluid.name()),
-            typeName,
-            fluid.mesh().time().timeName(),
-            fluid.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            registerObject
-        )
-    ),
-    fluid_(fluid)
-{}
-
-
-Foam::TwoFluidFoam::dragModel::dragModel
-(
     const dictionary& dict,
     const twoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter,
     const bool registerObject
 )
 :
@@ -89,15 +67,31 @@ Foam::TwoFluidFoam::dragModel::dragModel
             registerObject
         )
     ),
-    fluid_(fluid)
-{}
+    fluid_(fluid),
+    d_(dropletDiameter),
+    Ki_
+    (
+        IOobject
+        (
+            "Ki",
+            fluid.mesh().time().timeName(),
+            fluid.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        fluid.mesh(),
+        dimensionedScalar("zero", dimMass/dimTime/dimVolume, 0.0)
+    )
+{
+}
 
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
 Foam::TwoFluidFoam::dragModel::New
 (
-    const twoFluid& fluid
+    const twoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter
 )
 {
     const dictionary& dict = fluid.subDict("drag");
@@ -120,7 +114,7 @@ Foam::TwoFluidFoam::dragModel::New
         ) << exit(FatalIOError);
     }
 
-    return ctorPtr(dict, fluid, true);
+    return ctorPtr(dict, fluid, dropletDiameter, true);
 }
 
 
@@ -128,7 +122,8 @@ Foam::autoPtr<Foam::TwoFluidFoam::dragModel>
 Foam::TwoFluidFoam::dragModel::New
 (
     const dictionary& dict,
-    const twoFluid& fluid
+    const twoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter
 )
 {
     const word modelType(dict.get<word>("type"));
@@ -149,7 +144,7 @@ Foam::TwoFluidFoam::dragModel::New
         ) << exit(FatalIOError);
     }
 
-    return ctorPtr(dict, fluid, true);
+    return ctorPtr(dict, fluid, dropletDiameter, true);
 }
 
 
@@ -161,72 +156,82 @@ Foam::TwoFluidFoam::dragModel::~dragModel()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::Ki(const volScalarField& d) const
+/*const Foam::volScalarField& Foam::TwoFluidFoam::dragModel::CdRe() const
 {
-    return (0.75*CdRe(d)*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d;
+    //return Cd_;
+}*/
+
+
+const Foam::volScalarField& Foam::TwoFluidFoam::dragModel::Ki() const
+{
+    return Ki_;
+    //(0.75*Cd_*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d_;
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K(const volScalarField& d) const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::dragModel::K() const
 {
-    return Ki(d)*fluid_.alpha();
+    return Ki_*fluid_.alpha();
 }
 
 
 
-
-
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKidp(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidp(const label celli) const
 {
-    const volScalarField rho1 = fluid_.thermo1().rho();
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
 
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
     const scalar drho1dp = rho1[celli]*fluid_.gasProps1().beta_T(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*(Cd/d)*drho1dp*mag(U1 - U2);
+    return 0.75*(Cd_[celli]/d_[celli])*drho1dp*mag(U1 - U2);*/
+
+    return 0.0;
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKidalpha(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidalpha(const label celli) const
 {
     return 0.0;
 }
 
-Foam::vector Foam::TwoFluidFoam::dragModel::dKidU1(const label celli, const scalar d, const scalar Cd) const
+Foam::vector Foam::TwoFluidFoam::dragModel::dKidU1(const label celli) const
 {
-    const volScalarField rho1 = fluid_.thermo1().rho();
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
 
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
-    return 0.75*(Cd/d)*rho1[celli]*(U1 - U2)/(mag(U1 - U2) + VSMALL);
+    return 0.75*(Cd_[celli]/d_[celli])*rho1[celli]*(U1 - U2)/(mag(U1 - U2) + VSMALL);*/
+
+    return vector::zero;
 }
 
-Foam::vector Foam::TwoFluidFoam::dragModel::dKidU2(const label celli, const scalar d, const scalar Cd) const
+Foam::vector Foam::TwoFluidFoam::dragModel::dKidU2(const label celli) const
 {
-    return -dKidU1(celli, d, Cd);
+    return -dKidU1(celli);
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT1(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT1(const label celli) const
 {
-    const volScalarField rho1 = fluid_.thermo1().rho();
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
 
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
 
     const scalar drho1dT = -rho1[celli]*fluid_.gasProps1().beta_p(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*(Cd/d)*drho1dT*mag(U1 - U2);
+    return 0.75*(Cd_[celli]/d_[celli])*drho1dT*mag(U1 - U2);*/
+    return 0.0;
 }
 
-Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT2(const label celli, const scalar d, const scalar Cd) const
+Foam::scalar Foam::TwoFluidFoam::dragModel::dKidT2(const label celli) const
 {
     return 0.0;
 }
 
 
-std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label celli, const scalar Ki, const scalar d) const
+std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label celli) const
 {
     constexpr auto idx = [](std::size_t i, std::size_t j) constexpr
     {
@@ -242,23 +247,19 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     const scalar T1 = fluid_.T1()[celli];
     const scalar T2 = fluid_.T2()[celli];
 
-    const scalar K = Ki*alpha;
+
+    const scalar K = Ki_[celli]*alpha;
 
     const vector U1mU2 = U1 - U2;
     const scalar U1mU2dotU1 = U1mU2 & U1;
     const scalar U2mU1dotU2 = (-U1mU2) & U2;
 
-    volScalarField d = dimensionedScalar("ddd", dimLength, d)
-
-    const volScalarField CdRe_ = CdRe(d);
-    const scalar Cd = CdRe_[celli];
-
-    const scalar dKdp_      = alpha*dKidp(celli, d, Cd);
-    const scalar dKdalpha_  = alpha*dKidalpha(celli, d, Cd) + Ki;
-    const vector dKdU1_     = alpha*dKidU1(celli, d, Cd);
-    const vector dKdU2_     = alpha*dKidU2(celli, d, Cd);
-    const scalar dKdT1_     = alpha*dKidT1(celli, d, Cd);
-    const scalar dKdT2_     = alpha*dKidT2(celli, d, Cd);
+    const scalar dKdp_      = alpha*dKidp(celli);
+    const scalar dKdalpha_  = alpha*dKidalpha(celli) + Ki_[celli];
+    const vector dKdU1_     = alpha*dKidU1(celli);
+    const vector dKdU2_     = alpha*dKidU2(celli);
+    const scalar dKdT1_     = alpha*dKidT1(celli);
+    const scalar dKdT2_     = alpha*dKidT2(celli);
 
     //const scalar dKdp_ = 0.0;
     //const scalar dKdalpha_ = 0.0;
@@ -266,7 +267,6 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     //const vector dKdU2_ = vector::zero;
     //const scalar dKdT1_ = 0.0;
     //const scalar dKdT2_ = 0.0;
-
 
     out[idx(1, 0)] =  dKdp_*U1mU2.x();
     out[idx(2, 0)] =  dKdp_*U1mU2.y();

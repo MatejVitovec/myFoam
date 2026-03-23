@@ -27,8 +27,6 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "virtualMassModel.H"
-#include "phasePair.H"
-#include "surfaceInterpolate.H"
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
@@ -41,12 +39,12 @@ namespace TwoFluidFoam
 }
 }
 
-const Foam::dimensionSet Foam::virtualMassModel::dimK(dimDensity);
+const Foam::dimensionSet Foam::TwoFluidFoam::virtualMassModel::dimK(dimDensity);
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::virtualMassModel::virtualMassModel
+Foam::TwoFluidFoam::virtualMassModel::virtualMassModel
 (
     const twoFluid& fluid,
     const bool registerObject
@@ -69,7 +67,7 @@ Foam::virtualMassModel::virtualMassModel
 {}
 
 
-Foam::virtualMassModel::virtualMassModel
+Foam::TwoFluidFoam::virtualMassModel::virtualMassModel
 (
     const dictionary& dict,
     const twoFluid& fluid,
@@ -95,13 +93,15 @@ Foam::virtualMassModel::virtualMassModel
 
 // * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
 
-Foam::autoPtr<Foam::virtualMassModel>
-Foam::virtualMassModel::New
+Foam::autoPtr<Foam::TwoFluidFoam::virtualMassModel>
+Foam::TwoFluidFoam::virtualMassModel::New
 (
     const twoFluid& fluid
 )
 {
     const dictionary& dict = fluid.subDict("virtualMass");
+
+    const word modelType(dict.get<word>("type"));
 
     Info<< "Selecting virtualMassModel for "
         << fluid << ": " << modelType << endl;
@@ -123,8 +123,8 @@ Foam::virtualMassModel::New
 }
 
 
-Foam::autoPtr<Foam::virtualMassModel>
-Foam::virtualMassModel::New
+Foam::autoPtr<Foam::TwoFluidFoam::virtualMassModel>
+Foam::TwoFluidFoam::virtualMassModel::New
 (
     const dictionary& dict,
     const twoFluid& fluid
@@ -154,25 +154,25 @@ Foam::virtualMassModel::New
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::virtualMassModel::Ki() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::virtualMassModel::Ki() const
 {
     return Cvm()*fluid_.thermo1().rho();
 }
 
 
-Foam::tmp<Foam::volScalarField> Foam::virtualMassModel::K() const
+Foam::tmp<Foam::volScalarField> Foam::TwoFluidFoam::virtualMassModel::K() const
 {
     return fluid_.alpha()*Ki();
 }
 
 
-Foam::tmp<Foam::surfaceScalarField> Foam::virtualMassModel::Kf() const
+Foam::tmp<Foam::surfaceScalarField> Foam::TwoFluidFoam::virtualMassModel::Kf() const
 {
     return fvc::interpolate(fluid_.alpha())*fvc::interpolate(Ki());
 }
 
 
-bool Foam::virtualMassModel::writeData(Ostream& os) const
+bool Foam::TwoFluidFoam::virtualMassModel::writeData(Ostream& os) const
 {
     return os.good();
 }

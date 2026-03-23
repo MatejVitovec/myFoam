@@ -5,6 +5,6 @@
 ./interfacialModels/dragModels/viscousDrag/viscousDrag.C
 ./interfacialModels/dragModels/SchillerNaumann/SchillerNaumann.C
 ./interfacialModels/virtualMassModels/virtualMassModel/virtualMassModel.C
-./interfacialModels/virtualMassModels/constantvirtualMass/constantvirtualMass.C
+./interfacialModels/virtualMassModels/constantVirtualMass/constantVirtualMass.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyTwoFluid

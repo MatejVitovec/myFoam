@@ -24,7 +24,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::dragModels::constantDrag
+    Foam::constantDrag
 
 Description
     Schiller and Naumann drag model for dispersed bubbly flows.
@@ -48,8 +48,6 @@ namespace TwoFluidFoam
 
 class twoFluid;
 
-namespace dragModels
-{
 
 /*---------------------------------------------------------------------------*\
                            Class constantDrag Declaration
@@ -64,7 +62,6 @@ class constantDrag
         //- Constant drag coefficient
         const dimensionedScalar dragCoeff_;
 
-
 public:
 
     //- Runtime type information
@@ -78,6 +75,7 @@ public:
         (
             const dictionary& dict,
             const twoFluid& fluid,
+            const volScalarField& dropletDiameter,
             const bool registerObject
         );
 
@@ -88,14 +86,13 @@ public:
 
     // Member Functions
 
-        //- Drag coefficient
-        virtual tmp<volScalarField> CdRe(const volScalarField& d) const;
+    virtual void correct();
+
 };
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace dragModels
 }
 } // End namespace Foam
 
