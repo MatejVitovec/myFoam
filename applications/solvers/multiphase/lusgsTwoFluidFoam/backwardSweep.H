@@ -38,7 +38,7 @@
                     scalar T1_1      = T1[nei]    + dT1[nei];
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
-                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
                     //fluid.boundAlpha(alpha_1);
 
 
@@ -79,7 +79,7 @@
                     scalar T1_1      = T1[own]    + dT1Star[own];
                     scalar T2_1      = T2[own]    + dT2Star[own];
 
-                    fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
                     //fluid.boundAlpha(alpha_1);
 
 
@@ -111,7 +111,7 @@
                 label patchID = mesh.boundaryMesh().whichPatch(facei);
                 label localFaceID = facei - mesh.boundaryMesh()[patchID].start();
 
-                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]))
+                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]) && !mesh.boundaryMesh()[patchID].coupled())
                 {
                     const vector pSf = mesh.Sf().boundaryField()[patchID][localFaceID];
                     const scalar pMagSf = mag(pSf);

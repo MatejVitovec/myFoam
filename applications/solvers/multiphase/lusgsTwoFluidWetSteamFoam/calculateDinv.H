@@ -31,9 +31,7 @@
     forAll(mesh.cells(), celli)
     {
         //DRAG
-        const double Ki = dragKi[celli];
-
-        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, Ki, d[celli]);
+        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli);
         Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
 
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();

@@ -106,12 +106,12 @@
                     rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2[nei]*rho2[nei]*E2)      - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)             - alphaRhoPhi2*(E2 + p[nei]/rho2[nei]));
                 }
             }
-            else
+            /*else
             {
                 label patchID = mesh.boundaryMesh().whichPatch(facei);
                 label localFaceID = facei - mesh.boundaryMesh()[patchID].start();
 
-                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]))
+                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]) && !mesh.boundaryMesh()[patchID].coupled())
                 {
                     const vector pSf = mesh.Sf().boundaryField()[patchID][localFaceID];
                     const scalar pMagSf = mag(pSf);
@@ -167,7 +167,7 @@
                     rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1_0*rho1_0*E1_0)    + 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)       - alphaRhoPhi1_0*(E1_0 + p_0/rho1_0));
                     rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2_0*rho2_0*E2_0)    + 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)       - alphaRhoPhi2_0*(E2_0 + p_0/rho2_0));
                 }
-            }
+            }*/
         }
     
         Eigen::Vector<double,10> b;

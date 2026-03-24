@@ -54,11 +54,11 @@ namespace Foam
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 // dynamicCode:
-// SHA1 = f3d43dafcc4189f6fa130263c26292baffa1b15c
+// SHA1 = d43f658e8672c5c341c72164d2e4a30871627a62
 //
 // unique function name that can be checked if the correct library version
 // has been loaded
-extern "C" void alphaInletStartAfterIterBC_f3d43dafcc4189f6fa130263c26292baffa1b15c(bool load)
+extern "C" void alphaInletStartAfterIterBC_d43f658e8672c5c341c72164d2e4a30871627a62(bool load)
 {
     if (load)
     {
@@ -202,7 +202,7 @@ alphaInletStartAfterIterBCFixedValueFvPatchScalarField::updateCoeffs()
 
 //{{{ begin code
     #line 34 "/home/matej/myFoam/tutorials/SE1050BL2/0/alpha/boundaryField/inlet"
-const scalar lowValue = 1e-20;
+const scalar lowValue = 1e-22;
             const scalar highValue = 1e-5;
             const label switchIter = 5000;
 

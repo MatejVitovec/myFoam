@@ -49,7 +49,7 @@
     for (int intIter = 0; intIter < lusgsIntIters; intIter++)
     {
         #include "forwardSweep.H"
-        #include "boundarySweep.H"
+        //#include "boundarySweep.H"
         #include "backwardSweep.H"
     }
 }

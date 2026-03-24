@@ -28,13 +28,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;
+endTime         100;
 
 deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   1000;
+writeInterval   5000;
 
 purgeWrite      0;
 
@@ -52,7 +52,7 @@ graphFormat     raw;
 
 runTimeModifiable true;
 
-maxCo 0.05;
+maxCo 2.8;
 
 adjustTimeStep yes;
 

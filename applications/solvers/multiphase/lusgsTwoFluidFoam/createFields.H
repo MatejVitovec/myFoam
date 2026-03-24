@@ -116,7 +116,46 @@ volVectorField DU2
     fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2)
 );
 
-volVectorField virtualMassTerm
+volScalarField virtualMassCoeffs
+(
+    IOobject
+    (
+        "virtualMassCoeffs",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    -0.5*rho1*(1.0 - alpha2)*alpha2
+);
+
+volVectorField virtualMassCoeffsMinus1
+(
+    IOobject
+    (
+        "virtualMassCoeffsMinus1",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    virtualMassCoeffs*(fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2) - fvc::div(fvc::flux(U1), U1))
+);
+
+volVectorField virtualMassCoeffsMinus2
+(
+    IOobject
+    (
+        "virtualMassCoeffsMinus2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    virtualMassCoeffs*(fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1) - fvc::div(fvc::flux(U2), U2))
+);
+
+/*volVectorField virtualMassTerm
 (
     IOobject
     (
@@ -127,7 +166,7 @@ volVectorField virtualMassTerm
         IOobject::AUTO_WRITE
     ),
     -0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1)
-);
+);*/
 
 
 volScalarField dp

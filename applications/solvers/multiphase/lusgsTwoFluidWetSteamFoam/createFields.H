@@ -72,8 +72,6 @@ surfaceScalarField rhoMPhi2
     linearInterpolate(rhoM*U2) & mesh.Sf()
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
-TwoFluidFoam::dragModel& drag = pDrag();
 
 saturation satur = saturation(fluid.subDict("condensation"), thermo1);
 
@@ -91,19 +89,11 @@ autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::conde
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();
 
-/*volScalarField d
-(
-    IOobject
-    (
-        "dropletDiameter",
-        runTime.timeName(),
-        mesh,
-        IOobject::NO_READ,
-        IOobject::NO_WRITE
-    ),
-    mesh,
-    dimensionedScalar("dropletDiameter", dimLength, 1e-5)
-);*/
+
+volScalarField dropletDiameter = condensation.dropletDiameter();
+
+autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, dropletDiameter);
+TwoFluidFoam::dragModel& drag = pDrag();
 
 volScalarField condensationMassSource
 (

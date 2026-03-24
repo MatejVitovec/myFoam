@@ -29,7 +29,7 @@ condensation
 {
     condensationModel   monodispersion;
     nucleationModel     CNTNucleationModel;
-    growthModel         gyarmathyGrowthModel;
+    growthModel         gyarmathyMixtureGrowthModel;
     saturationCurve     IF97;
     liquidProperties    H2O_IAPWS97reg1;
 

@@ -103,8 +103,8 @@ int main(int argc, char *argv[])
             volScalarField Hvint = satur.hsv() + (Uint & U1) - 0.5*magSqr(U1);
             volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
-            volScalarField d = condensation.dropletDiameter();
-            volScalarField dragKi = drag.Ki(d);
+            dropletDiameter = condensation.dropletDiameter();
+            volScalarField dragKi = drag.Ki();
             volVectorField dragSource = dragKi*alpha*(U1 - U2);
 
             condensationMassSource = condensation.condensationRateMassSource();
@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
             //fluid.correctConservative();
 
             satur.correct();
+            drag.correct();
 
             scalar finalRezp     = fvc::domainIntegrate(mag(dp)    /dt).value();
             scalar finalRezalpha = fvc::domainIntegrate(mag(dalpha)/dt).value();

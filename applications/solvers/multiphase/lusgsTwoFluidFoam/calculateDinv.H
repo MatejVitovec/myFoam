@@ -53,6 +53,22 @@
         std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli);
         Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
 
+        Eigen::Matrix<double, 10, 10> virtualMassAdditionJ = Eigen::Matrix<double, 10, 10>::Zero();
+
+        virtualMassAdditionJ(1, 2) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(4, 2) = virtualMassCoeffs[celli]*U1[celli].x();
+        virtualMassAdditionJ(2, 3) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(4, 3) = virtualMassCoeffs[celli]*U1[celli].y();
+        virtualMassAdditionJ(3, 4) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(4, 4) = virtualMassCoeffs[celli]*U1[celli].z();
+
+        virtualMassAdditionJ(6, 5) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(9, 5) = virtualMassCoeffs[celli]*U2[celli].x();
+        virtualMassAdditionJ(7, 6) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(9, 6) = virtualMassCoeffs[celli]*U2[celli].y();
+        virtualMassAdditionJ(8, 7) = virtualMassCoeffs[celli];
+        virtualMassAdditionJ(9, 7) = virtualMassCoeffs[celli]*U2[celli].z();
+
         Eigen::Matrix<double, 10, 10> J = Eigen::Matrix<double, 10, 10>::Zero();
         Eigen::Matrix<double, 10, 10> pIntAdditionJ = Eigen::Matrix<double, 10, 10>::Zero();
 
@@ -112,7 +128,7 @@
         //Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
         //D_inv[celli].compute(A);
    
-        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(acSum1[celli]), Eigen::Vector<double, 5>::Constant(acSum2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
+        D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ + virtualMassAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(acSum1[celli]), Eigen::Vector<double, 5>::Constant(acSum2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
         //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
 
         //alpha1zero[celli] = (alpha1[celli] < 1.0e-20) ? 0.0 : 1.0;

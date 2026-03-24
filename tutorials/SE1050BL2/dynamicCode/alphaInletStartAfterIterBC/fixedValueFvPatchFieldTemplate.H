@@ -69,7 +69,7 @@ class alphaInletStartAfterIterBCFixedValueFvPatchScalarField
 public:
 
     //- SHA1 representation of the code content
-    static constexpr const char* const SHA1sum = "f3d43dafcc4189f6fa130263c26292baffa1b15c";
+    static constexpr const char* const SHA1sum = "d43f658e8672c5c341c72164d2e4a30871627a62";
 
     //- Runtime type information
     TypeName("alphaInletStartAfterIterBC");
