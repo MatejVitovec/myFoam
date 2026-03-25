@@ -65,6 +65,8 @@ class SchillerNaumann
         // -Reynolds number
         volScalarField Re_;
 
+        volScalarField nu_;
+
         //- Drag coefficient
         tmp<volScalarField> CdRe() const;
 

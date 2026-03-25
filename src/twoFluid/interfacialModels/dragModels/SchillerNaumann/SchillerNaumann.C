@@ -64,6 +64,17 @@ Foam::TwoFluidFoam::SchillerNaumann::SchillerNaumann
         ),
         fluid.mesh(),
         dimensionedScalar("zero", dimless, 0.0)
+    ),
+    nu_(
+        IOobject
+        (
+            "nu",
+            fluid.mesh().time().timeName(),
+            fluid.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        fluid.thermo1().nu()
     )
 {
 }
@@ -113,8 +124,9 @@ void Foam::TwoFluidFoam::SchillerNaumann::correct()
 {
     //Cd_ = Cd();
     //Ki_ = ((9.0/2.0)*fluid_.thermo1().mu()/(sqr(d_/2)*Cc(d_)))*0.44;//*pos(fluid_.alpha() - 1e-26);
-    Re_ = mag(fluid_.U1() - fluid_.U2())*d_/fluid_.thermo1().nu();
-    Ki_ = 0.75*CdRe()*fluid_.thermo1().rho()*fluid_.thermo1().nu()/sqr(d_);
+    nu_ = fluid_.thermo1().nu();
+    Re_ = mag(fluid_.U1() - fluid_.U2())*d_/nu_;
+    Ki_ = 0.75*CdRe()*fluid_.thermo1().rho()*nu_/sqr(d_);
 }
 
 
@@ -146,7 +158,6 @@ Foam::vector Foam::TwoFluidFoam::SchillerNaumann::dKidU1(const label celli) cons
     const scalar d = d_[celli];
     const scalar Re = Re_[celli];
 
-    const volScalarField nu_ = fluid_.thermo1().nu();
     //const scalar nu = dU12*d/Re;
     const scalar nu = nu_[celli];
 

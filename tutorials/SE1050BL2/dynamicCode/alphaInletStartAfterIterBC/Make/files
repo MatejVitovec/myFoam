@@ -1,6 +1,0 @@
-/* dynamicCode:
- * SHA1 = d43f658e8672c5c341c72164d2e4a30871627a62
- */
-fixedValueFvPatchFieldTemplate.C
-
-LIB = $(PWD)/../platforms/$(WM_OPTIONS)/lib/libalphaInletStartAfterIterBC_d43f658e8672c5c341c72164d2e4a30871627a62

@@ -52,7 +52,7 @@ graphFormat     raw;
 
 runTimeModifiable true;
 
-maxCo 10;
+maxCo 20;
 
 adjustTimeStep yes;
 

@@ -201,7 +201,7 @@ mapFieldT1ToT2FixedValueFvPatchScalarField::updateCoeffs()
     }
 
 //{{{ begin code
-    #line 39 "/home/matej/myFoam/tutorials/SE1050lusgs/0/T.2/boundaryField/inlet"
+    #line 39 "/home/matejv/myFoam/tutorials/SE1050lusgs/0/T.2/boundaryField/inlet"
 const volScalarField& sourceField = db().lookupObject<volScalarField>("T.1");
             operator== (sourceField.boundaryField()[patch().index()]);
 //}}} end code
