@@ -34,8 +34,8 @@ SourceFiles
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef fixedValueFvPatchTemplateScalarField_H
-#define fixedValueFvPatchTemplateScalarField_H
+#ifndef fixedValueFvPatchTemplateVectorField_H
+#define fixedValueFvPatchTemplateVectorField_H
 
 #include "fixedValueFvPatchFields.H"
 #include "dictionaryContent.H"
@@ -49,13 +49,13 @@ namespace Foam
                          A templated FixedValueFvPatch
 \*---------------------------------------------------------------------------*/
 
-class switchAlphaInletFixedValueFvPatchScalarField
+class mapFieldU2ToT1FixedValueFvPatchVectorField
 :
-    public fixedValueFvPatchField<scalar>,
+    public fixedValueFvPatchField<vector>,
     public dictionaryContent
 {
     //- The parent boundary condition type
-    typedef fixedValueFvPatchField<scalar> parent_bctype;
+    typedef fixedValueFvPatchField<vector> parent_bctype;
 
 
     // Private Member Functions
@@ -69,69 +69,69 @@ class switchAlphaInletFixedValueFvPatchScalarField
 public:
 
     //- SHA1 representation of the code content
-    static constexpr const char* const SHA1sum = "a7031561f0ee20f3ae7d277c310071fb5821f8ba";
+    static constexpr const char* const SHA1sum = "bf766773243118fdfeb54c6f9d87d057e8e10002";
 
     //- Runtime type information
-    TypeName("switchAlphaInlet");
+    TypeName("mapFieldU2ToT1");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        switchAlphaInletFixedValueFvPatchScalarField
+        mapFieldU2ToT1FixedValueFvPatchVectorField
         (
             const fvPatch&,
-            const DimensionedField<scalar, volMesh>&
+            const DimensionedField<vector, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        switchAlphaInletFixedValueFvPatchScalarField
+        mapFieldU2ToT1FixedValueFvPatchVectorField
         (
             const fvPatch&,
-            const DimensionedField<scalar, volMesh>&,
+            const DimensionedField<vector, volMesh>&,
             const dictionary&
         );
 
         //- Construct by mapping a copy onto a new patch
-        switchAlphaInletFixedValueFvPatchScalarField
+        mapFieldU2ToT1FixedValueFvPatchVectorField
         (
-            const switchAlphaInletFixedValueFvPatchScalarField&,
+            const mapFieldU2ToT1FixedValueFvPatchVectorField&,
             const fvPatch&,
-            const DimensionedField<scalar, volMesh>&,
+            const DimensionedField<vector, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        switchAlphaInletFixedValueFvPatchScalarField
+        mapFieldU2ToT1FixedValueFvPatchVectorField
         (
-            const switchAlphaInletFixedValueFvPatchScalarField&
+            const mapFieldU2ToT1FixedValueFvPatchVectorField&
         );
 
         //- Construct as copy setting internal field reference
-        switchAlphaInletFixedValueFvPatchScalarField
+        mapFieldU2ToT1FixedValueFvPatchVectorField
         (
-            const switchAlphaInletFixedValueFvPatchScalarField&,
-            const DimensionedField<scalar, volMesh>&
+            const mapFieldU2ToT1FixedValueFvPatchVectorField&,
+            const DimensionedField<vector, volMesh>&
         );
 
         //- Return a clone
-        virtual tmp<fvPatchField<scalar>> clone() const
+        virtual tmp<fvPatchField<vector>> clone() const
         {
-            return fvPatchField<scalar>::Clone(*this);
+            return fvPatchField<vector>::Clone(*this);
         }
 
         //- Clone with an internal field reference
-        virtual tmp<fvPatchField<scalar>> clone
+        virtual tmp<fvPatchField<vector>> clone
         (
-            const DimensionedField<scalar, volMesh>& iF
+            const DimensionedField<vector, volMesh>& iF
         ) const
         {
-            return fvPatchField<scalar>::Clone(*this, iF);
+            return fvPatchField<vector>::Clone(*this, iF);
         }
 
 
     //- Destructor
-    virtual ~switchAlphaInletFixedValueFvPatchScalarField();
+    virtual ~mapFieldU2ToT1FixedValueFvPatchVectorField();
 
 
     // Member Functions

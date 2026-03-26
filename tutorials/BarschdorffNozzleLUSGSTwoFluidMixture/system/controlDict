@@ -1,9 +1,9 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
-| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
-|    \\/     M anipulation  |                                                 |
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
 \*---------------------------------------------------------------------------*/
 FoamFile
 {
@@ -20,6 +20,8 @@ libs (
   "libmyFoam.so"
 );
 
+application     wetSteamLusgsFoam;
+
 startFrom       startTime;
 
 startTime       0;
@@ -32,13 +34,13 @@ deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   100;
+writeInterval   5000;
 
 purgeWrite      0;
 
 writeFormat     ascii;
 
-writePrecision  6;
+writePrecision  16;
 
 writeCompression off;
 
@@ -46,13 +48,35 @@ timeFormat      general;
 
 timePrecision   6;
 
-runTimeModifiable yes;
+graphFormat     raw;
 
-adjustTimeStep  yes;
+runTimeModifiable true;
 
-maxCo 5;
+maxCo 2;
 
-rDeltaTSmoothingCoeff 0.1;
+adjustTimeStep yes;
 
+//functions
+//{
+//    #includeFunc MachNo
+//    #includeFunc axisLine
+//}
+
+functions
+{
+    totalLoss
+    {
+        type totalLoss;
+        libs ("libmyfieldFunctionObjects.so");
+
+        xMin    -0.2;
+        xMax    0.1;
+        Npoints 480;
+        sigma   0.0025;
+
+        executeControl  writeTime;
+        writeControl    writeTime;
+    }
+}
 
 // ************************************************************************* //

@@ -7,5 +7,6 @@ nucleationModels/CNTNucleationModel/CNTNucleationModel.C
 growthModels/growthModel.C
 growthModels/gyarmathyGrowthModel/gyarmathyGrowthModel.C
 growthModels/gyarmathyMixtureGrowthModel/gyarmathyMixtureGrowthModel.C
+growthModels/gyarmathyTwoFluidMixtureGrowthModel/gyarmathyTwoFluidMixtureGrowthModel.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyCondensationModels

@@ -19,6 +19,7 @@ EXE_INC = \
     -I./growthModels \
     -I./growthModels/gyarmathyGrowthModel \
     -I./growthModels/gyarmathyMixtureGrowthModel \
+    -I./growthModels/gyarmathyTwoFluidMixtureGrowthModel \
     -I./../applyFunctions
 
 

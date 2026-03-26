@@ -1,6 +1,0 @@
-/* dynamicCode:
- * SHA1 = a7031561f0ee20f3ae7d277c310071fb5821f8ba
- */
-fixedValueFvPatchFieldTemplate.C
-
-LIB = $(PWD)/../platforms/$(WM_OPTIONS)/lib/libswitchAlphaInlet_a7031561f0ee20f3ae7d277c310071fb5821f8ba

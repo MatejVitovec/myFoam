@@ -93,7 +93,6 @@ int main(int argc, char *argv[])
         
         dimensionedScalar dt = runTime.deltaT();
 
-
         for (int intIter = 0; intIter < lusgsIters; intIter++)
         {
             twoFluidFlux.computeFlux();
@@ -159,6 +158,8 @@ int main(int argc, char *argv[])
             psi = log(alpha/(1.0 - alpha));
             //Info << "ok2" << endl;
 
+            //Info << "ok" << endl; 
+
             #include "lusgsSweep.H"
 
             //Info << "ok5" << endl;
@@ -173,7 +174,7 @@ int main(int argc, char *argv[])
 
             Info << "psi max:   " << max(psi) << "psi min:   " << min(psi) << endl;
 
-            psi = min(max(psi, -50.0), 50.0);
+            psi = min(max(psi, -36.0), 36.0);
             alpha = 1.0/(1.0 + exp(-psi));
 
             //Info << "alpha max: " << max(alpha) << "alpha min: " << min(alpha) << endl;

@@ -63,7 +63,7 @@
     for (int intIter = 0; intIter < lusgsIntIters; intIter++)
     {
         #include "forwardSweep.H"
-        //Info << "ok4" << endl;
+        //Info << "ok after for" << endl;
         //Info << "max: " << max(dpsiStar) << " , min: " << min(dpsiStar) << endl;
         //#include "boundarySweep.H"
         #include "backwardSweep.H"

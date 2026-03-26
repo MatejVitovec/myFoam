@@ -288,7 +288,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
 {
     if ((1.0 - alpha2) <= epsilonMin_)
     {
-        alpha2 = 1.0 - epsilonMin_;
+        //alpha2 = 1.0 - epsilonMin_;
         U1 = U2;
         T1 = T2;
     }
@@ -303,7 +303,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid
         
     if (alpha2 <= epsilonMin_)
     {
-        alpha2 = epsilonMin_;
+        //alpha2 = epsilonMin_;
         U2 = U1;
         T2 = T1;
     }
@@ -574,7 +574,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
 
         if ((1.0 - alpha2) <= epsilonMin_)
         {
-            alpha2_[celli] = 1.0 - epsilonMin_;
+            //alpha2_[celli] = 1.0 - epsilonMin_;
             U1_[celli] = U2_[celli];
             T1_[celli] = T2_[celli];
         }
@@ -589,7 +589,7 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
         
         if (alpha2 <= epsilonMin_)
         {
-            alpha2_[celli] = epsilonMin_;
+            //alpha2_[celli] = epsilonMin_;
             U2_[celli] = U1_[celli];
             T2_[celli] = T1_[celli];
         }

@@ -39,13 +39,20 @@
                     scalar T1_1      = T1[own]    + dT1Star[own];
                     scalar T2_1      = T2[own]    + dT2Star[own];
 
-                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    //fluid.boundAlpha(alpha_1);
-                    psi_1 = min(psi_1, 50.0);
-                    psi_1 = max(psi_1, -50.0);
+                    if(psi_1 > 36.0 || psi_1 < -36.0) 
+                    {
+                        Info << psi_1 << " , dPsi: " << dpsiStar[own] << " , celli own: " << own << endl;
+                    }
 
-                    const scalar alpha2_1 = 1.0/(1.0 + Foam::exp(-psi_1));
-                    const scalar alpha1_1 = 1.0 - alpha2_1;
+                    psi_1 = min(psi_1, 36.0);
+                    psi_1 = max(psi_1, -36.0);
+
+                    scalar alpha2_1 = 1.0/(1.0 + Foam::exp(-psi_1));
+                    scalar alpha1_1 = 1.0 - alpha2_1;
+
+                    //fluid.blendVanishingFluid(alpha2_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.boundAlpha(alpha2_1);
+
                     const scalar rho1_1 = gasProps1.rho(p_1, T1_1);
                     const scalar rho2_1 = gasProps2.rho(p_1, T2_1);
 
@@ -82,13 +89,20 @@
                     scalar T1_1      = T1[nei]    + dT1[nei];
                     scalar T2_1      = T2[nei]    + dT2[nei];
 
-                    //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
-                    //fluid.boundAlpha(alpha_1);
-                    psi_1 = min(psi_1, 50.0);
-                    psi_1 = max(psi_1, -50.0);                    
+                    if(psi_1 > 36.0 || psi_1 < -36.0) 
+                    {
+                        Info << psi_1 << " , dPsi: " << dpsi[nei] << " , celli nei: " << nei << endl;
+                    }
 
-                    const scalar alpha2_1 = 1.0/(1.0 + Foam::exp(-psi_1));
-                    const scalar alpha1_1 = 1.0 - alpha2_1;
+                    psi_1 = min(psi_1, 36.0);
+                    psi_1 = max(psi_1, -36.0);
+
+                    scalar alpha2_1 = 1.0/(1.0 + Foam::exp(-psi_1));
+                    scalar alpha1_1 = 1.0 - alpha2_1;
+
+                    //fluid.blendVanishingFluid(alpha2_1, U1_1, U2_1, T1_1, T2_1);
+                    //fluid.boundAlpha(alpha2_1);
+
                     const scalar rho1_1 = gasProps1.rho(p_1, T1_1);
                     const scalar rho2_1 = gasProps2.rho(p_1, T2_1);
 
@@ -179,6 +193,16 @@
 
         //Eigen::Vector<double,10> starState = D_inv[celli].solve((Eigen::Vector<double,10>() << rAlphaRho1, rAlphaRhoU1.x(), rAlphaRhoU1.y(), rAlphaRhoU1.z(), rEpsilon1,  rAlphaRho2, rAlphaRhoU2.x(), rAlphaRhoU2.y(), rAlphaRhoU2.z(), rEpsilon2).finished());
         Eigen::Vector<double,10> starState = D_inv[celli].solve(b);
+
+        /*if(celli == 4937)
+        {
+            Info << "--- celli: " << celli << " -------" << endl;
+
+            std::cout << b << std::endl << std::endl;
+            std::cout << starState << std::endl;
+
+            Info << "-----------------" << Foam::endl;
+        }*/
 
         dpStar[celli]     = starState(0);
         //dalphaStar[celli] = starState(1);

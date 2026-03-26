@@ -54,11 +54,11 @@ namespace Foam
 // * * * * * * * * * * * * * * * Global Functions  * * * * * * * * * * * * * //
 
 // dynamicCode:
-// SHA1 = a7031561f0ee20f3ae7d277c310071fb5821f8ba
+// SHA1 = 7b45920900006f2e0af41ee33a0c0d75de2ecece
 //
 // unique function name that can be checked if the correct library version
 // has been loaded
-extern "C" void switchAlphaInlet_a7031561f0ee20f3ae7d277c310071fb5821f8ba(bool load)
+extern "C" void mapFieldT1ToT2_7b45920900006f2e0af41ee33a0c0d75de2ecece(bool load)
 {
     if (load)
     {
@@ -75,7 +75,7 @@ extern "C" void switchAlphaInlet_a7031561f0ee20f3ae7d277c310071fb5821f8ba(bool l
 makeRemovablePatchTypeField
 (
     fvPatchScalarField,
-    switchAlphaInletFixedValueFvPatchScalarField
+    mapFieldT1ToT2FixedValueFvPatchScalarField
 );
 
 } // End namespace Foam
@@ -84,8 +84,8 @@ makeRemovablePatchTypeField
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-switchAlphaInletFixedValueFvPatchScalarField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF
@@ -95,16 +95,16 @@ switchAlphaInletFixedValueFvPatchScalarField
 {
     if (false)
     {
-        printMessage("Construct switchAlphaInlet : patch/DimensionedField");
+        printMessage("Construct mapFieldT1ToT2 : patch/DimensionedField");
     }
 }
 
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-switchAlphaInletFixedValueFvPatchScalarField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const switchAlphaInletFixedValueFvPatchScalarField& rhs,
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs,
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
     const fvPatchFieldMapper& mapper
@@ -114,14 +114,14 @@ switchAlphaInletFixedValueFvPatchScalarField
 {
     if (false)
     {
-        printMessage("Construct switchAlphaInlet : patch/DimensionedField/mapper");
+        printMessage("Construct mapFieldT1ToT2 : patch/DimensionedField/mapper");
     }
 }
 
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-switchAlphaInletFixedValueFvPatchScalarField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
     const fvPatch& p,
     const DimensionedField<scalar, volMesh>& iF,
@@ -132,16 +132,16 @@ switchAlphaInletFixedValueFvPatchScalarField
 {
     if (false)
     {
-        printMessage("Construct switchAlphaInlet : patch/dictionary");
+        printMessage("Construct mapFieldT1ToT2 : patch/dictionary");
     }
 }
 
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-switchAlphaInletFixedValueFvPatchScalarField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const switchAlphaInletFixedValueFvPatchScalarField& rhs
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs
 )
 :
     parent_bctype(rhs),
@@ -149,16 +149,16 @@ switchAlphaInletFixedValueFvPatchScalarField
 {
     if (false)
     {
-        printMessage("Copy construct switchAlphaInlet");
+        printMessage("Copy construct mapFieldT1ToT2");
     }
 }
 
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-switchAlphaInletFixedValueFvPatchScalarField
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+mapFieldT1ToT2FixedValueFvPatchScalarField
 (
-    const switchAlphaInletFixedValueFvPatchScalarField& rhs,
+    const mapFieldT1ToT2FixedValueFvPatchScalarField& rhs,
     const DimensionedField<scalar, volMesh>& iF
 )
 :
@@ -166,7 +166,7 @@ switchAlphaInletFixedValueFvPatchScalarField
 {
     if (false)
     {
-        printMessage("Construct switchAlphaInlet : copy/DimensionedField");
+        printMessage("Construct mapFieldT1ToT2 : copy/DimensionedField");
     }
 }
 
@@ -174,12 +174,12 @@ switchAlphaInletFixedValueFvPatchScalarField
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::
-~switchAlphaInletFixedValueFvPatchScalarField()
+mapFieldT1ToT2FixedValueFvPatchScalarField::
+~mapFieldT1ToT2FixedValueFvPatchScalarField()
 {
     if (false)
     {
-        printMessage("Destroy switchAlphaInlet");
+        printMessage("Destroy mapFieldT1ToT2");
     }
 }
 
@@ -188,7 +188,7 @@ switchAlphaInletFixedValueFvPatchScalarField::
 
 void
 Foam::
-switchAlphaInletFixedValueFvPatchScalarField::updateCoeffs()
+mapFieldT1ToT2FixedValueFvPatchScalarField::updateCoeffs()
 {
     if (this->updated())
     {
@@ -197,20 +197,13 @@ switchAlphaInletFixedValueFvPatchScalarField::updateCoeffs()
 
     if (false)
     {
-        printMessage("updateCoeffs switchAlphaInlet");
+        printMessage("updateCoeffs mapFieldT1ToT2");
     }
 
 //{{{ begin code
-    #line 36 "/home/matejv/myFoam/tutorials/SE1050BL2/0/alpha/boundaryField/inlet"
-const scalar lowValue = 1e-10;
-            const scalar highValue = 1e-5;
-            const label switchIter = 4000;
-
-            label iter = this->db().time().timeIndex();
-
-            scalar val = (iter < switchIter) ? lowValue : highValue;
-
-            operator==(val);
+    #line 31 "/home/matejv/myFoam/tutorials/BarschdorffNozzleLUSGSTwoFluidMixture/processor0/0/T.2/boundaryField/inlet"
+const volScalarField& sourceField = db().lookupObject<volScalarField>("T.1");
+            operator== (sourceField.boundaryField()[patch().index()]);
 //}}} end code
 
     this->parent_bctype::updateCoeffs();

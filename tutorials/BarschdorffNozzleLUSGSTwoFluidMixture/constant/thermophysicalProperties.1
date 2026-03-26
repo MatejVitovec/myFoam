@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.0                                 |
+|  \\    /   O peration     | Version:  2.3.0                                 |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -10,50 +10,42 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "system";
-    object      fvSolution;
+    location    "constant";
+    object      thermophysicalProperties.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
+thermoType
 {
-    alphaRho1
-    {
-        solver diag;
-    }
-
-    alphaRho2
-    {
-        solver diag;
-    }
-
-    alphaRhoU1 
-    {
-        solver diag;
-    }
-
-    alphaRhoU2
-    {
-        solver diag;
-    }
-
-    epsilon1 
-    {
-        solver diag;
-    }
-
-    epsilon2
-    {
-        solver diag;
-    }  
+    type            heRhoThermo;
+    mixture         pureMixture;
+    transport       sutherlandPolynomial;
+    thermo          eConst;
+    equationOfState perfectGas;
+    specie          specie;
+    energy          sensibleInternalEnergy;
 }
 
-LUSGS {
-    iterations 1;
-    internalIterations 3;
-    localTimestepping false;
-    omega 1.8;
+mixture
+{
+    specie
+    {
+        nMoles      1;
+        molWeight   18.0154644;
+    }
+    thermodynamics
+    {
+        Cv          1387.471;
+        Hf          0;
+        Tref        0;
+        Eref        1995917;
+    }
+    transport
+    {
+        As          1.823e-6;
+        Ts          673.0;
+        kappaCoeffs<4>  ( 7.341e-3 -1.013e-5 1.801e-7 -9.1e-11);
+    }
 }
-
 
 // ************************************************************************* //

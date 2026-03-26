@@ -6,23 +6,11 @@
     volScalarField::Internal acSum1 = 0.0*dVdt;
     volScalarField::Internal acSum2 = 0.0*dVdt;
 
-    volScalarField::Internal ac1 = 0.0*dVdt;
-    volScalarField::Internal ac2 = 0.0*dVdt;
+    //volScalarField::Internal ac1 = 0.0*dVdt;
+    //volScalarField::Internal ac2 = 0.0*dVdt;
     
     forAll(owner, facei)
     {
-        /*const scalar ac = 0.5*lusgsOmega*( 
-                            max(max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],
-                                    mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]),
-                                max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei],
-                                    mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei])));*/
-
-        //acSum[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei]);
-        //acSum[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
-        //acSum[owner[facei]]     += 0.5*ac[facei];
-        //acSum[neighbour[facei]] += 0.5*ac[facei];
-        //-----------
-
         //acSum[owner[facei]]     += 0.5*lusgsOmega*max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],     mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]);
         //acSum[neighbour[facei]] += 0.5*lusgsOmega*max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei], mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
 
@@ -50,6 +38,7 @@
     forAll(mesh.cells(), celli)
     {
         double dalphadpsi = (1.0 - alpha[celli])*alpha[celli];
+        //double dalphadpsi = 1.0;
 
 
         //DRAG
@@ -132,7 +121,7 @@
         D_inv[celli].setThreshold(1e-60);     
         //Eigen::Matrix<double, 10, 10> A = (D[celli]*Eigen::Matrix<double, 10, 10>::Identity()) * J;
         //D_inv[celli].compute(A);
-   
+        
         D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(acSum1[celli]), Eigen::Vector<double, 5>::Constant(acSum2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
         //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
 
