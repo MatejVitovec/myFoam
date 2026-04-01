@@ -26,10 +26,10 @@
 
                 if (own != celli)
                 {
-                    //const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
-                    //const scalar ac2 = ac1;
-                    const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
-                    const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
+                    const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
+                    const scalar ac2 = ac1;
+                    //const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
+                    //const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
                     
                     const scalar p_1 = p[own]     + dpStar[own];
                     //scalar alpha_1   = alpha[own] + dalphaStar[own];
@@ -76,10 +76,10 @@
 
                 if (nei != celli)
                 {
-                    //const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
-                    //const scalar ac2 = ac2;
-                    const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
-                    const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
+                    const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
+                    const scalar ac2 = ac1;
+                    //const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
+                    //const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
 
                     const scalar p_1 = p[nei]     + dp[nei];
                     //scalar alpha_1   = alpha[nei] + dalpha[nei];

@@ -52,7 +52,8 @@
     volScalarField::Internal dT2Star(IOobject("dTStar.2", runTime.timeName(), mesh, IOobject::NO_READ, IOobject::NO_WRITE), mesh, dimensionedScalar("dT2Star", dimTemperature, 0.0));
 
     /*volScalarField pStar(IOobject("pStar", p.time().timeName(), p.db(), IOobject::NO_READ, IOobject::NO_WRITE), p);
-    volScalarField alphaStar(IOobject("alphaStar", alpha.time().timeName(), alpha.db(), IOobject::NO_READ, IOobject::NO_WRITE), alpha);
+    //volScalarField alphaStar(IOobject("alphaStar", alpha.time().timeName(), alpha.db(), IOobject::NO_READ, IOobject::NO_WRITE), alpha);
+    volScalarField psiStar(IOobject("psiStar", alpha.time().timeName(), psi.db(), IOobject::NO_READ, IOobject::NO_WRITE), psi);
     volVectorField U1Star(IOobject("UStar.1", U1.time().timeName(), U1.db(), IOobject::NO_READ, IOobject::NO_WRITE), U1);
     volVectorField U2Star(IOobject("UStar.2", U2.time().timeName(), U2.db(), IOobject::NO_READ, IOobject::NO_WRITE), U2);
     volScalarField T1Star(IOobject("TStar.1", T1.time().timeName(), T1.db(), IOobject::NO_READ, IOobject::NO_WRITE), T1);
