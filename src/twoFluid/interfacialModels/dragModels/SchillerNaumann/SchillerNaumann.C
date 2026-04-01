@@ -157,14 +157,14 @@ Foam::vector Foam::TwoFluidFoam::SchillerNaumann::dKidU1(const label celli) cons
     const scalar dU12 = mag(U1 - U2);
     const scalar d = d_[celli];
     const scalar Re = Re_[celli];
-
-    //const scalar nu = dU12*d/Re;
     const scalar nu = nu_[celli];
+
+    const volScalarField& rho1 = fluid_.thermo1().rho();
 
     //const vector dRedU1 = (d*(U1 - U2))/(nu*mag(U1 - U2));
     //const vector dCdReDU1 = dCdRedx(Re_[celli], dRedU1);
 
-    return 0.75*(nu/d)*dCdRedx(Re, (d*(U1 - U2))/(nu*(dU12 + VSMALL)));
+    return 0.75*rho1[celli]*(nu/sqr(d))*dCdRedx(Re, (d*(U1 - U2))/(nu*(dU12 + VSMALL)));
 
     /*const volScalarField rho1 = fluid_.thermo1().rho();
     const vector U1 = fluid_.U1()[celli];

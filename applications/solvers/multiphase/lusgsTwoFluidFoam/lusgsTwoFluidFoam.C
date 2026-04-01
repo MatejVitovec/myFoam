@@ -156,18 +156,17 @@ int main(int argc, char *argv[])
 
             #include "lusgsSweep.H"
 
-            p     += dp;
-            alpha += dalpha;
-            U1    += dU1;
-            U2    += dU2;
-            T1    += dT1;
-            T2    += dT2;
+            p     += lusgsRelax*dp;
+            alpha += lusgsRelax*dalpha;
+            U1    += lusgsRelax*dU1;
+            U2    += lusgsRelax*dU2;
+            T1    += lusgsRelax*dT1;
+            T2    += lusgsRelax*dT2;
 
             fluid.blendVanishingFluid();
             //fluid.boundAlpha();
             //fluid.bound();
             fluid.correctBoundaryCondition();
-            drag.correct();
 
             /*if (runTime.timeIndex() > 12570)
             {
@@ -183,9 +182,11 @@ int main(int argc, char *argv[])
             if(intIter == lusgsIters - 1) fluid.correctInterfacialPressure();
             fluid.correctConservative();
 
+            drag.correct();
+
             DU1 = fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1);
             DU2 = fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2);
-            virtualMassCoeffs = 0.*0.5*thermo1.rho()*(1.0 - alpha2)*alpha2;
+            virtualMassCoeffs = 0.0*0.5*thermo1.rho()*(1.0 - alpha2)*alpha2;
             virtualMassCoeffsMinus1 = virtualMassCoeffs*(fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2) - fvc::div(fvc::flux(U1), U1));
             virtualMassCoeffsMinus2 = virtualMassCoeffs*(fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1) - fvc::div(fvc::flux(U2), U2));
 

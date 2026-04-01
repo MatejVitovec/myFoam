@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
                 fvc::ddt(conservative.epsilon1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 + ((drag.K()*(fluid.U1() - fluid.U2())) & U1)
-                + (virtualMassCoeffsMinus1 & U1)
+                //+ (virtualMassCoeffsMinus1 & U1)
                 //+ (virtualMassTerm & U1)
                 //+ ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));

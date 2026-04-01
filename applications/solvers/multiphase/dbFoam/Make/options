@@ -30,5 +30,6 @@ EXE_LIBS = \
     -lmyThermophysicalModels \
     -lmyFiniteVolumeFoam \
     -lmyConvectiveFlux \
+    -lmyBoundFoam \
     -lmyTwoFluid
     

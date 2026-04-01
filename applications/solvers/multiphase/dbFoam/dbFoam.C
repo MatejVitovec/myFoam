@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
             /*volScalarField rho = alpha1*rho1 + alpha2*rho2;
             volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
             volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());*/
-            volScalarField dragK = drag.K(d);
+            volScalarField dragK = drag.K();
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
             if(i == 2) fluid.correctInterfacialPressure();
             fluid.correctConservative();
 
-
+            drag.correct();
 
             /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
             const fvPatch& patch = U1.boundaryField()[patchI].patch();

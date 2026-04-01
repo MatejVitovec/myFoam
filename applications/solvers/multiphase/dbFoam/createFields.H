@@ -36,9 +36,6 @@ surfaceScalarField amaxSf
     fluid.amaxSf()
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
-TwoFluidFoam::dragModel& drag = pDrag();
-
 volScalarField d
 (
     IOobject
@@ -52,6 +49,9 @@ volScalarField d
     mesh,
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
+
+autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, d);
+TwoFluidFoam::dragModel& drag = pDrag();
 
 
 //Pro ukladani
