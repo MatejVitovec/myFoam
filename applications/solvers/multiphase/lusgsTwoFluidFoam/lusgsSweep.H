@@ -58,6 +58,7 @@
     }
 
     //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
+    std::vector<Eigen::Matrix<double,10,10>> J_(mesh.nCells());
     std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
 
     //std::vector<scalar> alpha1zero(mesh.nCells());

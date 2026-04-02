@@ -49,7 +49,7 @@ namespace Foam
                          A templated FixedValueFvPatch
 \*---------------------------------------------------------------------------*/
 
-class alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+class switchAlphaInletFixedValueFvPatchScalarField
 :
     public fixedValueFvPatchField<scalar>,
     public dictionaryContent
@@ -69,23 +69,23 @@ class alphaInletStartAfterIterBCFixedValueFvPatchScalarField
 public:
 
     //- SHA1 representation of the code content
-    static constexpr const char* const SHA1sum = "bd1e08311cfc579bc2b93bf672a498845e033aa3";
+    static constexpr const char* const SHA1sum = "7e45c65b3d52ff3f6dcde7fb5519241881198871";
 
     //- Runtime type information
-    TypeName("alphaInletStartAfterIterBC");
+    TypeName("switchAlphaInlet");
 
 
     // Constructors
 
         //- Construct from patch and internal field
-        alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+        switchAlphaInletFixedValueFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&
         );
 
         //- Construct from patch, internal field and dictionary
-        alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+        switchAlphaInletFixedValueFvPatchScalarField
         (
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
@@ -93,24 +93,24 @@ public:
         );
 
         //- Construct by mapping a copy onto a new patch
-        alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+        switchAlphaInletFixedValueFvPatchScalarField
         (
-            const alphaInletStartAfterIterBCFixedValueFvPatchScalarField&,
+            const switchAlphaInletFixedValueFvPatchScalarField&,
             const fvPatch&,
             const DimensionedField<scalar, volMesh>&,
             const fvPatchFieldMapper&
         );
 
         //- Construct as copy
-        alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+        switchAlphaInletFixedValueFvPatchScalarField
         (
-            const alphaInletStartAfterIterBCFixedValueFvPatchScalarField&
+            const switchAlphaInletFixedValueFvPatchScalarField&
         );
 
         //- Construct as copy setting internal field reference
-        alphaInletStartAfterIterBCFixedValueFvPatchScalarField
+        switchAlphaInletFixedValueFvPatchScalarField
         (
-            const alphaInletStartAfterIterBCFixedValueFvPatchScalarField&,
+            const switchAlphaInletFixedValueFvPatchScalarField&,
             const DimensionedField<scalar, volMesh>&
         );
 
@@ -131,7 +131,7 @@ public:
 
 
     //- Destructor
-    virtual ~alphaInletStartAfterIterBCFixedValueFvPatchScalarField();
+    virtual ~switchAlphaInletFixedValueFvPatchScalarField();
 
 
     // Member Functions
