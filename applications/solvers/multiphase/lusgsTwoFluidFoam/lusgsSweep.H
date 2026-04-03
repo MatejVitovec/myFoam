@@ -90,8 +90,8 @@
 
     for (int intIter = 0; intIter < lusgsIntIters; intIter++)
     {
-        #include "forwardSweep.H"
+        #include "forwardSweep2.H"
         //#include "boundarySweep.H"
-        #include "backwardSweep.H"
+        #include "backwardSweep2.H"
     }
 }
