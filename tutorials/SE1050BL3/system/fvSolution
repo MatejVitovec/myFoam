@@ -52,7 +52,8 @@ LUSGS {
     iterations 1;
     internalIterations 1;
     localTimestepping false;
-    omega 1.6;
+    relaxCoeff 1;
+    omega 3;
 }
 
 
