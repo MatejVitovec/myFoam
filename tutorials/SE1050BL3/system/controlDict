@@ -22,7 +22,7 @@ libs (
 
 startFrom       startTime;
 
-startTime       0.00254664;
+startTime       0;
 
 stopAt          endTime;
 
@@ -32,7 +32,7 @@ deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   1;
+writeInterval   1000;
 
 purgeWrite      0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 5;
+maxCo 10;
 
 rDeltaTSmoothingCoeff 0.1;
 

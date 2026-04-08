@@ -124,8 +124,10 @@ void Foam::TwoFluidFoam::SchillerNaumann::correct()
 {
     //Cd_ = Cd();
     //Ki_ = ((9.0/2.0)*fluid_.thermo1().mu()/(sqr(d_/2)*Cc(d_)))*0.44;//*pos(fluid_.alpha() - 1e-26);
+    const dimensionedScalar epsilon("Udzero", dimVelocity, 1e-2);
+
     nu_ = fluid_.thermo1().nu();
-    Re_ = mag(fluid_.U1() - fluid_.U2())*d_/nu_;
+    Re_ = (mag(fluid_.U1() - fluid_.U2()) + epsilon)*d_/nu_;
     Ki_ = 0.75*CdRe()*fluid_.thermo1().rho()*nu_/sqr(d_);
 }
 
@@ -154,7 +156,8 @@ Foam::vector Foam::TwoFluidFoam::SchillerNaumann::dKidU1(const label celli) cons
 {
     const vector U1 = fluid_.U1()[celli];
     const vector U2 = fluid_.U2()[celli];
-    const scalar dU12 = mag(U1 - U2);
+    const scalar epsilon = 1.0e-2;
+    const scalar dU12 = mag(U1 - U2) + epsilon;
     const scalar d = d_[celli];
     const scalar Re = Re_[celli];
     const scalar nu = nu_[celli];
@@ -164,7 +167,8 @@ Foam::vector Foam::TwoFluidFoam::SchillerNaumann::dKidU1(const label celli) cons
     //const vector dRedU1 = (d*(U1 - U2))/(nu*mag(U1 - U2));
     //const vector dCdReDU1 = dCdRedx(Re_[celli], dRedU1);
 
-    return 0.75*rho1[celli]*(nu/sqr(d))*dCdRedx(Re, (d*(U1 - U2))/(nu*(dU12 + VSMALL)));
+    return 0.75*rho1[celli]*(nu/sqr(d))*dCdRedx(Re, (d*(U1 - U2))/(nu*dU12));
+    //return 0.75*rho1[celli]*(nu/sqr(d))*dCdRedx(Re, (d*(U1 - U2))/(nu*(dU12 + VSMALL)));
 
     /*const volScalarField rho1 = fluid_.thermo1().rho();
     const vector U1 = fluid_.U1()[celli];

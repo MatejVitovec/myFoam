@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.1.0                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|  \\    /   O peration     | Version:  1.7.0                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -11,50 +11,48 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "system";
-    object      fvSolution;
+    object      controlDict;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-solvers
-{
-    alphaRho1
-    {
-        solver diag;
-    }
+libs (
+  "libfluidThermophysicalModels.so"
+  "libmyFoam.so"
+);
 
-    alphaRho2
-    {
-        solver diag;
-    }
+startFrom       startTime;
 
-    alphaRhoU1 
-    {
-        solver diag;
-    }
+startTime       0.000331886;
 
-    alphaRhoU2
-    {
-        solver diag;
-    }
+stopAt          endTime;
 
-    epsilon1 
-    {
-        solver diag;
-    }
+endTime         100;
 
-    epsilon2
-    {
-        solver diag;
-    }  
-}
+deltaT          1e-6;
 
-LUSGS {
-    iterations 1;
-    internalIterations 1;
-    localTimestepping false;
-    relaxCoeff 0.5;
-    omega 1.5;
-}
+writeControl    timeStep;
+
+writeInterval   1000;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxCo 0.8;
+
+rDeltaTSmoothingCoeff 0.1;
 
 
 // ************************************************************************* //

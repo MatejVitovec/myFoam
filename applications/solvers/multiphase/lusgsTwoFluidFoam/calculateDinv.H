@@ -135,7 +135,6 @@
    
         //D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ + virtualMassAdditionJ) + ((Eigen::Vector<double, 10>() << Eigen::Vector<double, 5>::Constant(acSum1[celli]), Eigen::Vector<double, 5>::Constant(acSum2[celli])).finished().asDiagonal() * J) + (dragJ*mesh.V()[celli]));
         D_inv[celli].compute(dVdt[celli] * (J + pIntAdditionJ) + (Eigen::Vector<double, 10>::Constant(acSum[celli]).asDiagonal() * J) + (dragJ*mesh.V()[celli]));
-        J_[celli] = J;
 
         //alpha1zero[celli] = (alpha1[celli] < 1.0e-20) ? 0.0 : 1.0;
         //alpha2zero[celli] = (alpha2[celli] < 1.0e-20) ? 0.0 : 1.0;
