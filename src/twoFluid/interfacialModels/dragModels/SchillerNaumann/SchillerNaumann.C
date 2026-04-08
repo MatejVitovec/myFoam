@@ -134,15 +134,18 @@ void Foam::TwoFluidFoam::SchillerNaumann::correct()
 
 Foam::scalar Foam::TwoFluidFoam::SchillerNaumann::dKidp(const label celli) const
 {
-    /*const volScalarField rho1 = fluid_.thermo1().rho();
+    const volScalarField rho1 = fluid_.thermo1().rho();
 
-    const vector U1 = fluid_.U1()[celli];
-    const vector U2 = fluid_.U2()[celli];
+    //const vector U1 = fluid_.U1()[celli];
+    //const vector U2 = fluid_.U2()[celli];
+
+    const scalar cdRe = neg(Re_[celli] - 1000)*24.0*(1.0 + 0.15*pow(Re_[celli], 0.687)) + pos0(Re_[celli] - 1000)*0.44*Re_[celli];
+    const scalar nu = nu_[celli];
 
     const scalar drho1dp = rho1[celli]*fluid_.gasProps1().beta_T(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*(Cd_[celli]/d_[celli])*drho1dp*mag(U1 - U2);*/
-    return 0.0;
+    return 0.75*(cdRe/sqr(d_[celli]))*nu*drho1dp;
+    //return 0.0;
 }
 
 
@@ -187,15 +190,15 @@ Foam::vector Foam::TwoFluidFoam::SchillerNaumann::dKidU2(const label celli) cons
 
 Foam::scalar Foam::TwoFluidFoam::SchillerNaumann::dKidT1(const label celli) const
 {
-    /*const volScalarField rho1 = fluid_.thermo1().rho();
+    const volScalarField rho1 = fluid_.thermo1().rho();
 
-    const vector U1 = fluid_.U1()[celli];
-    const vector U2 = fluid_.U2()[celli];
+    const scalar cdRe = neg(Re_[celli] - 1000)*24.0*(1.0 + 0.15*pow(Re_[celli], 0.687)) + pos0(Re_[celli] - 1000)*0.44*Re_[celli];
+    const scalar nu = nu_[celli];
 
     const scalar drho1dT = -rho1[celli]*fluid_.gasProps1().beta_p(fluid_.p()[celli], fluid_.T1()[celli]);
 
-    return 0.75*(Cd_[celli]/d_[celli])*drho1dT*mag(U1 - U2);*/
-    return 0.0;
+    return 0.75*(cdRe/sqr(d_[celli]))*nu*drho1dT;
+    //return 0.0;
 }
 
 

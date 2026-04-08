@@ -297,7 +297,7 @@ std::array<Foam::scalar, 100> Foam::TwoFluidFoam::dragModel::dSdpUT(const label 
     out[idx(8, 2)] = -dKdU1_.x()*U1mU2.z(); //
     out[idx(9, 2)] =  dKdU1_.x()*U2mU1dotU2 - K*U2.x();
 
-    out[idx(1, 3)] =  dKdU1_.y()*U1mU2.x(); //o
+    out[idx(1, 3)] =  dKdU1_.y()*U1mU2.x(); //
     out[idx(2, 3)] =  dKdU1_.y()*U1mU2.y()  + K;
     out[idx(3, 3)] =  dKdU1_.y()*U1mU2.z(); //
     out[idx(4, 3)] =  dKdU1_.y()*U1mU2dotU1 + K*(2*U1.y() - U2.y());
