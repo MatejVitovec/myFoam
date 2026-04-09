@@ -37,7 +37,7 @@ Description
 
 #include "fvCFD.H"
 #include "localEulerDdtScheme.H"
-#include "turbulentFluidThermoModel.H"
+#include "PhaseCompressibleTurbulenceModel.H"
 #include "fvcSmooth.H"
 
 #include "twoFluid.H"

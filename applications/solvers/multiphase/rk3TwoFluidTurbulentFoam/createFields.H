@@ -56,18 +56,21 @@ autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, d);
 TwoFluidFoam::dragModel& drag = pDrag();
 
 
-const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();
+const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();  //TODO
+const surfaceScalarField& phi1 = twoFluidFlux.alphaRhoFlux1_pos();          //TODO
 
 Info<< "Creating turbulence model\n" << endl;
 autoPtr<compressible::turbulenceModel> turbulence
 (
-    compressible::turbulenceModel::New
+    PhaseCompressibleTurbulenceModel::New
     (
         alpha1,
         thermo1.rho(),
         U1,
         alphaRhoPhi1,
-        thermo1
+        phi1,
+        thermo1,
+        "2"
     )
 );
 
