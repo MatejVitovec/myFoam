@@ -46,6 +46,7 @@ Description
 
 #include <eigen3/Eigen/Dense>
 #include "emptyPolyPatch.H"
+#include "wallPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -186,7 +187,7 @@ int main(int argc, char *argv[])
 
             DU1 = fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1);
             DU2 = fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2);
-            virtualMassCoeffs = 0.0*0.5*thermo1.rho()*(1.0 - alpha2)*alpha2;
+            virtualMassCoeffs = 0.5*thermo1.rho()*(1.0 - alpha2)*alpha2;
             virtualMassCoeffsMinus1 = virtualMassCoeffs*(fvc::ddt(U2) + fvc::div(fvc::flux(U2), U2) - fvc::div(fvc::flux(U1), U1));
             virtualMassCoeffsMinus2 = virtualMassCoeffs*(fvc::ddt(U1) + fvc::div(fvc::flux(U1), U1) - fvc::div(fvc::flux(U2), U2));
 

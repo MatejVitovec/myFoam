@@ -45,7 +45,7 @@
                     rAlphaRho2  += 0.5*(                                                   alpha2[own]*unMLambda2*drhodp2[own]*dpStar[own]                              + unMLambda2*rho2[own]*dalphaStar[own]                                    + ((alpha2[own]*rho2[own]*Sf[facei]) & dU2Star[own])                                + alpha2[own]*(unMLambda2*drhodT2[own])*dT2Star[own]);
 
                     rAlphaRhoU1 += 0.5*(                             alpha1[own]*(unMLambda1*drhodp1[own]*U1[own] + Sf[facei])*dpStar[own] - (unMLambda1*rho1[own]*U1[own] + p[own]*Sf[facei])*dalphaStar[own] + (alpha1[own]*rho1[own]*(unMLambda1*tensor::I + (U1[own] * Sf[facei])) & dU1Star[own])                        + alpha1[own]*(unMLambda1*drhodT1[own]*U1[own])*dT1Star[own]);
-                    rAlphaRhoU2 += 0.5*(                             alpha2[own]*(unMLambda2*drhodp2[own]*U1[own] + Sf[facei])*dpStar[own] + (unMLambda2*rho2[own]*U2[own] + p[own]*Sf[facei])*dalphaStar[own] + (alpha2[own]*rho2[own]*(unMLambda2*tensor::I + (U2[own] * Sf[facei])) & dU2Star[own])                        + alpha2[own]*(unMLambda2*drhodT2[own]*U2[own])*dT2Star[own]);
+                    rAlphaRhoU2 += 0.5*(                             alpha2[own]*(unMLambda2*drhodp2[own]*U2[own] + Sf[facei])*dpStar[own] + (unMLambda2*rho2[own]*U2[own] + p[own]*Sf[facei])*dalphaStar[own] + (alpha2[own]*rho2[own]*(unMLambda2*tensor::I + (U2[own] * Sf[facei])) & dU2Star[own])                        + alpha2[own]*(unMLambda2*drhodT2[own]*U2[own])*dT2Star[own]);
                 
                     rEpsilon1   += 0.5*(alpha1[own]*(unMLambda1*(drhodp1[own]*H1[own] + drhodT1[own]*T1[own]/rho1[own]) + un1)*dpStar[own]            - (unMLambda1*rho1[own]*E1 + p[own]*un1)*dalphaStar[own]     + ((alpha1[own]*rho1[own]*(unMLambda1*U1[own] + H1[own]*Sf[facei])) & dU1Star[own]) + alpha1[own]*(unMLambda1*(drhodT1[own]*H1[own] + rho1[own]*cp1[own]))*dT1Star[own]);
                     rEpsilon2   += 0.5*(alpha2[own]*(unMLambda2*(drhodp2[own]*H2[own] + drhodT2[own]*T2[own]/rho2[own]) + un2)*dpStar[own]            + (unMLambda2*rho2[own]*E2 + p[own]*un2)*dalphaStar[own]     + ((alpha2[own]*rho2[own]*(unMLambda2*U2[own] + H2[own]*Sf[facei])) & dU2Star[own]) + alpha2[own]*(unMLambda2*(drhodT2[own]*H2[own] + rho2[own]*cp2[own]))*dT2Star[own]);
@@ -72,74 +72,59 @@
                     rAlphaRho2  += 0.5*(                                                   alpha2[nei]*unMLambda2*drhodp2[nei]*dpStar[nei]                              + unMLambda2*rho2[nei]*dalphaStar[nei]                                    + ((alpha2[nei]*rho2[nei]*Sf[facei]) & dU2Star[nei])                                + alpha2[nei]*(unMLambda2*drhodT2[nei])*dT2Star[nei]);
 
                     rAlphaRhoU1 += 0.5*(                             alpha1[nei]*(unMLambda1*drhodp1[nei]*U1[nei] + Sf[facei])*dpStar[nei] - (unMLambda1*rho1[nei]*U1[nei] + p[nei]*Sf[facei])*dalphaStar[nei] + (alpha1[nei]*rho1[nei]*(unMLambda1*tensor::I + (U1[nei] * Sf[facei])) & dU1Star[nei])                        + alpha1[nei]*(unMLambda1*drhodT1[nei]*U1[nei])*dT1Star[nei]);
-                    rAlphaRhoU2 += 0.5*(                             alpha2[nei]*(unMLambda2*drhodp2[nei]*U1[nei] + Sf[facei])*dpStar[nei] + (unMLambda2*rho2[nei]*U2[nei] + p[nei]*Sf[facei])*dalphaStar[nei] + (alpha2[nei]*rho2[nei]*(unMLambda2*tensor::I + (U2[nei] * Sf[facei])) & dU2Star[nei])                        + alpha2[nei]*(unMLambda2*drhodT2[nei]*U2[nei])*dT2Star[nei]);
+                    rAlphaRhoU2 += 0.5*(                             alpha2[nei]*(unMLambda2*drhodp2[nei]*U2[nei] + Sf[facei])*dpStar[nei] + (unMLambda2*rho2[nei]*U2[nei] + p[nei]*Sf[facei])*dalphaStar[nei] + (alpha2[nei]*rho2[nei]*(unMLambda2*tensor::I + (U2[nei] * Sf[facei])) & dU2Star[nei])                        + alpha2[nei]*(unMLambda2*drhodT2[nei]*U2[nei])*dT2Star[nei]);
                 
                     rEpsilon1   += 0.5*(alpha1[nei]*(unMLambda1*(drhodp1[nei]*H1[nei] + drhodT1[nei]*T1[nei]/rho1[nei]) + un1)*dpStar[nei]            - (unMLambda1*rho1[nei]*E1 + p[nei]*un1)*dalphaStar[nei]     + ((alpha1[nei]*rho1[nei]*(unMLambda1*U1[nei] + H1[nei]*Sf[facei])) & dU1Star[nei]) + alpha1[nei]*(unMLambda1*(drhodT1[nei]*H1[nei] + rho1[nei]*cp1[nei]))*dT1Star[nei]);
                     rEpsilon2   += 0.5*(alpha2[nei]*(unMLambda2*(drhodp2[nei]*H2[nei] + drhodT2[nei]*T2[nei]/rho2[nei]) + un2)*dpStar[nei]            + (unMLambda2*rho2[nei]*E2 + p[nei]*un2)*dalphaStar[nei]     + ((alpha2[nei]*rho2[nei]*(unMLambda2*U2[nei] + H2[nei]*Sf[facei])) & dU2Star[nei]) + alpha2[nei]*(unMLambda2*(drhodT2[nei]*H2[nei] + rho2[nei]*cp2[nei]))*dT2Star[nei]);
                 }
             }
-            /*else
+            else
             {
                 label patchID = mesh.boundaryMesh().whichPatch(facei);
                 label localFaceID = facei - mesh.boundaryMesh()[patchID].start();
 
-                if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]) && !mesh.boundaryMesh()[patchID].coupled())
+                //if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]) && !mesh.boundaryMesh()[patchID].coupled())
+                if(isA<wallPolyPatch>(mesh.boundaryMesh()[patchID]))
                 {
-                    const vector pSf = mesh.Sf().boundaryField()[patchID][localFaceID];
-                    const scalar pMagSf = mag(pSf);
+                    const vector Uw1 = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & U1[celli];
+                    const vector Uw2 = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & U2[celli];
 
-                    const scalar p_1 = pStar.boundaryField()[patchID][localFaceID];
-                    scalar alpha_1   = alphaStar.boundaryField()[patchID][localFaceID];
-                    vector U1_1      = U1Star.boundaryField()[patchID][localFaceID];
-                    vector U2_1      = U2Star.boundaryField()[patchID][localFaceID];
-                    scalar T1_1      = T1Star.boundaryField()[patchID][localFaceID];
-                    scalar T2_1      = T2Star.boundaryField()[patchID][localFaceID];
-
-                    const scalar p_0        = p.boundaryField()[patchID][localFaceID];
-                    const scalar alpha_0    = alpha.boundaryField()[patchID][localFaceID];
-                    const vector U1_0       = U1.boundaryField()[patchID][localFaceID];
-                    const vector U2_0       = U2.boundaryField()[patchID][localFaceID];
-                    const scalar T1_0       = T1.boundaryField()[patchID][localFaceID];
-                    const scalar T2_0       = T2.boundaryField()[patchID][localFaceID];
-                    const scalar a1_0       = a1.boundaryField()[patchID][localFaceID];
-                    const scalar a2_0       = a2.boundaryField()[patchID][localFaceID];
-
-                    const scalar ac1 = lusgsOmega*(max(mag(U1_0 & pSf) + (a1_0*pMagSf), mag(U2_0 & pSf) + (a2_0*pMagSf)));
+                    //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
+                    //                                   max(mag(U1[celli] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
+                    const scalar ac1 = lusgsOmega*(max(mag(Uw1 & Sf[facei]) + (a1[celli] * magSf[facei]), mag(Uw2 & Sf[facei]) + (a2[celli]*magSf[facei])));
                     const scalar ac2 = ac1;
-                    //const scalar ac1 = lusgsOmega*(mag(U1_0 & pSf) + a1_0*pMagSf);
-                    //const scalar ac2 = lusgsOmega*(mag(U2_0 & pSf) + a2_0*pMagSf);
+                    //const scalar ac1 = lusgsOmega*(mag(U1[celli] & Sf[facei]) + a1[celli]*magSf[facei]);
+                    //const scalar ac2 = lusgsOmega*(mag(U2[celli] & Sf[facei]) + a2[celli]*magSf[facei]);
+
+                    //const scalar p_1 = pStar.boundaryField()[patchID][localFaceID];
 
                     //fluid.blendVanishingFluid(alpha_1, U1_1, U2_1, T1_1, T2_1);
                     //fluid.boundAlpha(alpha_1);
 
-                    const scalar alpha1_0 = 1.0 - alpha_0;
-                    const scalar alpha2_0 = alpha_0;
-                    const scalar alpha1_1 = 1.0 - alpha_1;
-                    const scalar alpha2_1 = alpha_1;
+                    const scalar Ew1   = e1[celli] + 0.5*magSqr(Uw1);
+                    const scalar Ew2   = e2[celli] + 0.5*magSqr(Uw2);
 
-                    const scalar rho1_0 = gasProps1.rho(p_0, T1_0);
-                    const scalar rho2_0 = gasProps2.rho(p_0, T2_0);
-                    const scalar rho1_1 = gasProps1.rho(p_1, T1_1);
-                    const scalar rho2_1 = gasProps2.rho(p_1, T2_1);
+                    const scalar Hw1 = Ew1 + p[celli]/rho1[celli];
+                    const scalar Hw2 = Ew2 + p[celli]/rho2[celli];
 
-                    const scalar E1_0 = gasProps1.Es(p_0, T1_0) + 0.5*magSqr(U1_0);
-                    const scalar E2_0 = gasProps2.Es(p_0, T2_0) + 0.5*magSqr(U2_0);
-                    const scalar E1_1 = gasProps1.Es(p_1, T1_1) + 0.5*magSqr(U1_1);
-                    const scalar E2_1 = gasProps2.Es(p_1, T2_1) + 0.5*magSqr(U2_1);
+                    const scalar un1 = -(U1[celli] & Sf[facei]);
+                    const scalar un2 = -(U2[celli] & Sf[facei]);
+                    const scalar unMLambda1 = ac1 - un1;
+                    const scalar unMLambda2 = ac2 - un2;
 
-                    const scalar alphaRhoPhi1_0 = alpha1_0*rho1_0*(U1_0 & pSf);
-                    const scalar alphaRhoPhi2_0 = alpha2_0*rho2_0*(U2_0 & pSf);
-                    const scalar alphaRhoPhi1_1 = alpha1_1*rho1_1*(U1_1 & pSf);
-                    const scalar alphaRhoPhi2_1 = alpha2_1*rho2_1*(U2_1 & pSf);
+                    const vector dUw1Star = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & dU1Star[celli];
+                    const vector dUw2Star = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & dU2Star[celli];
 
-                    rAlphaRho1  += 0.5*ac1*(alpha1_1*rho1_1      - alpha1_0*rho1_0)         - 0.5*(alphaRhoPhi1_1                           - alphaRhoPhi1_0);
-                    rAlphaRho2  += 0.5*ac2*(alpha2_1*rho2_1      - alpha2_0*rho2_0)         - 0.5*(alphaRhoPhi2_1                           - alphaRhoPhi2_0); 
-                    rAlphaRhoU1 += 0.5*ac1*(alpha1_1*rho1_1*U1_1 - alpha1_0*rho1_0*U1_0)    - 0.5*((alphaRhoPhi1_1*U1_1 + alpha1_1*p_1*pSf) - (alphaRhoPhi1_0*U1_0 + alpha1_0*p_0*pSf));
-                    rAlphaRhoU2 += 0.5*ac2*(alpha2_1*rho2_1*U2_1 - alpha2_0*rho2_0*U2_0)    - 0.5*((alphaRhoPhi2_1*U2_1 + alpha2_1*p_1*pSf) - (alphaRhoPhi2_0*U2_0 + alpha2_0*p_0*pSf));
-                    rEpsilon1   += 0.5*ac1*(alpha1_1*rho1_1*E1_1 - alpha1_0*rho1_0*E1_0)    - 0.5*(alphaRhoPhi1_1*(E1_1 + p_1/rho1_1)       - alphaRhoPhi1_0*(E1_0 + p_0/rho1_0));
-                    rEpsilon2   += 0.5*ac2*(alpha2_1*rho2_1*E2_1 - alpha2_0*rho2_0*E2_0)    - 0.5*(alphaRhoPhi2_1*(E2_1 + p_1/rho2_1)       - alphaRhoPhi2_0*(E2_0 + p_0/rho2_0));
+                    rAlphaRho1  += 0.5*(                                                     alpha1[celli]*unMLambda1*drhodp1[celli]*dpStar[celli]                            - unMLambda1*rho1[celli]*dalphaStar[celli]                                + ((alpha1[celli]*rho1[celli]*Sf[facei]) & dUw1Star)                                + alpha1[celli]*(unMLambda1*drhodT1[celli])*dT1Star[celli]);
+                    rAlphaRho2  += 0.5*(                                                     alpha2[celli]*unMLambda2*drhodp2[celli]*dpStar[celli]                            + unMLambda2*rho2[celli]*dalphaStar[celli]                                + ((alpha2[celli]*rho2[celli]*Sf[facei]) & dUw2Star)                                + alpha2[celli]*(unMLambda2*drhodT2[celli])*dT2Star[celli]);
+
+                    rAlphaRhoU1 += 0.5*(                                   alpha1[celli]*(unMLambda1*drhodp1[celli]*Uw1 + Sf[facei])*dpStar[celli] - (unMLambda1*rho1[celli]*Uw1 + p[celli]*Sf[facei])*dalphaStar[celli] + (alpha1[celli]*rho1[celli]*(unMLambda1*tensor::I + (Uw1 * Sf[facei])) & dUw1Star)                            + alpha1[celli]*(unMLambda1*drhodT1[celli]*Uw1)*dT1Star[celli]);
+                    rAlphaRhoU2 += 0.5*(                                   alpha2[celli]*(unMLambda2*drhodp2[celli]*Uw2 + Sf[facei])*dpStar[celli] + (unMLambda2*rho2[celli]*Uw2 + p[celli]*Sf[facei])*dalphaStar[celli] + (alpha2[celli]*rho2[celli]*(unMLambda2*tensor::I + (Uw2 * Sf[facei])) & dUw2Star)                            + alpha2[celli]*(unMLambda2*drhodT2[celli]*Uw2)*dT2Star[celli]);
+
+                    rEpsilon1   += 0.5*(alpha1[celli]*(unMLambda1*(drhodp1[celli]*Hw1 + drhodT1[celli]*T1[celli]/rho1[celli]) + un1)*dpStar[celli]       - (unMLambda1*rho1[celli]*Ew1 + p[celli]*un1)*dalphaStar[celli]         + ((alpha1[celli]*rho1[celli]*(unMLambda1*Uw1 + Hw1*Sf[facei])) & dUw1Star) + alpha1[celli]*(unMLambda1*(drhodT1[celli]*Hw1 + rho1[celli]*cp1[celli]))*dT1Star[celli]);
+                    rEpsilon2   += 0.5*(alpha2[celli]*(unMLambda2*(drhodp2[celli]*Hw2 + drhodT2[celli]*T2[celli]/rho2[celli]) + un2)*dpStar[celli]       + (unMLambda2*rho2[celli]*Ew2 + p[celli]*un2)*dalphaStar[celli]         + ((alpha2[celli]*rho2[celli]*(unMLambda2*Uw2 + Hw2*Sf[facei])) & dUw2Star) + alpha2[celli]*(unMLambda2*(drhodT2[celli]*Hw2 + rho2[celli]*cp2[celli]))*dT2Star[celli]);
                 }
-            }*/
+            }
         }
     
         Eigen::Vector<double,10> b;
