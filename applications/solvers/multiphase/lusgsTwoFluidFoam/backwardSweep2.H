@@ -86,15 +86,18 @@
                 //if(!isA<emptyPolyPatch>(mesh.boundaryMesh()[patchID]) && !mesh.boundaryMesh()[patchID].coupled())
                 if(isA<wallPolyPatch>(mesh.boundaryMesh()[patchID]))
                 {
-                    const vector Uw1 = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & U1[celli];
-                    const vector Uw2 = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & U2[celli];
+                    const vector pSf = mesh.Sf().boundaryField()[patchID][localFaceID];
+                    const scalar pMagSf = mag(pSf);
 
-                    //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
-                    //                                   max(mag(U1[celli] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
-                    const scalar ac1 = lusgsOmega*(max(mag(Uw1 & Sf[facei]) + (a1[celli] * magSf[facei]), mag(Uw2 & Sf[facei]) + (a2[celli]*magSf[facei])));
+                    const vector Uw1 = (tensor::I - 2.0*(pSf * pSf)) & U1[celli];
+                    const vector Uw2 = (tensor::I - 2.0*(pSf * pSf)) & U2[celli];
+
+                    //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & pSf) + (a1[own] * pMagSf), mag(U2[own] & pSf) + (a2[own]*pMagSf)),
+                    //                                   max(mag(U1[celli] & pSf) + (a1[nei] * pMagSf), mag(U2[nei] & pSf) + (a2[nei]*pMagSf))));
+                    const scalar ac1 = lusgsOmega*(max(mag(Uw1 & pSf) + (a1[celli] * pMagSf), mag(Uw2 & pSf) + (a2[celli]*pMagSf)));
                     const scalar ac2 = ac1;
-                    //const scalar ac1 = lusgsOmega*(mag(U1[celli] & Sf[facei]) + a1[celli]*magSf[facei]);
-                    //const scalar ac2 = lusgsOmega*(mag(U2[celli] & Sf[facei]) + a2[celli]*magSf[facei]);
+                    //const scalar ac1 = lusgsOmega*(mag(U1[celli] & pSf) + a1[celli]*pMagSf);
+                    //const scalar ac2 = lusgsOmega*(mag(U2[celli] & pSf) + a2[celli]*pMagSf);
 
                     //const scalar p_1 = pStar.boundaryField()[patchID][localFaceID];
 
@@ -107,22 +110,22 @@
                     const scalar Hw1 = Ew1 + p[celli]/rho1[celli];
                     const scalar Hw2 = Ew2 + p[celli]/rho2[celli];
 
-                    const scalar un1 = - (U1[celli] & Sf[facei]);
-                    const scalar un2 = - (U2[celli] & Sf[facei]);
+                    const scalar un1 = - (U1[celli] & pSf);
+                    const scalar un2 = - (U2[celli] & pSf);
                     const scalar unMLambda1 = ac1 - un1;
                     const scalar unMLambda2 = ac2 - un2;
 
-                    const vector dUw1Star = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & dU1Star[celli];
-                    const vector dUw2Star = (tensor::I - 2.0*(Sf[facei] * Sf[facei])) & dU2Star[celli];
+                    const vector dUw1Star = (tensor::I - 2.0*(pSf * pSf)) & dU1Star[celli];
+                    const vector dUw2Star = (tensor::I - 2.0*(pSf * pSf)) & dU2Star[celli];
 
-                    rAlphaRho1  += 0.5*(                                                     alpha1[celli]*unMLambda1*drhodp1[celli]*dpStar[celli]                            - unMLambda1*rho1[celli]*dalphaStar[celli]                                + ((alpha1[celli]*rho1[celli]*Sf[facei]) & dUw1Star)                                + alpha1[celli]*(unMLambda1*drhodT1[celli])*dT1Star[celli]);
-                    rAlphaRho2  += 0.5*(                                                     alpha2[celli]*unMLambda2*drhodp2[celli]*dpStar[celli]                            + unMLambda2*rho2[celli]*dalphaStar[celli]                                + ((alpha2[celli]*rho2[celli]*Sf[facei]) & dUw2Star)                                + alpha2[celli]*(unMLambda2*drhodT2[celli])*dT2Star[celli]);
+                    rAlphaRho1  += 0.5*(                                                     alpha1[celli]*unMLambda1*drhodp1[celli]*dpStar[celli]                            - unMLambda1*rho1[celli]*dalphaStar[celli]                                + ((alpha1[celli]*rho1[celli]*pSf) & dUw1Star)                                + alpha1[celli]*(unMLambda1*drhodT1[celli])*dT1Star[celli]);
+                    rAlphaRho2  += 0.5*(                                                     alpha2[celli]*unMLambda2*drhodp2[celli]*dpStar[celli]                            + unMLambda2*rho2[celli]*dalphaStar[celli]                                + ((alpha2[celli]*rho2[celli]*pSf) & dUw2Star)                                + alpha2[celli]*(unMLambda2*drhodT2[celli])*dT2Star[celli]);
 
-                    rAlphaRhoU1 += 0.5*(                                   alpha1[celli]*(unMLambda1*drhodp1[celli]*Uw1 + Sf[facei])*dpStar[celli] - (unMLambda1*rho1[celli]*Uw1 + p[celli]*Sf[facei])*dalphaStar[celli] + (alpha1[celli]*rho1[celli]*(unMLambda1*tensor::I + (Uw1 * Sf[facei])) & dUw1Star)                            + alpha1[celli]*(unMLambda1*drhodT1[celli]*Uw1)*dT1Star[celli]);
-                    rAlphaRhoU2 += 0.5*(                                   alpha2[celli]*(unMLambda2*drhodp2[celli]*Uw1 + Sf[facei])*dpStar[celli] + (unMLambda2*rho2[celli]*Uw2 + p[celli]*Sf[facei])*dalphaStar[celli] + (alpha2[celli]*rho2[celli]*(unMLambda2*tensor::I + (Uw2 * Sf[facei])) & dUw2Star)                            + alpha2[celli]*(unMLambda2*drhodT2[celli]*Uw2)*dT2Star[celli]);
+                    rAlphaRhoU1 += 0.5*(                                   alpha1[celli]*(unMLambda1*drhodp1[celli]*Uw1 + pSf)*dpStar[celli] - (unMLambda1*rho1[celli]*Uw1 + p[celli]*pSf)*dalphaStar[celli] + (alpha1[celli]*rho1[celli]*(unMLambda1*tensor::I + (Uw1 * pSf)) & dUw1Star)                            + alpha1[celli]*(unMLambda1*drhodT1[celli]*Uw1)*dT1Star[celli]);
+                    rAlphaRhoU2 += 0.5*(                                   alpha2[celli]*(unMLambda2*drhodp2[celli]*Uw2 + pSf)*dpStar[celli] + (unMLambda2*rho2[celli]*Uw2 + p[celli]*pSf)*dalphaStar[celli] + (alpha2[celli]*rho2[celli]*(unMLambda2*tensor::I + (Uw2 * pSf)) & dUw2Star)                            + alpha2[celli]*(unMLambda2*drhodT2[celli]*Uw2)*dT2Star[celli]);
                 
-                    rEpsilon1   += 0.5*(alpha1[celli]*(unMLambda1*(drhodp1[celli]*Hw1 + drhodT1[celli]*T1[celli]/rho1[celli]) + un1)*dpStar[celli]       - (unMLambda1*rho1[celli]*Ew1 + p[celli]*un1)*dalphaStar[celli]         + ((alpha1[celli]*rho1[celli]*(unMLambda1*Uw1 + Hw1*Sf[facei])) & dUw1Star) + alpha1[celli]*(unMLambda1*(drhodT1[celli]*Hw1 + rho1[celli]*cp1[celli]))*dT1Star[celli]);
-                    rEpsilon2   += 0.5*(alpha2[celli]*(unMLambda2*(drhodp2[celli]*Hw2 + drhodT2[celli]*T2[celli]/rho2[celli]) + un2)*dpStar[celli]       + (unMLambda2*rho2[celli]*Ew2 + p[celli]*un2)*dalphaStar[celli]         + ((alpha2[celli]*rho2[celli]*(unMLambda2*Uw2 + Hw2*Sf[facei])) & dUw2Star) + alpha2[celli]*(unMLambda2*(drhodT2[celli]*Hw2 + rho2[celli]*cp2[celli]))*dT2Star[celli]);
+                    rEpsilon1   += 0.5*(alpha1[celli]*(unMLambda1*(drhodp1[celli]*Hw1 + drhodT1[celli]*T1[celli]/rho1[celli]) + un1)*dpStar[celli]       - (unMLambda1*rho1[celli]*Ew1 + p[celli]*un1)*dalphaStar[celli]         + ((alpha1[celli]*rho1[celli]*(unMLambda1*Uw1 + Hw1*pSf)) & dUw1Star) + alpha1[celli]*(unMLambda1*(drhodT1[celli]*Hw1 + rho1[celli]*cp1[celli]))*dT1Star[celli]);
+                    rEpsilon2   += 0.5*(alpha2[celli]*(unMLambda2*(drhodp2[celli]*Hw2 + drhodT2[celli]*T2[celli]/rho2[celli]) + un2)*dpStar[celli]       + (unMLambda2*rho2[celli]*Ew2 + p[celli]*un2)*dalphaStar[celli]         + ((alpha2[celli]*rho2[celli]*(unMLambda2*Uw2 + Hw2*pSf)) & dUw2Star) + alpha2[celli]*(unMLambda2*(drhodT2[celli]*Hw2 + rho2[celli]*cp2[celli]))*dT2Star[celli]);
                 }
             }
         }

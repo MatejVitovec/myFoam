@@ -7,7 +7,7 @@ FoamFile
 }
 
 // Počet poddomén (jader)
-numberOfSubdomains 8;
+numberOfSubdomains 12;
 
 // Metoda rozdělení
 method          scotch;  // Automatické optimalizované dělení

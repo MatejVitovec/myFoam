@@ -49,11 +49,11 @@ solvers
 }
 
 LUSGS {
-    iterations 1;
-    internalIterations 1;
+    iterations 3;
+    internalIterations 3;
     localTimestepping false;
-    relaxCoeff 1;
-    omega 1.5;
+    relaxCoeff 0.8;
+    omega 2;
 }
 
 

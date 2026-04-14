@@ -60,17 +60,16 @@ const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();  //TO
 const surfaceScalarField& phi1 = twoFluidFlux.alphaRhoFlux1_pos();          //TODO
 
 Info<< "Creating turbulence model\n" << endl;
-autoPtr<compressible::turbulenceModel> turbulence
+autoPtr<PhaseCompressibleTurbulenceModel<fluidThermo>> turbulence;
 (
-    PhaseCompressibleTurbulenceModel::New
+    PhaseCompressibleTurbulenceModel<fluidThermo>::New
     (
         alpha1,
         thermo1.rho(),
         U1,
         alphaRhoPhi1,
         phi1,
-        thermo1,
-        "2"
+        thermo1
     )
 );
 

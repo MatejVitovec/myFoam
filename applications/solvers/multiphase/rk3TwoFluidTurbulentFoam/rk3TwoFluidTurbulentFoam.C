@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          + fvc::div(turbulence->devRhoReff())
+                                          //+ fvc::div(turbulence->devRhoReff())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
                                           + dragK*(fluid.U1() - fluid.U2()));
             
@@ -122,8 +122,8 @@ int main(int argc, char *argv[])
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                    + fvc::div(turbulence->devRhoReff() & U1)
-                                    - fvc::laplacian(turbulence->alphaEff(), h1)
+                                    //+ fvc::div(turbulence->devRhoReff() & U1)
+                                    //- fvc::laplacian(turbulence->alphaEff(), h1)
                                     + ((dragK*(fluid.U1() - fluid.U2())) & U1));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
