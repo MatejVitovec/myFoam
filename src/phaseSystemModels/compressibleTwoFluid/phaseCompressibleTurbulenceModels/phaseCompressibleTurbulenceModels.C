@@ -57,11 +57,11 @@ namespace Foam
 }
 
 
-namespace Foam
+/*namespace Foam
 {
       typedef ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>
           phaseCompressibleTurbulenceModel;
-}
+}*/
 
 
 

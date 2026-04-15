@@ -37,11 +37,17 @@ divSchemes
     default         none;
     div(interpolate(U.1),U.1)   Gauss linear;
     div(interpolate(U.2),U.2)   Gauss linear;
+    div(alphaRhoPhiL.1,k.1)      Gauss linearUpwind limitedGauss;
+    div(alphaRhoPhiL.1,omega.1)  Gauss linearUpwind limitedGauss;
+    div(devRhoReff.1) Gauss linear;
+    div((devRhoReff.1&U.1)) Gauss linear;
+
+    div((muEff*dev2(grad(U.1).T()))) Gauss linear;
 }
 
 laplacianSchemes
 {
-   default         Gauss linear corrected;
+    default         Gauss linear limited corrected 0.5;
 }
 
 interpolationSchemes
@@ -64,13 +70,19 @@ interpolationSchemes
 
 snGradSchemes
 {
-    default         corrected;
+    //default         corrected;
+    default         limited corrected 0.5;
 }
 
 fluxRequired
 {
     default         no;
 }
+
+wallDist {
+    method meshWave;
+}
+
 
 
 // ************************************************************************* //

@@ -57,12 +57,36 @@ TwoFluidFoam::dragModel& drag = pDrag();
 
 
 const surfaceScalarField& alphaRhoPhi1 = twoFluidFlux.alphaRhoFlux1_pos();  //TODO
-const surfaceScalarField& phi1 = twoFluidFlux.alphaRhoFlux1_pos();          //TODO
 
-Info<< "Creating turbulence model\n" << endl;
-autoPtr<PhaseCompressibleTurbulenceModel<fluidThermo>> turbulence;
+surfaceScalarField phi1(
+    IOobject
+    (
+        "phi",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    linearInterpolate(U1) & mesh.Sf()
+);
+
+volVectorField U(
+    IOobject
+    (
+        "U",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    U1
+);
+
+
+Info<< "Creating turbulence model for phase 1 (gas)\n" << endl;
+autoPtr<ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>> turbulence1
 (
-    PhaseCompressibleTurbulenceModel<fluidThermo>::New
+    ThermalDiffusivity<PhaseCompressibleTurbulenceModel<fluidThermo>>::New
     (
         alpha1,
         thermo1.rho(),

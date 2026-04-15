@@ -74,7 +74,7 @@ alpha1_
 (
     IOobject
     (
-        "alpha1",
+        "alpha.1",
         mesh_.time().timeName(),
         mesh_,
         IOobject::NO_READ,
@@ -112,7 +112,7 @@ a1_
 (
     IOobject
     (
-        "a1",
+        "a.1",
         mesh_.time().timeName(),
         mesh_,
         IOobject::NO_READ,
@@ -125,7 +125,7 @@ a2_
 (
     IOobject
     (
-        "a2",
+        "a.2",
         mesh_.time().timeName(),
         mesh_,
         IOobject::NO_READ,

@@ -38,6 +38,7 @@ Description
 #include "fvCFD.H"
 #include "localEulerDdtScheme.H"
 #include "PhaseCompressibleTurbulenceModel.H"
+#include "ThermalDiffusivity.H"
 #include "fvcSmooth.H"
 
 #include "twoFluid.H"
@@ -70,6 +71,8 @@ int main(int argc, char *argv[])
     // Courant numbers used to adjust the time-step
     scalar CoNum = 0.0;
     scalar meanCoNum = 0.0;
+
+    turbulence1->correct();
 
     Info<< "\nStarting time loop\n" << endl;
 
@@ -109,7 +112,7 @@ int main(int argc, char *argv[])
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                                          //+ fvc::div(turbulence->devRhoReff())
+                                          + alpha1*fvc::div(turbulence1->devRhoReff())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
                                           + dragK*(fluid.U1() - fluid.U2()));
             
@@ -122,8 +125,9 @@ int main(int argc, char *argv[])
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                    //+ fvc::div(turbulence->devRhoReff() & U1)
-                                    //- fvc::laplacian(turbulence->alphaEff(), h1)
+                                    + alpha1*fvc::div(turbulence1->devRhoReff() & U1)
+                                    - alpha1*fvc::laplacian(turbulence1->alphaEff(), h1)
+                                    //- fvc::laplacian(turbulence1->kappaEff(), T1)
                                     + ((dragK*(fluid.U1() - fluid.U2())) & U1));
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
@@ -139,6 +143,11 @@ int main(int argc, char *argv[])
             fluid.correctConservative();
 
             drag.correct();
+
+            turbulence1->correct();
+            h1 = thermo1.he() + p/thermo1.rho();
+            phi1 = linearInterpolate(U1) & mesh.Sf();
+            U = U1;
 
             /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
             const fvPatch& patch = U1.boundaryField()[patchI].patch();
