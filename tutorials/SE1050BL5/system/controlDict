@@ -22,7 +22,7 @@ libs (
 
 startFrom       startTime;
 
-startTime       0.0038768963;
+startTime       0;
 
 stopAt          endTime;
 

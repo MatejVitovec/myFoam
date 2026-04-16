@@ -1,9 +1,8 @@
-
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  v2412                                 |
-|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|  \\    /   O peration     | Version:  v3.0+                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -11,20 +10,18 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    object      phaseProperties;
+    location    "constant";
+    object      turbulenceProperties.1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+simulationType RAS;
 
-epsilon         1.0e-10;
-epsilonMin      1.0e-13;
-epsilonMax      1.0e-8;
-
-drag
+RAS
 {
-    type        SchillerNaumann;
-    dragCoeff   1.0;
-    residualRe	1e-2;
+  RASModel        kOmegaSST;
+  
+  turbulence      on;
+  
+  printCoeffs     on;
 }
-
-// ************************************************************************* //

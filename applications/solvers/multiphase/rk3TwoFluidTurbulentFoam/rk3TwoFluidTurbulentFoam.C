@@ -85,8 +85,8 @@ int main(int argc, char *argv[])
         #include "setDeltaT.H"
         ++runTime;
 
-        Info << "Iter = " << runTime.timeIndex() << endl;
-        Info<< "Time = " << runTime.timeName() << nl << endl;
+        Info << nl << "Iter = " << runTime.timeIndex() << endl;
+        Info<< "Time = " << runTime.timeName() << endl;
 
         dimensionedScalar dt = runTime.deltaT();
 
@@ -144,10 +144,10 @@ int main(int argc, char *argv[])
 
             drag.correct();
 
-            turbulence1->correct();
+            /*turbulence1->correct();
             h1 = thermo1.he() + p/thermo1.rho();
             phi1 = linearInterpolate(U1) & mesh.Sf();
-            U = U1;
+            U = U1;*/
 
             /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
             const fvPatch& patch = U1.boundaryField()[patchI].patch();
@@ -177,6 +177,11 @@ int main(int argc, char *argv[])
             Info << bcIntDiff << endl;*/
 
         }
+
+        turbulence1->correct();
+        h1 = thermo1.he() + p/thermo1.rho();
+        phi1 = linearInterpolate(U1) & mesh.Sf();
+        U = U1;
 
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();
