@@ -160,10 +160,11 @@ conservative_
 )
 {
     //blendVanishingFluid();
-    correctBoundaryCondition();
-    correctThermo();
-    correctInterfacialPressure();
-    correctConservative();
+    
+    //correctBoundaryCondition();
+    //correctThermo();
+    //correctInterfacialPressure();
+    //correctConservative();
 }
 
 

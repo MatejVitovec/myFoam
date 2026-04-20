@@ -34,5 +34,4 @@ EXE_LIBS = \
     -lmyPhaseCompressibleTurbulenceModels \
     -lmyConvectiveFlux \
     -lmyBoundFoam \
-    -lmyTwoFluid
-    
+    -lmyTwoFluid 
