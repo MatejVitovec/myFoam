@@ -103,11 +103,6 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
-            //volScalarField rho = alpha1*rho1 + alpha2*rho2;
-            //volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
-
-            //virtualMassTerm = 0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1);
-
             volScalarField rezAlphaRho1(-dt*(
                 fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
             ));
@@ -143,7 +138,6 @@ int main(int argc, char *argv[])
                 + ((drag.K()*(fluid.U1() - fluid.U2())) & U1)
                 + (virtualMassCoeffsMinus1 & U1)
                 //+ (virtualMassTerm & U1)
-                //+ ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
             volScalarField rezEpsilon2(-dt*(
@@ -152,7 +146,6 @@ int main(int argc, char *argv[])
                 + ((drag.K()*(fluid.U2() - fluid.U1())) & U2)
                 + (virtualMassCoeffsMinus2 & U2)
                 //- (virtualMassTerm & U2)
-                //- ((dragTerm /*+ virtualMassTerm*/) & virtualVelocity)
             ));
 
             dp     = dimensionedScalar("pzero", dimPressure, 0.0);
@@ -227,8 +220,6 @@ int main(int argc, char *argv[])
                 break;
             }*/
         }
-
-
 
         runTime.write();
 

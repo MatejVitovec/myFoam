@@ -29,12 +29,13 @@
                 if (nei != celli)
                 {
                     const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*nu1Max[nei];
+                    const scalar av2 = 0.0;
                     //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
                     //                                   max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
-                    const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
-                    const scalar ac2 = ac1;
-                    //const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
-                    //const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
+                    //const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
+                    //const scalar ac2 = ac1;
+                    const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
+                    const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
 
                     const scalar E1   = e1[nei] + 0.5*magSqr(U1[nei]);
                     const scalar E2   = e2[nei] + 0.5*magSqr(U2[nei]);
@@ -42,7 +43,7 @@
                     const scalar un1 = U1[nei] & Sf[facei];
                     const scalar un2 = U2[nei] & Sf[facei];
                     const scalar unMLambda1 = ac1 + av1 - un1;
-                    const scalar unMLambda2 = ac2 + av1 - un2;
+                    const scalar unMLambda2 = ac2 + av2 - un2;
 
                     rAlphaRho1  += 0.5*(                                                   alpha1[nei]*unMLambda1*drhodp1[nei]*dpStar[nei]                              - unMLambda1*rho1[nei]*dalphaStar[nei]                                    + ((alpha1[nei]*rho1[nei]*Sf[facei]) & dU1Star[nei])                                + alpha1[nei]*(unMLambda1*drhodT1[nei])*dT1Star[nei]);
                     rAlphaRho2  += 0.5*(                                                   alpha2[nei]*unMLambda2*drhodp2[nei]*dpStar[nei]                              + unMLambda2*rho2[nei]*dalphaStar[nei]                                    + ((alpha2[nei]*rho2[nei]*Sf[facei]) & dU2Star[nei])                                + alpha2[nei]*(unMLambda2*drhodT2[nei])*dT2Star[nei]);
@@ -57,12 +58,13 @@
                 if (own != celli)
                 {
                     const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*nu1Max[own];
+                    const scalar av2 = 0.0;
                     //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
                     //                                   max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
-                    const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
-                    const scalar ac2 = ac1;
-                    //const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
-                    //const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
+                    //const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
+                    //const scalar ac2 = ac1;
+                    const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
+                    const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
 
                     const scalar E1   = e1[own] + 0.5*magSqr(U1[own]);
                     const scalar E2   = e2[own] + 0.5*magSqr(U2[own]);
@@ -70,7 +72,7 @@
                     const scalar un1 = U1[own] & Sf[facei];
                     const scalar un2 = U2[own] & Sf[facei];
                     const scalar unMLambda1 = ac1 + av1 + un1;
-                    const scalar unMLambda2 = ac2 + av1 + un2;
+                    const scalar unMLambda2 = ac2 + av2 + un2;
 
                     rAlphaRho1  += 0.5*(                                                   alpha1[own]*unMLambda1*drhodp1[own]*dpStar[own]                              - unMLambda1*rho1[own]*dalphaStar[own]                                    + ((alpha1[own]*rho1[own]*Sf[facei]) & dU1Star[own])                                + alpha1[own]*(unMLambda1*drhodT1[own])*dT1Star[own]);
                     rAlphaRho2  += 0.5*(                                                   alpha2[own]*unMLambda2*drhodp2[own]*dpStar[own]                              + unMLambda2*rho2[own]*dalphaStar[own]                                    + ((alpha2[own]*rho2[own]*Sf[facei]) & dU2Star[own])                                + alpha2[own]*(unMLambda2*drhodT2[own])*dT2Star[own]);

@@ -10,8 +10,8 @@
     const volScalarField nu1Max
     (
         "nuMax.1",
-        max(4.0/3.0 * turbulence1->nuEff(), thermo1.Cp()/thermo1.Cv() * turbulence1->alphaEff()/rho1)
-        //turbulence1->alphaEff()/rho1
+        //max(4.0/3.0 * turbulence1->nuEff(), thermo1.Cp()/thermo1.Cv() * turbulence1->alphaEff()/rho1)
+        turbulence1->alphaEff()/rho1
     );
 
     Field<scalar> drhodp1(mesh.nCells());
