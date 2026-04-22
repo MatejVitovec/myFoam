@@ -4,8 +4,6 @@ Info<< "Reading thermophysical properties\n" << endl;
 
 TwoFluidFoam::twoFluid fluid(mesh);
 
-Info << "OK" << endl;
-
 twoFluidConservative& conservative = fluid.conservative();
 
 twoFluidConvectiveFlux twoFluidFlux
@@ -29,7 +27,7 @@ fluid.correctConservative();
 volScalarField& p = fluid.p();
 const volScalarField& alpha1 = fluid.alpha1();
 const volScalarField& alpha2 = fluid.alpha2();
-volScalarField& alpha = fluid.alpha();;
+volScalarField& alpha = fluid.alpha();
 volVectorField& U1 = fluid.U1();
 volVectorField& U2 = fluid.U2();
 volScalarField& T1 = fluid.T1();

@@ -18,6 +18,11 @@ twoFluidConvectiveFlux twoFluidFlux
     fluid.thermo2()
 );
 
+fluid.correctBoundaryCondition();
+fluid.correctThermo();
+fluid.correctInterfacialPressure();
+fluid.correctConservative();
+
 
 volScalarField& p = fluid.p();
 const volScalarField& alpha1 = fluid.alpha1();

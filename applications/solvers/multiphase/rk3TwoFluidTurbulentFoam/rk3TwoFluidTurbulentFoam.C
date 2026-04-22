@@ -41,6 +41,8 @@ Description
 #include "ThermalDiffusivity.H"
 #include "fvcSmooth.H"
 
+#include "processorPolyPatch.H"
+
 #include "twoFluid.H"
 #include "twoFluidConvectiveFlux.H"
 #include "twoFluidFvc.H"
@@ -96,9 +98,6 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
-            /*volScalarField rho = alpha1*rho1 + alpha2*rho2;
-            volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
-            volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());*/
             volScalarField dragK = drag.K();
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
@@ -143,40 +142,21 @@ int main(int argc, char *argv[])
             fluid.correctConservative();
 
             drag.correct();
-
-            /*turbulence1->correct();
-            h1 = thermo1.he() + p/thermo1.rho();
-            phi1 = linearInterpolate(U1) & mesh.Sf();
-            U = U1;*/
-
-            /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
-            const fvPatch& patch = U1.boundaryField()[patchI].patch();
-            const labelUList& faceCells = patch.faceCells();
-
-            const vectorField& Upatch = U2.boundaryField()[patchI];
-            const vectorField& normals = patch.nf();
-
-            scalarField Un(Upatch.size());
-
-            forAll(Upatch, faceI)
-            {
-                Un[faceI] = mag(Upatch[faceI] & normals[faceI]);
-            }
-            const vectorField& internal = U2.internalField();
-            vectorField BCneighborValues(patch.size());
-            vectorField bcIntDiff(patch.size());
-
-            forAll(patch, faceI)
-            {
-                label cellI = faceCells[faceI];
-
-                BCneighborValues[faceI] = internal[cellI];
-                bcIntDiff[faceI] = internal[cellI] - Upatch[faceI];
-            }
-
-            Info << bcIntDiff << endl;*/
-
         }
+
+        scalar finalRezp     = fvc::domainIntegrate(mag(p - p.oldTime())        /dt).value();
+        scalar finalRezalpha = fvc::domainIntegrate(mag(alpha2 - alpha2.oldTime())/dt).value();
+        scalar finalRezU1    = fvc::domainIntegrate(mag(U1 - U1.oldTime())      /dt).value();
+        scalar finalRezU2    = fvc::domainIntegrate(mag(U2 - U2.oldTime())      /dt).value();
+        scalar finalRezT1    = fvc::domainIntegrate(mag(T1 - T1.oldTime())      /dt).value();
+        scalar finalRezT2    = fvc::domainIntegrate(mag(T2 - T2.oldTime())      /dt).value();
+
+        Info << "rk3:  Solving for p,     " << "Final residual = " << finalRezp     << nl;
+        Info << "rk3:  Solving for alpha, " << "Final residual = " << finalRezalpha << nl;
+        Info << "rk3:  Solving for U1,    " << "Final residual = " << finalRezU1    << nl;
+        Info << "rk3:  Solving for U2,    " << "Final residual = " << finalRezU2    << nl;
+        Info << "rk3:  Solving for T1,    " << "Final residual = " << finalRezT1    << nl;
+        Info << "rk3:  Solving for T2,    " << "Final residual = " << finalRezT2    << nl;
 
         turbulence1->correct();
         h1 = thermo1.he() + p/thermo1.rho();
@@ -187,6 +167,8 @@ int main(int argc, char *argv[])
         rho2.ref() = thermo2.rho();
 
         runTime.write();
+
+        #include "../tools/boundaryFlux.H"
 
         //runTime.printExecutionTime(Info);
 
