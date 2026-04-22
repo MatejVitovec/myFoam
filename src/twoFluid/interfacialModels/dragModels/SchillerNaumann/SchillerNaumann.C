@@ -72,7 +72,7 @@ Foam::TwoFluidFoam::SchillerNaumann::SchillerNaumann
             fluid.mesh().time().timeName(),
             fluid.mesh(),
             IOobject::NO_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_WRITE
         ),
         fluid.thermo1().nu()
     )
