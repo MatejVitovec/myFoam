@@ -49,6 +49,7 @@ Description
 #include <eigen3/Eigen/Dense>
 #include "emptyPolyPatch.H"
 #include "wallPolyPatch.H"
+#include "processorPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -98,20 +99,21 @@ int main(int argc, char *argv[])
         
         dimensionedScalar dt = runTime.deltaT();
 
+        //Info << "KKKKKKKKKK: " << tV << endl;
 
         for (int intIter = 0; intIter < lusgsIters; intIter++)
         {
             twoFluidFlux.computeFlux();
 
-            volScalarField rezAlphaRho1(-dt*(
+            volScalarField::Internal rezAlphaRho1(-dt*(
                 fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
             ));
 
-            volScalarField rezAlphaRho2(-dt*(
-                fvc::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+            volScalarField::Internal rezAlphaRho2(-dt*(
+                fvc::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()) //+ massSourceWall2
             ));
 
-            volVectorField rezAlphaRhoU1(-dt*(
+            volVectorField::Internal rezAlphaRhoU1(-dt*(
                 fvc::ddt(conservative.alphaRhoU1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
@@ -121,16 +123,17 @@ int main(int argc, char *argv[])
                 //+ virtualMassTerm
             ));
 
-            volVectorField rezAlphaRhoU2(-dt*(
+            volVectorField::Internal rezAlphaRhoU2(-dt*(
                 fvc::ddt(conservative.alphaRhoU2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                 - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 + drag.K()*(fluid.U2() - fluid.U1())
                 + virtualMassCoeffsMinus2
+                //+ massSourceWall2*U2
                 //- virtualMassTerm
             ));
 
-            volScalarField rezEpsilon1(-dt*(
+            volScalarField::Internal rezEpsilon1(-dt*(
                 fvc::ddt(conservative.epsilon1())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 + alpha1*fvc::div(turbulence1->devRhoReff() & U1)
@@ -140,11 +143,12 @@ int main(int argc, char *argv[])
                 //+ (virtualMassTerm & U1)
             ));
 
-            volScalarField rezEpsilon2(-dt*(
+            volScalarField::Internal rezEpsilon2(-dt*(
                 fvc::ddt(conservative.epsilon2())
                 + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 + ((drag.K()*(fluid.U2() - fluid.U1())) & U2)
                 + (virtualMassCoeffsMinus2 & U2)
+                //+ massSourceWall2*(e2 + 0.5*magSqr(U2))
                 //- (virtualMassTerm & U2)
             ));
 
@@ -204,6 +208,8 @@ int main(int argc, char *argv[])
             phi1 = linearInterpolate(U1) & mesh.Sf();
             U = U1;
 
+            //#include "../tools/boundaryOutflow.H"
+
             /*bool lastIteration = ((intIter + 1) == lusgsIntIters);
 
             lastIteration = lastIteration || ( 
@@ -220,6 +226,8 @@ int main(int argc, char *argv[])
                 break;
             }*/
         }
+
+        #include "../tools/boundaryFlux.H"
 
         runTime.write();
 

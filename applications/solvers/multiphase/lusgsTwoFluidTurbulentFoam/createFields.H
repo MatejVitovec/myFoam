@@ -303,3 +303,19 @@ volScalarField dT2
     dimensionedScalar("dT2", dimTemperature, 0.0)
 );
 
+
+/*volScalarField massSourceWall2
+(
+    IOobject
+    (
+        "massSourceWall2",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("massSourceWall2", dimMass/dimTime/dimVolume, 0.0)
+);
+*/
+
