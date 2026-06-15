@@ -51,6 +51,8 @@ Description
 #include "wallPolyPatch.H"
 #include "processorPolyPatch.H"
 
+#include "faCFD.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -207,6 +209,8 @@ int main(int argc, char *argv[])
             h1 = thermo1.he() + p/thermo1.rho();
             phi1 = linearInterpolate(U1) & mesh.Sf();
             U = U1;
+
+            #include "../tools/film/solveFilm.H"
 
             //#include "../tools/boundaryOutflow.H"
 
