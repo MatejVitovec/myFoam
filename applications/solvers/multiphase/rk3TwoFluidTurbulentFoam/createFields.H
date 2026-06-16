@@ -54,7 +54,7 @@ volScalarField d
         IOobject::NO_WRITE
     ),
     mesh,
-    dimensionedScalar("dropletDiameter", dimLength, 1e-5)
+    dimensionedScalar("dropletDiameter", dimLength, 1e-6)
 );
 
 autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, d);
