@@ -48,6 +48,8 @@ Description
 #include "twoFluidFvc.H"
 #include "dragModel.H"
 
+#include "faCFD.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -66,6 +68,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
+    #include "../tools/film/createFilmFields.H"
     #include "createTimeControls.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -166,15 +169,17 @@ int main(int argc, char *argv[])
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();
 
-        runTime.write();
-
         #include "../tools/boundaryFlux.H"
+
+        #include "../tools/film/solveFilm.H"
+
+        runTime.write();
 
         //runTime.printExecutionTime(Info);
 
         //std::cin.ignore();
 
-        if(runTime.timeIndex() > 1000000)
+        if(runTime.timeIndex() > 1100000)
         {
             Info<< "End after 1 000 000 iter\n" << endl;
             return 0;

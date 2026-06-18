@@ -8,16 +8,28 @@ if (wallPatchID < 0)
         << abort(FatalError);
 }
 
-const fvPatchVectorField& Up = U1.boundaryField()[wallPatchID];
+
+dimensionedScalar rhoLiquid
+(
+    "rhoLiquid",
+    dimDensity,
+    1000
+);
+
+const scalarField& pAlphaRhoPhi2 = twoFluidFlux.alphaRhoFlux2_pos().boundaryField()[wallPatchID];
+
+const vectorField& Up = U1.boundaryField()[wallPatchID].patchInternalField();
 const fvPatchScalarField& rhop = rho1.boundaryField()[wallPatchID];
 
-const scalar Cf = 0.005;
+const scalar Cf = 0.01;
 
 forAll(h, faceI)
 {
     scalar Umag = mag(Up[faceI]);
 
     tauG[faceI] = 0.5*rhop[faceI]*sqr(Umag)*Cf;
+
+    Sfilm[faceI] = pAlphaRhoPhi2[faceI]/rhoLiquid.value();
 }
 
 //
@@ -73,3 +85,37 @@ hEqn.relax();
 hEqn.solve();
 
 h.max(0.0);
+
+
+volScalarField hWall
+(
+    IOobject
+    (
+        "hWall",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar(dimLength, Zero)
+);
+
+volVectorField uWall
+(
+    IOobject
+    (
+        "uWall",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector(dimLength/dimTime, vector::zero)
+);
+
+hWall.boundaryFieldRef()[wallPatchID] == h;
+uWall.boundaryFieldRef()[wallPatchID] == Uf;
+
+Info << "Film solved" << endl;

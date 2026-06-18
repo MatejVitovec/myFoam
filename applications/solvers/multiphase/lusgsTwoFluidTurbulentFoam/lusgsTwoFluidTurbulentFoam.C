@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
+    #include "../tools/film/createFilmFields.H"
     #include "createTimeControls.H"
     #include "createLUSGSControls.H"
 

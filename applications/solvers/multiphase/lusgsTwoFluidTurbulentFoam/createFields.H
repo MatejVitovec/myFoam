@@ -304,7 +304,6 @@ volScalarField dT2
 );
 
 
-#include "../tools/film/createFilmFields.H"
 
 /*volScalarField massSourceWall2
 (
