@@ -1,0 +1,4 @@
+
+bladeFilmFoam.C
+
+EXE = $(FOAM_USER_APPBIN)/bladeFilmFoam

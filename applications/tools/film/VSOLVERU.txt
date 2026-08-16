@@ -1,0 +1,54 @@
+5. V solveru
+
+Po vytvoření CFD polí:
+
+#include "createFilmFields.H"
+
+Uvnitř časové smyčky:
+
+while (runTime.run())
+{
+    runTime++;
+
+    // CFD
+
+    #include "UEqn.H"
+    #include "pEqn.H"
+
+    // FILM
+
+    #include "mapFlowToFilm.H"
+
+    #include "computeFilmVelocity.H"
+
+    #include "solveFilm.H"
+
+    runTime.write();
+}
+6. Make/options
+
+Musíš přidat:
+
+-lfiniteArea
+
+tedy např.
+
+EXE_LIBS = \
+    -lfiniteVolume \
+    -lmeshTools \
+    -lfiniteArea
+7. constant/faMesh
+
+Vygeneruješ jednou:
+
+createFaMesh
+
+s definicí obsahující patch blade.
+
+Pak solver pouze načítá
+
+faMesh::mesh(mesh)
+
+a všechna pole (h, Uf, tauG) se budou zapisovat do ParaView stejně jako volumová pole.
+
+Jediné místo, které budeš téměř jistě chtít upravit, je mapování v mapFlowToFilm.H. Pro jednoduchý případ bude fungovat index 1:1 mezi patch faces a finite-area faces, ale u složitějších faMesh (subset patchů, merge patchů apod.) je lepší použít aMesh.faceLabels() a mapovat přes skutečné ID stěnových faces. To bych doplnil jako další krok, až bude základní solver kompilovat.
