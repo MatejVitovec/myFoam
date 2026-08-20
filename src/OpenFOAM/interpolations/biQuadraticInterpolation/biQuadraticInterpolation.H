@@ -39,6 +39,11 @@ SourceFiles
 #define biQuadraticInterpolation_H
 
 //#include "interpolationTable.H"
+#include "IOobject.H"
+#include "scalar.H"
+#include "label.H"
+#include "scalarField.H"
+#include "FixedList.H"
 #include <eigen3/Eigen/Dense>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -50,32 +55,171 @@ namespace Foam
                     Class biQuadraticInterpolation Declaration
 \*---------------------------------------------------------------------------*/
 
-//template<class Type>
 class biQuadraticInterpolation
 {
+    public:
+        enum Transformation{NONE, LOG, LOG10, LOGINV};
+
+    struct Mat3x3
+    {
+        FixedList<scalar, 9> v_;
+
+        // Constructors
+        Mat3x3() : v_(Zero) {}
+
+        Mat3x3(const FixedList<scalar, 9>& values) : v_(values) {}
+
+        // Element access
+        inline scalar& operator()(const label i, const label j)
+        {
+            return v_[3*i + j];
+        }
+
+        inline const scalar& operator()(const label i, const label j) const
+        {
+            return v_[3*i + j];
+        }
+
+        // Transpose
+        inline Mat3x3 transpose() const
+        {
+            Mat3x3 result;
+
+            for (label i = 0; i < 3; ++i)
+            {
+                for (label j = 0; j < 3; ++j)
+                {
+                    result(i, j) = (*this)(j, i);
+                }
+            }
+
+            return result;
+        }
+
+        // Matrix multiplication
+        inline Mat3x3 operator*(const Mat3x3& B) const
+        {
+            Mat3x3 result;
+
+            for (label i = 0; i < 3; ++i)
+            {
+                for (label j = 0; j < 3; ++j)
+                {
+                    result(i, j) = Zero;
+
+                    for (label k = 0; k < 3; ++k)
+                    {
+                        result(i, j) += (*this)(i, k)*B(k, j);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        // Access to underlying data
+        inline FixedList<scalar, 9>& data()
+        {
+            return v_;
+        }
+
+        inline const FixedList<scalar, 9>& data() const
+        {
+            return v_;
+        }
+    };
+
+
+    class scalarMatrix
+    {
+        label nRows_;
+        label nCols_;
+        scalarField data_;
+
+    public:
+
+        // Constructors
+        scalarMatrix() : nRows_(0), nCols_(0), data_() {}
+
+        scalarMatrix ( const label nRows, const label nCols)
+        :
+            nRows_(nRows),
+            nCols_(nCols),
+            data_(nRows*nCols, Zero)
+        {}
+
+
+        inline label nRows() const
+        {
+            return nRows_;
+        }
+
+        inline label nCols() const
+        {
+            return nCols_;
+        }
+
+        inline label size() const
+        {
+            return data_.size();
+        }
+
+        // Element access
+        inline scalar& operator()(const label i, const label j)
+        {
+            return data_[i*nCols_ + j];
+        }
+
+        inline const scalar& operator()(const label i, const label j) const
+        {
+            return data_[i*nCols_ + j];
+        }
+
+        // Access to underlying data
+        inline scalarField& data()
+        {
+            return data_;
+        }
+
+        inline const scalarField& data() const
+        {
+            return data_;
+        }
+    };
+
+
+
+
+    /////////////
+
+
+
     // Private Data
 
         //- File name
         fileName fileName_;
 
-        std::vector<int> gridSizeX;
-        std::vector<int> gridSizeY;
-        std::Eigen::VectorXd boundaryX;
-        std::Eigen::VectorXd boundaryY;
-        Transformation transformationX;
-        Transformation transformationY;
+        int n_;
+        int m_;
 
-        std::Eigen::VectorXd x;
-        std::Eigen::VectorXd y;
-        std::Eigen::VectorXd z;
-        std::Eigen::VectorXd t;
-        std::Eigen::VectorXd dx;
-        std::Eigen::VectorXd dy;
+        labelList gridSizeX_;
+        labelList gridSizeY_;
+        scalarField boundaryX_;
+        scalarField boundaryY_;
+        Transformation transformationX_;
+        Transformation transformationY_;
 
-        std::Eigen::VectorXd dz;
-        std::Eigen::VectorXd dt;
+        scalarField x_;
+        scalarField y_;
+        scalarField z_;
+        scalarField t_;
+        scalarField dx_;
+        scalarField dy_;
 
-        Eigen::Matrix<double, 9, Eigen::Dynamic> coeffs_;
+        scalarField dz_;
+        scalarField dt_;
+
+        List<FixedList<scalar, 9>> coefficients_;
 
 
     // Private Member Functions
@@ -83,22 +227,21 @@ class biQuadraticInterpolation
         //- Read the table of data from file
         void readTable();
 
-        void calcCoeffs();
+        void calcCoeffs(std::function<scalar(scalar, scalar)> f);
 
-        Eigen::VectorXd solveTridiagonal(const Eigen::VectorXd& L, const Eigen::VectorXd& D, const Eigen::VectorXd& U, const Eigen::VectorXd& b) const;
+        scalarField solveTridiagonal(const scalarField& L, const scalarField& D, const scalarField& U, const scalarField& b) const;
         scalar calcDerivativeX (std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar step) const;
         scalar calcDerivativeY (std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar step) const;
         scalar calcDerivativeXY(std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar stepX, scalar stepY) const;
         
-        double transform(double x, Transformation transformation) const;
+        scalar transform(scalar x, Transformation transformation) const;
         
-        double backTransform(double x, Transformation transformation) const;
+        scalar backTransform(scalar x, Transformation transformation) const;
 
         scalar calc(scalar xx, scalar yy);
 
 
 public:
-    enum Transformation{NONE, LOG, LOG10, LOGINV};
 
     // Constructors
 
@@ -106,12 +249,12 @@ public:
         biQuadraticInterpolation();
 
         //- Construct from components
-        biQuadraticInterpolation
+        /*biQuadraticInterpolation
         (
-            const List<Tuple2<scalar, List<Tuple2<scalar, Type>>>>& values,
+            const List<Tuple2<scalar, List<Tuple2<scalar, scalar>>>>& values,
             const bounds::normalBounding bounding,
             const fileName& fName
-        );
+        );*/
 
         //- Construct given the name of the file containing the table of data
         explicit biQuadraticInterpolation(const fileName& fName);
@@ -134,16 +277,16 @@ public:
         //- Write
         void write(Ostream& os) const;
 
-        std::pair<int, int> findPosition(double xx, double yy) const;
+        std::pair<int, int> findPosition(scalar xx, scalar yy) const;
 
 
     // Member Operators
 
         //- Copy assignment
-        void operator=(const biQuadraticInterpolation<Type>& rhs);
+        void operator=(const biQuadraticInterpolation& rhs);
 
         //- Return an interpolated value
-        Type operator()(const scalar valueX, const scalar valueY) const;
+        scalar operator()(const scalar valueX, const scalar valueY) const;
 
 };
 

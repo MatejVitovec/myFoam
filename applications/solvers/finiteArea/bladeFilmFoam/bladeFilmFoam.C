@@ -101,6 +101,9 @@ int main(int argc, char *argv[])
 
         #include "../../../tools/film/solveFilm.H"
 
+        h[270] = 0.0;
+        h[271] = 0.0;
+
         runTime.write();
 
         //runTime.printExecutionTime(Info);

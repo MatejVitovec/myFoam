@@ -1,0 +1,4 @@
+
+interpolations/biQuadraticInterpolation/biQuadraticInterpolation.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmyOpenFoam

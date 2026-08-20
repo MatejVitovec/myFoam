@@ -26,11 +26,12 @@ License
 
 \*---------------------------------------------------------------------------*/
 
-#include "openFoamTableReader.H"
+#include "biQuadraticInterpolation.H"
+//#include "openFoamTableReader.H"
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-void Foam::biQuadraticInterpolation::readTable()
+/*void Foam::biQuadraticInterpolation::readTable()
 {
     fileName fName(fileName_);
     fName.expand();
@@ -47,226 +48,227 @@ void Foam::biQuadraticInterpolation::readTable()
 
     // Check that the data are in ascending order
     check();
-}
+}*/
 
 
-void Foam::biQuadraticInterpolation::calcCoeffs();
+void Foam::biQuadraticInterpolation::calcCoeffs(std::function<scalar(scalar, scalar)> f)
 {
-    Eigen::MatrixXd u(n, m);
-    Eigen::MatrixXd p(n+1, m);
-    Eigen::MatrixXd q(n, m+1);
-    Eigen::MatrixXd r(n+1, m+1);
+    scalarMatrix u(n_,   m_);
+    scalarMatrix p(n_+1, m_);
+    scalarMatrix q(n_,   m_+1);
+    scalarMatrix r(n_+1, m_+1);
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n_; i++)
     {
-        for (int j = 0; j < m; j++)
+        for (int j = 0; j < m_; j++)
         {
-            u[i][j] = f(x[i], y[j]);
+            //u[i][j] = f(x_[i], y_[j]);
+            u(i, j) = f(x_[i], y_[j]);
         }        
     }
 
-    const double divider = 100.0;
+    const scalar divider = 100.0;
 
-    for (int j = 0; j < m; j++)
+    for (int j = 0; j < m_; j++)
     {
-        p[0][j] = calcDerivativeX(f, z[0], y[j], dx[0]/divider);
-        p[n][j] = calcDerivativeX(f, z[n], y[j], dx[n]/divider);
+        p(0, j)  = calcDerivativeX(f, z_[0],  y_[j], dx_[0]/divider);
+        p(n_, j) = calcDerivativeX(f, z_[n_], y_[j], dx_[n_]/divider);
     }
 
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n_; i++)
     {
-        q[i][0] = calcDerivativeY(f, x[i], t[0], dy[0]/divider);
-        q[i][m] = calcDerivativeY(f, x[i], t[m], dy[m]/divider);
+        q(i, 0)  = calcDerivativeY(f, x_[i], t_[0], dy_[0]/divider);
+        q(i, m_) = calcDerivativeY(f, x_[i], t_[m_], dy_[m_]/divider);
     }
 
-    r[0][0] = calcDerivativeXY(f, z[0], t[0], dx[0]/divider, dy[0]/divider);
-    r[n][0] = calcDerivativeXY(f, z[n], t[0], dx[n]/divider, dy[0]/divider);
-    r[0][m] = calcDerivativeXY(f, z[0], t[m], dx[0]/divider, dy[m]/divider);
-    r[n][m] = calcDerivativeXY(f, z[n], t[m], dx[n]/divider, dy[m]/divider);
+    r(0, 0)   = calcDerivativeXY(f, z_[0],  t_[0],  dx_[0]/divider,  dy_[0]/divider);
+    r(n_, 0)  = calcDerivativeXY(f, z_[n_], t_[0],  dx_[n_]/divider, dy_[0]/divider);
+    r(0, m_)  = calcDerivativeXY(f, z_[0],  t_[m_], dx_[0]/divider,  dy_[m_]/divider);
+    r(n_, m_) = calcDerivativeXY(f, z_[n_], t_[m_], dx_[n_]/divider, dy_[m_]/divider);
     
 
     /////// solution for p
-    for (int j = 0; j < m; j++)
+    for (int j = 0; j < m_; j++)
     {
-        Eigen::VectorXd U(n-2);
-        Eigen::VectorXd D(n-1);
-        Eigen::VectorXd L(n-2);
-        Eigen::VectorXd b(n-1);
+        scalarField U(n_-2);
+        scalarField D(n_-1);
+        scalarField L(n_-2);
+        scalarField b(n_-1);
         int i = 0;
 
-        U[i] = 1.0/(dx[i+1] + dx[i+2]);
-        D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
+        U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
+        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
 
-        b[i] = (-1.0/(dx[i] + dx[i+1]))*p[0][j] + (4.0/dx[i+1])*((u[i+1][j] - u[i][j])/dx[i+1]);
+        b[i] = (-1.0/(dx_[i] + dx_[i+1]))*p(0, j) + (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
 
         i++;
-        for ( ; i < n-2; i++)
+        for ( ; i < n_ - 2; i++)
         {
-            U[i] = 1.0/(dx[i+1] + dx[i+2]);
-            D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
-            L[i-1] = 1.0/(dx[i] + dx[i+1]);
-            b[i] = (4.0/dx[i+1])*((u[i+1][j] - u[i][j])/dx[i+1]);
+            U[i]   = 1.0/(dx_[i+1] + dx_[i+2]);
+            D[i]   = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
+            L[i-1] = 1.0/(dx_[i] + dx_[i+1]);
+            b[i]   = (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
         }
 
-        D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
-        L[i-1] = 1.0/(dx[i]+dx[i+1]);
-        b[i] = (-1.0/(dx[i+1] + dx[i+2]))*p[n][j] + (4.0/dx[i+1])*((u[i+1][j] - u[i][j])/dx[i+1]);
+        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
+        L[i-1] = 1.0/(dx_[i]+dx_[i+1]);
+        b[i] = (-1.0/(dx_[i+1] + dx_[i+2]))*p(n_, j) + (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
 
-        Eigen::VectorXd pj = solveTridiagonal(L, D, U, b);
+        scalarField pj = solveTridiagonal(L, D, U, b);
         for (int i = 1; i < pj.size()+1; i++)
         {
-            p[i][j] = pj[i-1];
+            p(i, j) = pj[i-1];
         }        
     }
 
     ///////// solution for q
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < n_; i++)
     {
-        Eigen::VectorXd U(m-2);
-        Eigen::VectorXd D(m-1);
-        Eigen::VectorXd L(m-2);
-        Eigen::VectorXd b(m-1);
+        scalarField U(m_-2);
+        scalarField D(m_-1);
+        scalarField L(m_-2);
+        scalarField b(m_-1);
         int j = 0;
 
-        U[j] = 1.0/(dy[j+1] + dy[j+2]);
-        D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
+        U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
+        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
 
-        b[j] = (-1.0/(dy[j] + dy[j+1]))*q[i][0] + (4.0/dy[j+1])*((u[i][j+1] - u[i][j])/dy[j+1]);
+        b[j] = (-1.0/(dy_[j] + dy_[j+1]))*q(i, 0) + (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
 
         j++;
-        for ( ; j < m-2; j++)
+        for ( ; j < m_-2; j++)
         {
-            U[j] = 1.0/(dy[j+1] + dy[j+2]);
-            D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
-            L[j-1] = 1.0/(dy[j] + dy[j+1]);
-            b[j] = (4.0/dy[j+1])*((u[i][j+1] - u[i][j])/dy[j+1]);
+            U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
+            D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
+            L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
+            b[j] = (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
         }
 
-        D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
-        L[j-1] = 1.0/(dy[j] + dy[j+1]);
-        b[j] = (-1.0/(dy[j+1] + dy[j+2]))*q[i][m] + (4.0/dy[j+1])*((u[i][j+1] - u[i][j])/dy[j+1]);
+        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
+        L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
+        b[j] = (-1.0/(dy_[j+1] + dy_[j+2]))*q(i, m_) + (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
 
-        Eigen::VectorXd qi = solveTridiagonal(L, D, U, b);
+        scalarField qi = solveTridiagonal(L, D, U, b);
         for (int j = 1; j < qi.size()+1; j++)
         {
-            q[i][j] = qi[j-1];
+            q(i, j) = qi[j-1];
         }        
     }
 
     
     ///////// solution for ri0 and rim
-    for (int j = 0; j < m+1; j += m)
+    for (int j = 0; j < m_+1; j += m_)
     {
-        Eigen::VectorXd U(n-2);
-        Eigen::VectorXd D(n-1);
-        Eigen::VectorXd L(n-2);
-        Eigen::VectorXd b(n-1);
+        scalarField U(n_-2);
+        scalarField D(n_-1);
+        scalarField L(n_-2);
+        scalarField b(n_-1);
         int i = 0;
 
-        U[i] = 1.0/(dx[i+1] + dx[i+2]);
-        D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
+        U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
+        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
 
-        b[i] = (-1.0/(dx[i] + dx[i+1]))*r[i][j] + (4.0/dx[i+1])*((q[i+1][j] - q[i][j])/dx[i+1]);
+        b[i] = (-1.0/(dx_[i] + dx_[i+1]))*r(i, j) + (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
 
         i++;
-        for ( ; i < n-2; i++)
+        for ( ; i < n_-2; i++)
         {
-            U[i] = 1.0/(dx[i+1] + dx[i+2]);
-            D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
-            L[i-1] = 1.0/(dx[i] + dx[i+1]);
-            b[i] = (4.0/dx[i+1])*((q[i+1][j] - q[i][j])/dx[i+1]);
+            U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
+            D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
+            L[i-1] = 1.0/(dx_[i] + dx_[i+1]);
+            b[i] = (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
         }
 
-        D[i] = (1.0/dx[i+1])*(2.0 + dx[i]/(dx[i] + dx[i+1]) + dx[i+2]/(dx[i+1] + dx[i+2]));
-        L[i-1] = 1.0/(dx[i]+dx[i+1]);
-        b[i] = (-1.0/(dx[i+1] + dx[i+2]))*r[i+2][j] + (4.0/dx[i+1])*((q[i+1][j] - q[i][j])/dx[i+1]);
+        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
+        L[i-1] = 1.0/(dx_[i]+dx_[i+1]);
+        b[i] = (-1.0/(dx_[i+1] + dx_[i+2]))*r(i+2, j) + (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
 
-        Eigen::VectorXd rj = solveTridiagonal(L, D, U, b);
+        scalarField rj = solveTridiagonal(L, D, U, b);
         for (int i = 1; i < rj.size()+1; i++)
         {
-            r[i][j] = rj[i-1];
+            r(i, j) = rj[i-1];
         }
     }
 
 
     //////solution for r
-    for (int i = 0; i < n+1; i++)
+    for (int i = 0; i < n_+1; i++)
     {
-        Eigen::VectorXd U(m-2);
-        Eigen::VectorXd D(m-1);
-        Eigen::VectorXd L(m-2);
-        Eigen::VectorXd b(m-1);
+        scalarField U(m_-2);
+        scalarField D(m_-1);
+        scalarField L(m_-2);
+        scalarField b(m_-1);
         int j = 0;
 
-        U[j] = 1.0/(dy[j+1] + dy[j+2]);
-        D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
+        U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
+        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
 
-        b[j] = (-1.0/(dy[j] + dy[j+1]))*r[i][0] + (4.0/dy[j+1])*((p[i][j+1] - p[i][j])/dy[j+1]);
+        b[j] = (-1.0/(dy_[j] + dy_[j+1]))*r(i, 0) + (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
 
         j++;
-        for ( ; j < m-2; j++)
+        for ( ; j < m_-2; j++)
         {
-            U[j] = 1.0/(dy[j+1] + dy[j+2]);
-            D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
-            L[j-1] = 1.0/(dy[j] + dy[j+1]);
-            b[j] = (4.0/dy[j+1])*((p[i][j+1] - p[i][j])/dy[j+1]);
+            U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
+            D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
+            L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
+            b[j] = (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
         }
 
-        D[j] = (1.0/dy[j+1])*(2.0 + dy[j]/(dy[j] + dy[j+1]) + dy[j+2]/(dy[j+1] + dy[j+2]));
-        L[j-1] = 1.0/(dy[j] + dy[j+1]);
-        b[j] = (-1.0/(dy[j+1] + dy[j+2]))*r[i][m] + (4.0/dy[j+1])*((p[i][j+1] - p[i][j])/dy[j+1]);
+        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
+        L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
+        b[j] = (-1.0/(dy_[j+1] + dy_[j+2]))*r(i, m_) + (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
 
-        Eigen::VectorXd ri = solveTridiagonal(L, D, U, b);
+        scalarField ri = solveTridiagonal(L, D, U, b);
         for (int j = 1; j < ri.size()+1; j++)
         {
-            r[i][j] = ri[j-1];
+            r(i, j) = ri[j-1];
         }        
     }
 
-    int idx = 0;
-    for(int j = 0; j < m; j++)
+    int idx_ = 0;
+    for(int j = 0; j < m_; j++)
     {
-        for(int i = 0; i < n; i++)
+        for(int i = 0; i < n_; i++)
         {
             Mat3x3 VxInv({0 , 1.0, 0,
-                          dx[i+1]/(dx[i] + dx[i+1]), 0, dx[i]/(dx[i] + dx[i+1]),
-                          -1.0/(dx[i] + dx[i+1]), 0, 1.0/(dx[i] + dx[i+1])});
+                          dx_[i+1]/(dx_[i] + dx_[i+1]), 0, dx_[i]/(dx_[i] + dx_[i+1]),
+                          -1.0/(dx_[i] + dx_[i+1]), 0, 1.0/(dx_[i] + dx_[i+1])});
 
             Mat3x3 VyInv({0 , 1.0, 0,
-                          dy[j+1]/(dy[j] + dy[j+1]), 0, dy[j]/(dy[j] + dy[j+1]),
-                          -1.0/(dy[j] + dy[j+1]), 0, 1.0/(dy[j] + dy[j+1])});
+                          dy_[j+1]/(dy_[j] + dy_[j+1]), 0, dy_[j]/(dy_[j] + dy_[j+1]),
+                          -1.0/(dy_[j] + dy_[j+1]), 0, 1.0/(dy_[j] + dy_[j+1])});
 
-            Mat3x3 C({r[i][j], p[i][j], r[i][j+1],
-                      q[i][j], u[i][j], q[i][j+1],
-                      r[i+1][j], p[i+1][j], r[i+1][j+1]});
+            Mat3x3 C({r(i, j), p(i, j), r(i, j+1),
+                      q(i, j), u(i, j), q(i, j+1),
+                      r(i+1, j), p(i+1, j), r(i+1, j+1)});
 
-            coeffs[idx] = VyInv*C*(VyInv.transpose());
-            idx++;
+            coefficients_[idx_] = (VyInv*C*(VyInv.transpose())).data(); //TODO pristup 
+            idx_++;
         }
     }
 }
 
 
-Eigen::VectorXd Foam::biQuadraticInterpolation::solveTridiagonal
+Foam::scalarField Foam::biQuadraticInterpolation::solveTridiagonal
 (
-    const Eigen::VectorXd& L,
-    const Eigen::VectorXd& D,
-    const Eigen::VectorXd& U,
-    const Eigen::VectorXd& b
+    const Foam::scalarField& L,
+    const Foam::scalarField& D,
+    const Foam::scalarField& U,
+    const Foam::scalarField& b
 ) const
 {
     int n = b.size();
-    Eigen::VectorXd out(n);
+    scalarField out(n);
                                                                                                                                                                        
-    Eigen::VectorXd UStar(n-1, 0.0);
-    Eigen::VectorXd bStar(n, 0.0);
+    scalarField UStar(n-1, 0.0);
+    scalarField bStar(n, 0.0);
                                                                                                                                                     
     UStar[0] = U[0] / D[0];
     bStar[0] = b[0] / D[0];
                                                                                                                                             
     for (int i = 1; i < n-1; i++)
     {
-        double m = 1.0/(D[i] - L[i-1]*UStar[i-1]);
+        scalar m = 1.0/(D[i] - L[i-1]*UStar[i-1]);
         UStar[i] = U[i] * m;
         bStar[i] = (b[i] - L[i-1]*bStar[i-1])*m;
     }
@@ -283,7 +285,7 @@ Eigen::VectorXd Foam::biQuadraticInterpolation::solveTridiagonal
 }
 
 
-double Foam::biQuadraticInterpolation::transform(double x, Transformation transformation) const
+Foam::scalar Foam::biQuadraticInterpolation::transform(Foam::scalar x, Transformation transformation) const
 {
     switch(transformation) 
     {
@@ -293,12 +295,14 @@ double Foam::biQuadraticInterpolation::transform(double x, Transformation transf
             return log10(x);
         case LOGINV:
             return log(1/x);
+        case NONE:
+            return x;
     }
 
     return x;
 }
 
-double Foam::biQuadraticInterpolation::backTransform(double x, Transformation transformation) const
+Foam::scalar Foam::biQuadraticInterpolation::backTransform(Foam::scalar x, Transformation transformation) const
 {
     switch(transformation) 
     {
@@ -308,58 +312,60 @@ double Foam::biQuadraticInterpolation::backTransform(double x, Transformation tr
             return pow(x, 10.0);
         case LOGINV:
             return 1.0/exp(x);
+        case NONE:
+            return x;
     }
 
     return x;
 }
 
-scalar Foam::biQuadraticInterpolation::calc(scalar xx, scalar yy)
+Foam::scalar Foam::biQuadraticInterpolation::calc(Foam::scalar xx, Foam::scalar yy)
 {
     std::pair<int, int> position = findPosition(xx, yy);
 
-    double v = xx - x[position.first];
-    double w = yy - y[position.second];
+    scalar v = xx - x_[position.first];
+    scalar w = yy - y_[position.second];
 
-    const Mat3x3& coeff = coeffs_[position.second*n + position.first];
+    const Mat3x3& coeff = coefficients_[position.second*n_ + position.first];
 
-    return coeff[0][0] + w*(coeff[0][1] + w*coeff[0][2]) + v*(coeff[1][0] + w*(coeff[1][1] + w*coeff[1][2]) + v*(coeff[2][0] + w*(coeff[2][1] + w*coeff[2][2])));
+    return coeff(0, 0) + w*(coeff(0, 1) + w*coeff(0, 2)) + v*(coeff(1, 0) + w*(coeff(1, 1) + w*coeff(1, 2)) + v*(coeff(2, 0) + w*(coeff(2, 1) + w*coeff(2, 2))));
 }
 
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::biQuadraticInterpolation::biQuadraticInterpolation()
+/*Foam::biQuadraticInterpolation::biQuadraticInterpolation()
 :
     List<value_type>(),
     bounding_(bounds::normalBounding::WARN),
     fileName_("fileNameIsUndefined"),
     reader_(nullptr)
-{}
+{}*/
 
 
-Foam::biQuadraticInterpolation::biQuadraticInterpolation(const fileName& fName)
+/*Foam::biQuadraticInterpolation::biQuadraticInterpolation(const fileName& fName)
 :
     fileName_(fName)
 {
     readTable();
-}
+}*/
 
 
-Foam::biQuadraticInterpolation::biQuadraticInterpolation(const dictionary& dict)
+/*Foam::biQuadraticInterpolation::biQuadraticInterpolation(const dictionary& dict)
 :
     fileName_(dict.get<fileName>("file"))
 {
     readTable();
-}
+}*/
 
 
-Foam::biQuadraticInterpolation::biQuadraticInterpolation
+/*Foam::biQuadraticInterpolation::biQuadraticInterpolation
 (
      const biQuadraticInterpolation& tbl
 )
 :
     fileName_(tbl.fileName_)
-{}
+{}*/
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -381,7 +387,7 @@ Foam::biQuadraticInterpolation::biQuadraticInterpolation
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-void Foam::biQuadraticInterpolation::operator=
+/*void Foam::biQuadraticInterpolation::operator=
 (
     const biQuadraticInterpolation& rhs
 )
@@ -393,10 +399,10 @@ void Foam::biQuadraticInterpolation::operator=
 
     static_cast<List<value_type>&>(*this) = rhs;
     fileName_ = rhs.fileName_;
-}
+}*/
 
 
-scalar Foam::biQuadraticInterpolation::operator()
+/*scalar Foam::biQuadraticInterpolation::operator()
 (
     const scalar valueX,
     const scalar valueY
@@ -404,44 +410,44 @@ scalar Foam::biQuadraticInterpolation::operator()
 {
 
     //return (y0 + (y1 - y0)*(valueX - x0)/(x1 - x0));
-}
+}*/
 
 
-void Foam::biQuadraticInterpolation::check() const
+/*void Foam::biQuadraticInterpolation::check() const
 {
 
-}
+}*/
 
 
-void Foam::biQuadraticInterpolation::write(Ostream& os) const
+/*void Foam::biQuadraticInterpolation::write(Ostream& os) const
 {
     os.writeEntry("file", fileName_);
     os.writeEntry("outOfBounds", bounds::normalBoundingNames[bounding_]);
 
     os  << *this;
-}
+}*/
 
 
-std::pair<int, int> Foam::BiQuadraticInterpolation::findPosition(double xx, double yy) const
+std::pair<int, int> Foam::biQuadraticInterpolation::findPosition(Foam::scalar xx, Foam::scalar yy) const
 {
-    int shiftIdxX = 0;
-    int shiftIdxY = 0;
+    int shiftIdx_X = 0;
+    int shiftIdx_Y = 0;
 
     int ii;
-    for (ii = 0; ii < gridSizeX.size(); ii++)
+    for (ii = 0; ii < gridSizeX_.size(); ii++)
     {
-        if (xx < boundaryX[ii+1]) { break; }
-        shiftIdxX += gridSizeX[ii];
+        if (xx < boundaryX_[ii+1]) { break; }
+        shiftIdx_X += gridSizeX_[ii];
     }
     int jj; 
-    for (jj = 0; jj < gridSizeY.size(); jj++)
+    for (jj = 0; jj < gridSizeY_.size(); jj++)
     {
-        if (yy < boundaryY[jj+1]) { break; }
-        shiftIdxY += gridSizeY[jj];
+        if (yy < boundaryY_[jj+1]) { break; }
+        shiftIdx_Y += gridSizeY_[jj];
     }
     
-    return std::pair<int, int>(std::floor((abs(transform(xx, transformationX) - transform(boundaryX[ii], transformationX)))/dz[ii]) + shiftIdxX,
-                               std::floor((abs(transform(yy, transformationY) - transform(boundaryY[jj], transformationY)))/dt[jj]) + shiftIdxY);
+    return std::pair<int, int>(std::floor((abs(transform(xx, transformationX_) - transform(boundaryX_[ii], transformationX_)))/dz_[ii]) + shiftIdx_X,
+                               std::floor((abs(transform(yy, transformationY_) - transform(boundaryY_[jj], transformationY_)))/dt_[jj]) + shiftIdx_Y);
 }
 
 
