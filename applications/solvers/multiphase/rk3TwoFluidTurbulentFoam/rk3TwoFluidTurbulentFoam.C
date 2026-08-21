@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
-    #include "../tools/film/createFilmFields.H"
+    //#include "../tools/film/createFilmFields.H"
     #include "createTimeControls.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -169,9 +169,9 @@ int main(int argc, char *argv[])
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();
 
-        #include "../tools/boundaryFlux.H"
+        //#include "../tools/boundaryFlux.H"
 
-        #include "../tools/film/solveFilm.H"
+        //#include "../tools/film/solveFilm.H"
 
         runTime.write();
 
@@ -179,11 +179,11 @@ int main(int argc, char *argv[])
 
         //std::cin.ignore();
 
-        if(runTime.timeIndex() > 1100000)
+        /*if(runTime.timeIndex() > 1100000)
         {
             Info<< "End after 1 000 000 iter\n" << endl;
             return 0;
-        }
+        }*/
     }
 
     Info<< "End\n" << endl;

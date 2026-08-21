@@ -1,0 +1,31 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      decomposeParDict;
+}
+
+// Počet poddomén (jader)
+numberOfSubdomains 8;
+
+// Metoda rozdělení
+method          scotch;  // Automatické optimalizované dělení
+
+// Alternativní možnosti rozdělení (pro metody 'simple' a 'hierarchical')
+simpleCoeffs
+{
+    n           (4 2 1);  // Dělení v x, y, z směru (celkem 4×2×1 = 8 částí)
+    delta       0.001;    // Hraniční tolerance
+}
+
+hierarchicalCoeffs
+{
+    n           (4 2 1);
+    delta       0.001;
+    order       xyz;
+}
+
+// Výstupní logy
+distributed     no;
+roots          ();
