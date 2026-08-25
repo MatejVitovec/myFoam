@@ -48,7 +48,7 @@ namespace Foam
 Foam::mslau2::mslau2()
 :
     riemannSolver(),
-    epsilon_(1.0e-10) //TODO
+    epsilon_(1.0e-5) //TODO
 {}
 
 Foam::mslau2::mslau2
@@ -57,7 +57,7 @@ Foam::mslau2::mslau2
 )
 :
     riemannSolver(dict),
-    epsilon_(1.0e-10) //TODO
+    epsilon_(1.0e-5) //TODO
 {}
 
 scalar Foam::mslau2::massFlux

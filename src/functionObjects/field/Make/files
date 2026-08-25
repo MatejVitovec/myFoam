@@ -1,4 +1,5 @@
 relaxationLoss/relaxationLoss.C
 totalLoss/totalLoss.C
+totalPressure/totalPressure.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyfieldFunctionObjects

@@ -1,10 +1,19 @@
 EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
+    -I../../thermophysicalModels/lnInclude 
 
 EXE_LIBS = \
+    $(CPLIBS) \
     -lfiniteVolume \
+    -lfvOptions \
     -lmeshTools \
-    -lthermophysicalModels
-    
+    -lthermophysicalModels \
+    -lspecie \
+    -lthermoTools \
+    -ltopoChangerFvMesh \
+    -L$(FOAM_USER_LIBBIN) \
+    -lmyThermophysicalModels
