@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
-    #include "../../../tools/film/createFilmFields.H"
+    //#include "../../../tools/film/createFilmFields.H"
     #include "createTimeControls.H"
     #include "createLUSGSControls.H"
 
@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
             phi1 = linearInterpolate(U1) & mesh.Sf();
             U = U1;
 
-            #include "../../../tools/film/solveFilm.H"
+            //#include "../../../tools/film/solveFilm.H"
 
             //#include "../tools/boundaryOutflow.H"
 

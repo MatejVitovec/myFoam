@@ -41,7 +41,7 @@ SourceFiles
 #ifndef functionObjects_totalPressure_H
 #define functionObjects_totalPressure_H
 
-#include "fvMeshFunctionObject.H"
+#include "fieldExpression.H"
 #include "volFields.H"
 #include "dictionary.H"
 #include "wordList.H"
@@ -60,26 +60,19 @@ namespace functionObjects
 
 class totalPressure
 :
-    public fvMeshFunctionObject
+    public fieldExpression
 {
     // Field names
     word phaseName_;
-    word pName_;
-    word TName_;
-    word UName_;
-    word rhoName_;
 
-    // Patches for averaging
-    wordList patches_;
+    // Private Member Functions
+ 
+        //- Calculate the Q field and return true if successful
+        virtual bool calc();
 
-    // Write local p0 field
-    bool writeField_;
+        virtual bool read(const dictionary& dict);
 
-    // Calculate patch average
-    /*void calculatePatchAverage
-    (
-        const volScalarField& p0
-    ) const;*/
+        scalar pTot(scalar p, scalar T, vector U, gasProperties& gasProps);
 
 public:
 
@@ -88,8 +81,7 @@ public:
 
     // Constructors
 
-        //- Construct for given objectRegistry and dictionary.
-        //  Allow the possibility to load fields from files
+        //- Construct from Time and dictionary
         totalPressure
         (
             const word& name,
@@ -97,18 +89,15 @@ public:
             const dictionary& dict
         );
 
+        //- No copy construct
+        totalPressure(const totalPressure&) = delete;
+
+        //- No copy assignment
+        void operator=(const totalPressure&) = delete;
+
     // Destructor
     virtual ~totalPressure() = default;
-
-    // Member Functions
-
-        virtual bool read(const dictionary& dict);
-
-        virtual bool execute();
-
-        virtual bool write();
 };
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -120,4 +109,3 @@ public:
 #endif
 
 // ************************************************************************* //
-

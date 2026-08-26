@@ -14,6 +14,84 @@ namespace functionObjects
 }
 }
 
+ // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
+ 
+bool Foam::functionObjects::totalPressure::calc()
+{
+    const word thermoName =
+    IOobject::groupName
+    (
+        "thermophysicalProperties",
+        phaseName_
+    );
+
+    if
+    (
+        foundObject<volVectorField>(fieldName_)
+     && foundObject<fluidThermo>(thermoName)
+    )
+    {
+        const fluidThermo& thermo =
+            lookupObject<fluidThermo>(thermoName);
+
+        autoPtr<gasProperties> pGasProps(gasProperties::New(thermo));
+        gasProperties& gasProps = pGasProps.ref();
+        
+        const volVectorField& U = lookupObject<volVectorField>(fieldName_);
+        const volScalarField& p = thermo.p();
+        const volScalarField& T = thermo.T();
+
+        auto tp0 = tmp<volScalarField>::New
+        (
+            IOobject
+            (
+                resultName_,
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            mesh_,
+            dimensionedScalar("zero", p.dimensions(), 0.0)
+        );
+
+        volScalarField& p0 = tp0.ref();
+
+        forAll(p0, celli)
+        {
+            p0[celli] = this->pTot(p[celli], T[celli], U[celli], gasProps);
+
+            /*const scalar h = gasProps.Hs(p[celli], T[celli]);
+            const scalar s = gasProps.S (p[celli], T[celli]);
+
+            const scalar h0 = h + 0.5*magSqr(U[celli]);
+
+            Info << h0 << " , " << h << " , " << s << " , " << p[celli] << endl;
+
+            p0[celli] = gasProps.pHS(h0, s, p[celli]);*/
+        }
+
+        forAll(p0.boundaryField(), patchi)
+        {
+            auto& pp0  = p0.boundaryFieldRef()[patchi];
+            const auto& pU = U.boundaryField()[patchi];
+            const auto& pp = p.boundaryField()[patchi];
+            const auto& pT = T.boundaryField()[patchi];
+
+            forAll(pp0, facei)
+            {
+                pp0[facei] = this->pTot(pp[facei], pT[facei], pU[facei], gasProps);
+            }
+        }
+
+        //p0.correctBoundaryConditions();
+
+        return store(resultName_, tp0);
+    }
+
+    return false;
+}
+
 
 // * * * * * * * * * * * * Constructor * * * * * * * * * * * * //
 
@@ -24,14 +102,8 @@ Foam::functionObjects::totalPressure::totalPressure
     const dictionary& dict
 )
 :
-    fvMeshFunctionObject(name, runTime, dict),
-    phaseName_("phase"),
-    pName_("p"),
-    TName_("T"),
-    UName_("U"),
-    rhoName_("rho"),
-    patches_(),
-    writeField_(true)
+    fieldExpression(name, runTime, dict),
+    phaseName_("")
 {
     read(dict);
 }
@@ -41,211 +113,63 @@ Foam::functionObjects::totalPressure::totalPressure
 
 bool Foam::functionObjects::totalPressure::read(const dictionary& dict)
 {
-    fvMeshFunctionObject::read(dict);
+    fieldExpression::read(dict);
 
-    phaseName_  = dict.lookupOrDefault<word>("phase", "phase");
-    pName_      = dict.lookupOrDefault<word>("p", "p");
-    TName_      = dict.lookupOrDefault<word>("T", "T");
-    UName_      = dict.lookupOrDefault<word>("U", "U");
+    phaseName_  = dict.lookupOrDefault<word>("phaseName", "");
 
-    patches_    = dict.lookupOrDefault<wordList>("patches", wordList());
-
-    writeField_ = dict.lookupOrDefault<bool>("writeField", true);
-
-    return true;
-}
-
-// * * * * * * * * * * * Execute * * * * * * * * * * * * //
-
-bool Foam::functionObjects::totalPressure::execute()
-{
-    const fvMesh& mesh =
-        refCast<const fvMesh>(obr_);
-
-    const volScalarField& p =
-        mesh.lookupObject<volScalarField>(pName_);
-
-    const volScalarField& T =
-        mesh.lookupObject<volScalarField>(TName_);
-
-    const volVectorField& U =
-        mesh.lookupObject<volVectorField>(UName_);
-
-    const fluidThermo& thermo =
-        lookupObject<fluidThermo>(IOobject::groupName("thermophysicalProperties", phaseName_));
-
-    const autoPtr<gasProperties> pGasProps = gasProperties::New(thermo);
-    const gasProperties& gasProps = pGasProps();
-
-    // Create total-pressure field
-    volScalarField p0
-    (
-        IOobject
-        (
-            "p0",
-            mesh.time().timeName(),
-            mesh,
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        mesh,
-        dimensionedScalar
-        (
-            "zero",
-            p.dimensions(),
-            0.0
-        )
-    );
-
-    // Calculate local total pressure
-    forAll(p0, celli)
-    {
-        const scalar h = gasProps.Hs(p[celli], T[celli]);
-        const scalar s = gasProps.S(p[celli], T[celli]);
-
-        const scalar h0 = h + 0.5*magSqr(U[celli]);
-        p0[celli] = gasProps.pHS(h0, s, p[celli]);
-    }
-
-    p0.correctBoundaryConditions();
-
-    if (writeField_)
-    {
-        p0.write();
-    }
-
-    // Patch statistics
-    //calculatePatchAverage(p0);
+    resultName_ = IOobject::groupName("p0", phaseName_);
 
     return true;
 }
 
 
-// * * * * * * * * * * Patch average * * * * * * * * * * * //
-
-/*void totalPressure::calculatePatchAverage
+Foam::scalar Foam::functionObjects::totalPressure::pTot
 (
-    const volScalarField& p0
-) const
+    Foam::scalar p, Foam::scalar T, Foam::vector U, Foam::gasProperties& gasProps
+)
 {
-    const fvMesh& mesh =
-        refCast<const fvMesh>(obr_);
+    scalar S = gasProps.S(p, T);
+    scalar H = gasProps.Hs(p, T) + 0.5*magSqr(U);
+    scalar T0 = T;
+    scalar p0 = p;
 
-    const volVectorField& U =
-        mesh.lookupObject<volVectorField>(UName_);
-
-    const volScalarField& rho =
-        mesh.lookupObject<volScalarField>(rhoName_);
-
-
-    forAll(patches_, patchi)
+    const scalar tol = 1.e-8;
+    const label maxIter = 100;
+    
+    label iter = 0;
+    scalar dp, dT;
+    do
     {
-        const word& patchName =
-            patches_[patchi];
-
-        const label patchID =
-            mesh.boundaryMesh().findPatchID(patchName);
-
-
-        if (patchID < 0)
+        scalar Cp = gasProps.Cp(p0, T0);
+        scalar beta_p = gasProps.beta_p(p0, T0);
+        scalar v = 1.0/gasProps.rho(p0, T0);
+        
+        scalar dH = H - gasProps.Hs(p0, T0);
+        scalar dS = S - gasProps.S(p0, T0);
+        dT = dH/Cp;
+        dp = (Cp/T0*dT - dS)/(v*beta_p);
+        
+        
+        T0 += dT;
+        p0 += dp;
+        
+        if (iter++ > maxIter)
         {
-            WarningInFunction
-                << "Patch " << patchName
-                << " was not found."
-                << nl;
-
-            continue;
+            FatalErrorInFunction
+                << "Maximum number of iterations exceeded: " << maxIter
+                    << " T  : " << T0
+                    << " p  : " << p0
+                    << " Z  : " << gasProps.Z(p0,T0)
+                    << " Cp : " << gasProps.Cp(p0,T0)
+                    << " tol: " << tol
+                    << abort(FatalError);
         }
-
-
-        const vectorField& Sf =
-            mesh.Sf().boundaryField()[patchID];
-
-        const fvPatchVectorField& Up =
-            U.boundaryField()[patchID];
-
-        const fvPatchScalarField& rhop =
-            rho.boundaryField()[patchID];
-
-        const fvPatchScalarField& p0p =
-            p0.boundaryField()[patchID];
-
-
-        scalar massFlow = 0.0;
-        scalar p0MassFlow = 0.0;
-
-
-        forAll(Sf, facei)
-        {
-            const scalar mdot =
-                rhop[facei]
-              * (Up[facei] & Sf[facei]);
-
-
-            massFlow += mdot;
-
-            p0MassFlow +=
-                mdot*p0p[facei];
-        }
-
-
-        reduce(massFlow, sumOp<scalar>());
-        reduce(p0MassFlow, sumOp<scalar>());
-
-
-        if (mag(massFlow) > SMALL)
-        {
-            const scalar p0Mean =
-                p0MassFlow/massFlow;
-
-
-            Info<< "totalPressure:"
-                << " patch = " << patchName
-                << "  massFlow = " << massFlow
-                << "  p0 = " << p0Mean
-                << " Pa"
-                << nl;
-
-
-            // Create output directory
-
-            fileName outputDir =
-                mesh.time().path()
-              / "postProcessing"
-              / name();
-
-            mkDir(outputDir);
-
-
-            fileName outputFile =
-                outputDir/(patchName + ".dat");
-
-
-            OFstream os
-            (
-                outputFile,
-                IOstreamOption::APPEND
-            );
-
-
-            os
-                << mesh.time().value()
-                << " "
-                << p0Mean
-                << " "
-                << massFlow
-                << nl;
-        }
-    }
-}*/
-
-
-// * * * * * * * * * * * Write * * * * * * * * * * * * //
-
-bool Foam::functionObjects::totalPressure::write()
-{
-    return true;
+        
+    } while ( (mag(dp) > p*tol) || (mag(dT) > T*tol) );
+    
+    return p0;
 }
+
 
 
 // ************************************************************************* //
