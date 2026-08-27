@@ -16,6 +16,7 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 riemannSolver       mslau2;
+epsilonMSlau2       1.0e-10;
 
 ddtSchemes
 {

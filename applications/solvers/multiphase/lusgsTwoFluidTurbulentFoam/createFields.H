@@ -84,7 +84,8 @@ surfaceScalarField phi1(
     linearInterpolate(U1) & mesh.Sf()
 );
 
-volVectorField U(
+//OPRAVA: pridat do turbulentIntensityKineticEnergyInlet -> U "U.1"; a phi "alphaRhoPhiL.1";
+/*volVectorField U(
     IOobject
     (
         "U",
@@ -94,7 +95,7 @@ volVectorField U(
         IOobject::NO_WRITE
     ),
     U1
-);
+);*/
 
 
 Info<< "Creating turbulence model for phase 1 (gas)\n" << endl;

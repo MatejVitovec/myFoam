@@ -36,6 +36,7 @@ SourceFiles
 \*---------------------------------------------------------------------------*/
 
 #include "mslau2.H"
+#include "IOstream.H"
 
 #include "addToRunTimeSelectionTable.H"
 
@@ -48,7 +49,7 @@ namespace Foam
 Foam::mslau2::mslau2()
 :
     riemannSolver(),
-    epsilon_(1.0e-5) //TODO
+    epsilon_(1.0e-5)
 {}
 
 Foam::mslau2::mslau2
@@ -57,8 +58,11 @@ Foam::mslau2::mslau2
 )
 :
     riemannSolver(dict),
-    epsilon_(1.0e-5) //TODO
-{}
+
+    epsilon_(dict.lookupOrDefault<scalar>("epsilonMSlau2", 1.0e-5)) //TODO predelat na subdict
+{
+    //Info << "MSLAU epsilon: " << epsilon_ << endl;
+}
 
 scalar Foam::mslau2::massFlux
 (
