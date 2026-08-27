@@ -61,8 +61,72 @@ functions
         libs        (libmyfieldFunctionObjects.so);
 
     	field "U.1";
+        phaseName "1";
 
-        phaseName   "1";
+        executeControl  writeTime;
+        writeControl    writeTime;
+    }
+
+    alphaRho1
+    {
+        type            exprField;
+        libs            (fieldFunctionObjects);
+
+        field           alphaRho.1;
+        expression       "alpha.1*\"thermo:rho.1\"";
+
+        dimensions      [1 -3 0 0 0 0 0];
+
+        executeControl  writeTime;
+        writeControl    writeTime;
+    }
+
+    massFluxGas
+    {
+        type            flux;
+        libs            (fieldFunctionObjects);
+
+        field           U.1;
+        rho             alphaRho.1;
+        result          alphaRhoFlux.1;
+
+        executeControl  writeTime;
+        writeControl    writeTime;
+    }
+
+    massFlowGas
+    {
+        type            surfaceFieldValue;
+        libs            (fieldFunctionObjects);
+
+        writeFields     false;
+
+        regionType      patch;
+        name            outlet;
+
+        operation       sum;
+        fields          (alphaRhoFlux.1);
+
+        executeControl  writeTime;
+        writeControl    writeTime;
+    }
+
+    p0GasAverage
+    {
+        type            surfaceFieldValue;
+        libs            (fieldFunctionObjects);
+
+        writeFields     false;
+
+        regionType      patch;
+        name            outlet;
+
+        operation       weightedAverage;
+        fields          (p0.1);
+        weightField     alphaRhoFlux.1;
+
+        executeControl  writeTime;
+        writeControl    writeTime;
     }
 
 }
