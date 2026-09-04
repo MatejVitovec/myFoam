@@ -20,9 +20,9 @@ libs (
   "libmyFoam.so"
 );
 
-startFrom       startTime;
+startFrom       latestTime;
 
-startTime       0.0039823509814958264;
+startTime       0.0011457545;
 
 stopAt          endTime;
 
@@ -32,7 +32,7 @@ deltaT          1e-6;
 
 writeControl    timeStep;
 
-writeInterval   20000;
+writeInterval   5000;
 
 purgeWrite      0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 0.025;
+maxCo 0.0125;
 
 rDeltaTSmoothingCoeff 0.1;
 

@@ -16,9 +16,9 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-epsilon         1.0e-4;
-epsilonMin      1.0e-6;
-epsilonMax      1.0e-3;
+epsilon         1.0e-10;
+epsilonMin      1.0e-13;
+epsilonMax      1.0e-8;
 
 drag
 {

@@ -1,0 +1,44 @@
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      faSchemes;
+}
+
+ddtSchemes
+{
+    default         Euler;
+}
+
+divSchemes
+{
+    default         none;
+
+    div(phiF,h)      Gauss linearUpwind;
+}
+
+gradSchemes
+{
+    default Gauss linear;
+}
+
+lnGradSchemes
+{
+    default         corrected;
+}
+
+laplacianSchemes
+{
+    default         Gauss linear corrected;
+}
+
+interpolationSchemes
+{
+    default         linear;
+}
+
+snGradSchemes
+{
+    default         corrected;
+}
