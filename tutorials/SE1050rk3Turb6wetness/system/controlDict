@@ -20,7 +20,7 @@ libs (
   "libmyFoam.so"
 );
 
-startFrom       startTime;
+startFrom       latestTime;
 
 startTime       0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  yes;
 
-maxCo 0.3;
+maxCo 0.8;
 
 rDeltaTSmoothingCoeff 0.1;
 

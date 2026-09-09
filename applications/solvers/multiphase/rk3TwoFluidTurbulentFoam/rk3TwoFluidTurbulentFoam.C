@@ -62,6 +62,7 @@ int main(int argc, char *argv[])
 
     #define NO_CONTROL
     #include "postProcess.H"
+    #include "OFstream.H"
 
     #include "addCheckCaseOptions.H"
     #include "setRootCaseLists.H"
@@ -169,7 +170,7 @@ int main(int argc, char *argv[])
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();
 
-        //#include "../tools/boundaryFlux.H"
+        #include "../tools/boundaryFlux.H"
 
         //#include "../tools/film/solveFilm.H"
 
