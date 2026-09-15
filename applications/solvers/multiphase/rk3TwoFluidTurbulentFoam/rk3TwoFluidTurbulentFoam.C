@@ -180,11 +180,11 @@ int main(int argc, char *argv[])
 
         //std::cin.ignore();
 
-        /*if(runTime.timeIndex() > 1100000)
+        if(runTime.timeIndex() > 1100000)
         {
-            Info<< "End after 1 000 000 iter\n" << endl;
+            Info<< "End after 1 100 000 iter\n" << endl;
             return 0;
-        }*/
+        }
     }
 
     Info<< "End\n" << endl;

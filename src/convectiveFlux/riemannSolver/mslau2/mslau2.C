@@ -61,7 +61,7 @@ Foam::mslau2::mslau2
 
     epsilon_(dict.lookupOrDefault<scalar>("epsilonMSlau2", 1.0e-5)) //TODO predelat na subdict
 {
-    //Info << "MSLAU epsilon: " << epsilon_ << endl;
+    Info << "MSLAU epsilon: " << epsilon_ << endl;
 }
 
 scalar Foam::mslau2::massFlux
