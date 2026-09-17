@@ -155,13 +155,19 @@ int main(int argc, char *argv[])
         scalar finalRezT1    = fvc::domainIntegrate(mag(T1 - T1.oldTime())      /dt).value();
         scalar finalRezT2    = fvc::domainIntegrate(mag(T2 - T2.oldTime())      /dt).value();
 
-        Info << "rk3:  Solving for p,     " << "Final residual = " << finalRezp     << nl;
-        Info << "rk3:  Solving for alpha, " << "Final residual = " << finalRezalpha << nl;
-        Info << "rk3:  Solving for U1,    " << "Final residual = " << finalRezU1    << nl;
-        Info << "rk3:  Solving for U2,    " << "Final residual = " << finalRezU2    << nl;
-        Info << "rk3:  Solving for T1,    " << "Final residual = " << finalRezT1    << nl;
-        Info << "rk3:  Solving for T2,    " << "Final residual = " << finalRezT2    << nl;
+        scalar finalRezpL2     = Foam::sqrt(gSum(magSqr(((p - p.oldTime())/dt)*mesh.V())));
+        scalar finalRezalphaL2 = Foam::sqrt(gSum(magSqr(((alpha2 - alpha2.oldTime())/dt)*mesh.V())));
+        scalar finalRezU1L2    = Foam::sqrt(gSum(magSqr(((U1 - U1.oldTime())/dt))*magSqr(mesh.V())));
+        scalar finalRezU2L2    = Foam::sqrt(gSum(magSqr(((U2 - U2.oldTime())/dt))*magSqr(mesh.V())));
+        scalar finalRezT1L2    = Foam::sqrt(gSum(magSqr(((T1 - T1.oldTime())/dt)*mesh.V())));
+        scalar finalRezT2L2    = Foam::sqrt(gSum(magSqr(((T2 - T2.oldTime())/dt)*mesh.V())));
 
+        Info << "rk3:  Solving for p,     " << "Final residual = " << finalRezp     << "\t  , L2 norm: " << finalRezpL2     << endl;
+        Info << "rk3:  Solving for alpha, " << "Final residual = " << finalRezalpha << "\t  , L2 norm: " << finalRezalphaL2 << endl;
+        Info << "rk3:  Solving for U1,    " << "Final residual = " << finalRezU1    << "\t  , L2 norm: " << finalRezU1L2    << endl;
+        Info << "rk3:  Solving for U2,    " << "Final residual = " << finalRezU2    << "\t  , L2 norm: " << finalRezU2L2    << endl;
+        Info << "rk3:  Solving for T1,    " << "Final residual = " << finalRezT1    << "\t  , L2 norm: " << finalRezT1L2    << endl;
+        Info << "rk3:  Solving for T2,    " << "Final residual = " << finalRezT2    << "\t  , L2 norm: " << finalRezT2L2    << endl;
         turbulence1->correct();
         h1 = thermo1.he() + p/thermo1.rho();
         phi1 = linearInterpolate(U1) & mesh.Sf();

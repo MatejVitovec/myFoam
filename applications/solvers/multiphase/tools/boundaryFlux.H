@@ -26,16 +26,20 @@
                 const scalarField& pAlphaRhoPhi1    = twoFluidFlux.alphaRhoFlux1_pos().boundaryField()[patchi];
                 const scalarField& pAlphaRhoPhi1old = twoFluidFlux.alphaRhoFlux1_pos().oldTime().boundaryField()[patchi];
 
+                const scalarField pAlphaRhoPhi1res = (pAlphaRhoPhi1 - pAlphaRhoPhi1old)/dt.value();
+                const label nFaces = returnReduce(mesh.boundary()[pp.name()].size(), sumOp<label>());
+
                 scalar alphaRhoPhi1Global = gSum(pAlphaRhoPhi1);
                 scalar alphaRhoPhi1Globalold = gSum(pAlphaRhoPhi1old);
-                scalar alphaRhoPhi1GlobalresSum = fabs((alphaRhoPhi1Global - alphaRhoPhi1Globalold)/dt.value());
+                //scalar alphaRhoPhi1GlobalresSum = mag((alphaRhoPhi1Global - alphaRhoPhi1Globalold)/dt.value());
 
-                scalarField pAlphaRhoPhi1res = (pAlphaRhoPhi1 - pAlphaRhoPhi1old)/dt.value();
-                scalar pAlphaRhoPhi1resSqrSum = gSum(sqr(pAlphaRhoPhi1res));
-                const label nFaces = returnReduce(mesh.boundary()[pp.name()].size(), sumOp<label>());
-                scalar alphaRhoPhi1GlobalresNorm = Foam::sqrt(pAlphaRhoPhi1resSqrSum/nFaces);
+                scalar alphaRhoPhi1SfGlobalresSum = gSum(mag(pAlphaRhoPhi1res*pMagSf));
 
-                Info << "outlet mass flux: " << alphaRhoPhi1Global  << " , oultlet mass flux res: " << alphaRhoPhi1GlobalresSum << " , L2 norm: " << alphaRhoPhi1GlobalresNorm << endl;
+                scalar pAlphaRhoPhi1resSfSqr = gSum(sqr(pAlphaRhoPhi1res*pMagSf));
+                scalar alphaRhoPhi1SfGlobalresNorm = Foam::sqrt(pAlphaRhoPhi1resSfSqr);
+                scalar alphaRhoPhi1SfGlobalresNormNormalized = Foam::sqrt(pAlphaRhoPhi1resSfSqr/nFaces);
+
+                Info << "outlet mass flux: " << alphaRhoPhi1Global  << " , oultlet mass flux res: " << alphaRhoPhi1SfGlobalresSum << " , L2 norm: " << alphaRhoPhi1SfGlobalresNorm << " , L2 norm normalized: " << alphaRhoPhi1SfGlobalresNormNormalized << endl;
                 if (Pstream::master() && (runTime.timeIndex() % 100) == 0)
                 {
                     OFstream file
@@ -46,7 +50,7 @@
                         IOstreamOption::APPEND
                     );
 
-                    file << runTime.timeIndex() << '\t' << runTime.value() << '\t' << alphaRhoPhi1Global << '\t' << alphaRhoPhi1GlobalresSum << '\t' << alphaRhoPhi1GlobalresNorm << endl;
+                    file << runTime.timeIndex() << '\t' << runTime.value() << '\t' << alphaRhoPhi1Global << '\t' << alphaRhoPhi1SfGlobalresSum << '\t' << alphaRhoPhi1SfGlobalresNorm << '\t' << alphaRhoPhi1SfGlobalresNormNormalized << endl;
                 }
             }
         }
