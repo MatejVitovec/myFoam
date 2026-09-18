@@ -34,21 +34,21 @@
 
                 scalar alphaRhoPhi1Global = gSum(pAlphaRhoPhi1);
                 scalar alphaRhoPhi2Global = gSum(pAlphaRhoPhi2);
-                scalar alphaRhoPhi1Globalold = gSum(pAlphaRhoPhi1old);
+                //scalar alphaRhoPhi1Globalold = gSum(pAlphaRhoPhi1old);
                 //scalar alphaRhoPhi1GlobalresSum = mag((alphaRhoPhi1Global - alphaRhoPhi1Globalold)/dt.value());
 
-                scalar alphaRhoPhi1SfGlobalresSum = gSum(mag(pAlphaRhoPhi1res*pMagSf));
-                scalar alphaRhoPhi2SfGlobalresSum = gSum(mag(pAlphaRhoPhi2res*pMagSf));
+                scalar alphaRhoPhi1GlobalresSum = gSum(mag(pAlphaRhoPhi1res));
+                scalar alphaRhoPhi2GlobalresSum = gSum(mag(pAlphaRhoPhi2res));
 
-                scalar pAlphaRhoPhi1resSfSqr = gSum(sqr(pAlphaRhoPhi1res*pMagSf));
-                scalar pAlphaRhoPhi2resSfSqr = gSum(sqr(pAlphaRhoPhi2res*pMagSf));
-                scalar alphaRhoPhi1SfGlobalresNorm = Foam::sqrt(pAlphaRhoPhi1resSfSqr);
-                scalar alphaRhoPhi2SfGlobalresNorm = Foam::sqrt(pAlphaRhoPhi2resSfSqr);
-                scalar alphaRhoPhi1SfGlobalresNormNormalized = Foam::sqrt(pAlphaRhoPhi1resSfSqr/nFaces);
-                scalar alphaRhoPhi2SfGlobalresNormNormalized = Foam::sqrt(pAlphaRhoPhi2resSfSqr/nFaces);
+                scalar pAlphaRhoPhi1resSqr = gSum(sqr(pAlphaRhoPhi1res));
+                scalar pAlphaRhoPhi2resSqr = gSum(sqr(pAlphaRhoPhi2res));
+                scalar alphaRhoPhi1GlobalresNorm = Foam::sqrt(pAlphaRhoPhi1resSqr);
+                scalar alphaRhoPhi2GlobalresNorm = Foam::sqrt(pAlphaRhoPhi2resSqr);
+                scalar alphaRhoPhi1GlobalresNormNormalized = Foam::sqrt(pAlphaRhoPhi1resSqr/nFaces);
+                scalar alphaRhoPhi2GlobalresNormNormalized = Foam::sqrt(pAlphaRhoPhi2resSqr/nFaces);
 
-                Info << "outlet mass flux1: " << alphaRhoPhi1Global  << " , oultlet mass flux1 res: " << alphaRhoPhi1SfGlobalresSum << " , L2 norm1: " << alphaRhoPhi1SfGlobalresNorm << " , L2 norm1 normalized: " << alphaRhoPhi1SfGlobalresNormNormalized << endl;
-                Info << "outlet mass flux2: " << alphaRhoPhi2Global  << " , oultlet mass flux2 res: " << alphaRhoPhi2SfGlobalresSum << " , L2 norm2: " << alphaRhoPhi2SfGlobalresNorm << " , L2 norm2 normalized: " << alphaRhoPhi2SfGlobalresNormNormalized << endl;
+                Info << "outlet mass flux1: " << alphaRhoPhi1Global  << " , oultlet mass flux1 res: " << alphaRhoPhi1GlobalresSum << " , L2 norm1: " << alphaRhoPhi1GlobalresNorm << " , L2 norm1 normalized: " << alphaRhoPhi1GlobalresNormNormalized << endl;
+                Info << "outlet mass flux2: " << alphaRhoPhi2Global  << " , oultlet mass flux2 res: " << alphaRhoPhi2GlobalresSum << " , L2 norm2: " << alphaRhoPhi2GlobalresNorm << " , L2 norm2 normalized: " << alphaRhoPhi2GlobalresNormNormalized << endl;
                 if (Pstream::master() && (runTime.timeIndex() % 100) == 0)
                 {
                     OFstream file
@@ -59,8 +59,8 @@
                         IOstreamOption::APPEND
                     );
 
-                    file << runTime.timeIndex() << '\t' << runTime.value() << '\t' << alphaRhoPhi1Global << '\t' << alphaRhoPhi1SfGlobalresSum << '\t' << alphaRhoPhi1SfGlobalresNorm << '\t' << alphaRhoPhi1SfGlobalresNormNormalized
-                                                                           << '\t' << alphaRhoPhi2Global << '\t' << alphaRhoPhi2SfGlobalresSum << '\t' << alphaRhoPhi2SfGlobalresNorm << '\t' << alphaRhoPhi2SfGlobalresNormNormalized << endl;
+                    file << runTime.timeIndex() << '\t' << runTime.value() << '\t' << alphaRhoPhi1Global << '\t' << alphaRhoPhi1GlobalresSum << '\t' << alphaRhoPhi1GlobalresNorm << '\t' << alphaRhoPhi1GlobalresNormNormalized
+                                                                           << '\t' << alphaRhoPhi2Global << '\t' << alphaRhoPhi2GlobalresSum << '\t' << alphaRhoPhi2GlobalresNorm << '\t' << alphaRhoPhi2GlobalresNormNormalized << endl;
                 }
             }
         }
