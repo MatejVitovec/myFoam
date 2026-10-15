@@ -27,31 +27,349 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "biQuadraticInterpolation.H"
-//#include "openFoamTableReader.H"
+#include "IFstream.H"
+#include "OFstream.H"
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::biQuadraticInterpolation::biQuadraticInterpolation
+(
+    const fileName& fName
+)
+:
+    fileName_(fName),
+    n_(0),
+    m_(0),
+    transformationX_(NONE),
+    transformationY_(NONE)
+{
+    readTable();
+}
+
+
+Foam::biQuadraticInterpolation::biQuadraticInterpolation
+(
+    const dictionary& dict,
+    const std::function<scalar(scalar, scalar)>& f
+)
+:
+    fileName_(),
+    n_(0),
+    m_(0),
+    transformationX_(NONE),
+    transformationY_(NONE)
+{
+    readSettings(dict);
+    calcCoeffs(f);
+}
+
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
-/*void Foam::biQuadraticInterpolation::readTable()
+void Foam::biQuadraticInterpolation::readTable()
 {
-    fileName fName(fileName_);
-    fName.expand();
+    IFstream is(fileName_);
 
-    // Read data from file
-    reader_()(fName, *this);
-
-    if (this->empty())
+    if (!is.good())
     {
         FatalErrorInFunction
-            << "table read from " << fName << " is empty" << nl
+            << "Cannot open coefficient file " << fileName_ << nl
             << exit(FatalError);
     }
 
-    // Check that the data are in ascending order
+    const dictionary dict(is);
+    readSettings(dict);
+
+    coefficients_ = dict.get<List<FixedList<scalar, 9>>>("coefficients");
+
+    if (coefficients_.size() != n_*m_)
+    {
+        FatalErrorInFunction
+            << "Coefficient file " << fileName_ << " contains "
+            << coefficients_.size() << " cell entries, expected "
+            << n_*m_ << nl
+            << exit(FatalError);
+    }
+}
+
+
+Foam::biQuadraticInterpolation::Transformation
+Foam::biQuadraticInterpolation::readTransformation(const word& name)
+{
+    if (name == "none")
+    {
+        return NONE;
+    }
+    if (name == "log")
+    {
+        return LOG;
+    }
+    if (name == "log10")
+    {
+        return LOG10;
+    }
+    if (name == "loginv")
+    {
+        return LOGINV;
+    }
+
+    FatalErrorInFunction
+        << "Unknown coordinate transformation '" << name << "'. Valid values: "
+        << "none, log, log10, loginv" << nl
+        << exit(FatalError);
+
+    return NONE;
+}
+
+
+Foam::word Foam::biQuadraticInterpolation::transformationName
+(
+    const Transformation transformation
+)
+{
+    switch (transformation)
+    {
+        case NONE:
+            return "none";
+        case LOG:
+            return "log";
+        case LOG10:
+            return "log10";
+        case LOGINV:
+            return "loginv";
+    }
+
+    return "none";
+}
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::biQuadraticInterpolation::check() const
+{
+    if
+    (
+        gridSizeX_.empty()
+     || gridSizeY_.empty()
+     || boundaryX_.size() != gridSizeX_.size() + 1
+     || boundaryY_.size() != gridSizeY_.size() + 1
+    )
+    {
+        FatalErrorInFunction
+            << "Grid sizes must be non-empty and each boundary list must "
+            << "contain one more entry than its grid-size list" << nl
+            << exit(FatalError);
+    }
+
+    label totalX = 0;
+    forAll(gridSizeX_, i)
+    {
+        if (gridSizeX_[i] <= 0 || boundaryX_[i + 1] <= boundaryX_[i])
+        {
+            FatalErrorInFunction
+                << "The x grid sizes must be positive and x boundaries "
+                << "strictly increasing" << nl
+                << exit(FatalError);
+        }
+        totalX += gridSizeX_[i];
+    }
+
+    label totalY = 0;
+    forAll(gridSizeY_, j)
+    {
+        if (gridSizeY_[j] <= 0 || boundaryY_[j + 1] <= boundaryY_[j])
+        {
+            FatalErrorInFunction
+                << "The y grid sizes must be positive and y boundaries "
+                << "strictly increasing" << nl
+                << exit(FatalError);
+        }
+        totalY += gridSizeY_[j];
+    }
+
+    if (totalX < 2 || totalY < 2)
+    {
+        FatalErrorInFunction
+            << "At least two cells are required in each direction" << nl
+            << exit(FatalError);
+    }
+
+    if (transformationX_ != NONE && boundaryX_[0] <= 0)
+    {
+        FatalErrorInFunction
+            << "The x boundaries must be positive for logarithmic "
+            << "transformations" << nl
+            << exit(FatalError);
+    }
+
+    if (transformationY_ != NONE && boundaryY_[0] <= 0)
+    {
+        FatalErrorInFunction
+            << "The y boundaries must be positive for logarithmic "
+            << "transformations" << nl
+            << exit(FatalError);
+    }
+}
+
+
+void Foam::biQuadraticInterpolation::write(Ostream& os) const
+{
+    os.writeEntry("gridSizeX", gridSizeX_);
+    os.writeEntry("gridSizeY", gridSizeY_);
+    os.writeEntry("boundaryX", boundaryX_);
+    os.writeEntry("boundaryY", boundaryY_);
+    os.writeEntry("transformationX", transformationName(transformationX_));
+    os.writeEntry("transformationY", transformationName(transformationY_));
+    os.writeEntry("coefficients", coefficients_);
+}
+
+
+void Foam::biQuadraticInterpolation::write(const fileName& fName) const
+{
+    OFstream os(fName);
+
+    if (!os.good())
+    {
+        FatalErrorInFunction
+            << "Cannot open coefficient file " << fName << " for writing" << nl
+            << exit(FatalError);
+    }
+
+    os << token::BEGIN_BLOCK << nl;
+    write(os);
+    os << token::END_BLOCK << nl;
+}
+
+
+void Foam::biQuadraticInterpolation::createGrid()
+{
+    n_ = sum(gridSizeX_);
+    m_ = sum(gridSizeY_);
+
+    x_.setSize(n_);
+    z_.setSize(n_ + 1);
+    dx_.setSize(n_ + 1);
+    dz_.setSize(gridSizeX_.size());
+
+    y_.setSize(m_);
+    t_.setSize(m_ + 1);
+    dy_.setSize(m_ + 1);
+    dt_.setSize(gridSizeY_.size());
+
+    label xIndex = 0;
+    z_[0] = boundaryX_[0];
+
+    forAll(gridSizeX_, section)
+    {
+        const scalar transformedStart
+        (
+            transform(boundaryX_[section], transformationX_)
+        );
+        const scalar transformedEnd
+        (
+            transform(boundaryX_[section + 1], transformationX_)
+        );
+        const scalar transformedStep
+        (
+            (transformedEnd - transformedStart)/gridSizeX_[section]
+        );
+
+        dz_[section] = mag(transformedStep);
+
+        for (label localCell = 0; localCell < gridSizeX_[section]; localCell++)
+        {
+            x_[xIndex] = backTransform
+            (
+                transformedStart + (localCell + 0.5)*transformedStep,
+                transformationX_
+            );
+            z_[xIndex + 1] = backTransform
+            (
+                transformedStart + (localCell + 1)*transformedStep,
+                transformationX_
+            );
+            xIndex++;
+        }
+    }
+
+    label yIndex = 0;
+    t_[0] = boundaryY_[0];
+
+    forAll(gridSizeY_, section)
+    {
+        const scalar transformedStart
+        (
+            transform(boundaryY_[section], transformationY_)
+        );
+        const scalar transformedEnd
+        (
+            transform(boundaryY_[section + 1], transformationY_)
+        );
+        const scalar transformedStep
+        (
+            (transformedEnd - transformedStart)/gridSizeY_[section]
+        );
+
+        dt_[section] = mag(transformedStep);
+
+        for (label localCell = 0; localCell < gridSizeY_[section]; localCell++)
+        {
+            y_[yIndex] = backTransform
+            (
+                transformedStart + (localCell + 0.5)*transformedStep,
+                transformationY_
+            );
+            t_[yIndex + 1] = backTransform
+            (
+                transformedStart + (localCell + 1)*transformedStep,
+                transformationY_
+            );
+            yIndex++;
+        }
+    }
+
+    for (label i = 1; i < n_; i++)
+    {
+        dx_[i] = x_[i] - x_[i - 1];
+    }
+    dx_[0] = dx_[1];
+    dx_[n_] = dx_[n_ - 1];
+
+    for (label j = 1; j < m_; j++)
+    {
+        dy_[j] = y_[j] - y_[j - 1];
+    }
+    dy_[0] = dy_[1];
+    dy_[m_] = dy_[m_ - 1];
+
+    coefficients_.setSize(n_*m_);
+}
+
+
+void Foam::biQuadraticInterpolation::readSettings(const dictionary& dict)
+{
+    gridSizeX_ = dict.get<labelList>("gridSizeX");
+    gridSizeY_ = dict.get<labelList>("gridSizeY");
+    boundaryX_ = dict.get<scalarField>("boundaryX");
+    boundaryY_ = dict.get<scalarField>("boundaryY");
+    transformationX_ = readTransformation
+    (
+        dict.get<word>("transformationX")
+    );
+    transformationY_ = readTransformation
+    (
+        dict.get<word>("transformationY")
+    );
+
     check();
-}*/
+    createGrid();
+}
 
 
-void Foam::biQuadraticInterpolation::calcCoeffs(std::function<scalar(scalar, scalar)> f)
+void Foam::biQuadraticInterpolation::calcCoeffs
+(
+    const std::function<scalar(scalar, scalar)>& f
+)
 {
     scalarMatrix u(n_,   m_);
     scalarMatrix p(n_+1, m_);
@@ -87,148 +405,87 @@ void Foam::biQuadraticInterpolation::calcCoeffs(std::function<scalar(scalar, sca
     r(n_, m_) = calcDerivativeXY(f, z_[n_], t_[m_], dx_[n_]/divider, dy_[m_]/divider);
     
 
-    /////// solution for p
+    // Solve the derivative spline independently along each grid line.
     for (int j = 0; j < m_; j++)
     {
-        scalarField U(n_-2);
-        scalarField D(n_-1);
-        scalarField L(n_-2);
-        scalarField b(n_-1);
-        int i = 0;
-
-        U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
-        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-
-        b[i] = (-1.0/(dx_[i] + dx_[i+1]))*p(0, j) + (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
-
-        i++;
-        for ( ; i < n_ - 2; i++)
+        scalarField values(n_);
+        for (int i = 0; i < n_; i++)
         {
-            U[i]   = 1.0/(dx_[i+1] + dx_[i+2]);
-            D[i]   = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-            L[i-1] = 1.0/(dx_[i] + dx_[i+1]);
-            b[i]   = (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
+            values[i] = u(i, j);
         }
 
-        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-        L[i-1] = 1.0/(dx_[i]+dx_[i+1]);
-        b[i] = (-1.0/(dx_[i+1] + dx_[i+2]))*p(n_, j) + (4.0/dx_[i+1])*((u(i+1, j) - u(i, j))/dx_[i+1]);
+        const scalarField derivatives
+        (
+            solveSplineDerivatives(values, dx_, p(0, j), p(n_, j))
+        );
 
-        scalarField pj = solveTridiagonal(L, D, U, b);
-        for (int i = 1; i < pj.size()+1; i++)
+        for (int i = 0; i < n_ + 1; i++)
         {
-            p(i, j) = pj[i-1];
-        }        
+            p(i, j) = derivatives[i];
+        }
     }
 
-    ///////// solution for q
     for (int i = 0; i < n_; i++)
     {
-        scalarField U(m_-2);
-        scalarField D(m_-1);
-        scalarField L(m_-2);
-        scalarField b(m_-1);
-        int j = 0;
-
-        U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
-        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-
-        b[j] = (-1.0/(dy_[j] + dy_[j+1]))*q(i, 0) + (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
-
-        j++;
-        for ( ; j < m_-2; j++)
+        scalarField values(m_);
+        for (int j = 0; j < m_; j++)
         {
-            U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
-            D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-            L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
-            b[j] = (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
+            values[j] = u(i, j);
         }
 
-        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-        L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
-        b[j] = (-1.0/(dy_[j+1] + dy_[j+2]))*q(i, m_) + (4.0/dy_[j+1])*((u(i, j+1) - u(i, j))/dy_[j+1]);
+        const scalarField derivatives
+        (
+            solveSplineDerivatives(values, dy_, q(i, 0), q(i, m_))
+        );
 
-        scalarField qi = solveTridiagonal(L, D, U, b);
-        for (int j = 1; j < qi.size()+1; j++)
+        for (int j = 0; j < m_ + 1; j++)
         {
-            q(i, j) = qi[j-1];
-        }        
-    }
-
-    
-    ///////// solution for ri0 and rim
-    for (int j = 0; j < m_+1; j += m_)
-    {
-        scalarField U(n_-2);
-        scalarField D(n_-1);
-        scalarField L(n_-2);
-        scalarField b(n_-1);
-        int i = 0;
-
-        U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
-        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-
-        b[i] = (-1.0/(dx_[i] + dx_[i+1]))*r(i, j) + (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
-
-        i++;
-        for ( ; i < n_-2; i++)
-        {
-            U[i] = 1.0/(dx_[i+1] + dx_[i+2]);
-            D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-            L[i-1] = 1.0/(dx_[i] + dx_[i+1]);
-            b[i] = (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
-        }
-
-        D[i] = (1.0/dx_[i+1])*(2.0 + dx_[i]/(dx_[i] + dx_[i+1]) + dx_[i+2]/(dx_[i+1] + dx_[i+2]));
-        L[i-1] = 1.0/(dx_[i]+dx_[i+1]);
-        b[i] = (-1.0/(dx_[i+1] + dx_[i+2]))*r(i+2, j) + (4.0/dx_[i+1])*((q(i+1, j) - q(i, j))/dx_[i+1]);
-
-        scalarField rj = solveTridiagonal(L, D, U, b);
-        for (int i = 1; i < rj.size()+1; i++)
-        {
-            r(i, j) = rj[i-1];
+            q(i, j) = derivatives[j];
         }
     }
 
-
-    //////solution for r
-    for (int i = 0; i < n_+1; i++)
+    for (int side = 0; side < 2; side++)
     {
-        scalarField U(m_-2);
-        scalarField D(m_-1);
-        scalarField L(m_-2);
-        scalarField b(m_-1);
-        int j = 0;
-
-        U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
-        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-
-        b[j] = (-1.0/(dy_[j] + dy_[j+1]))*r(i, 0) + (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
-
-        j++;
-        for ( ; j < m_-2; j++)
+        const label j = side ? m_ : 0;
+        scalarField values(n_);
+        for (int i = 0; i < n_; i++)
         {
-            U[j] = 1.0/(dy_[j+1] + dy_[j+2]);
-            D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-            L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
-            b[j] = (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
+            values[i] = q(i, j);
         }
 
-        D[j] = (1.0/dy_[j+1])*(2.0 + dy_[j]/(dy_[j] + dy_[j+1]) + dy_[j+2]/(dy_[j+1] + dy_[j+2]));
-        L[j-1] = 1.0/(dy_[j] + dy_[j+1]);
-        b[j] = (-1.0/(dy_[j+1] + dy_[j+2]))*r(i, m_) + (4.0/dy_[j+1])*((p(i, j+1) - p(i, j))/dy_[j+1]);
+        const scalarField derivatives
+        (
+            solveSplineDerivatives(values, dx_, r(0, j), r(n_, j))
+        );
 
-        scalarField ri = solveTridiagonal(L, D, U, b);
-        for (int j = 1; j < ri.size()+1; j++)
+        for (int i = 0; i < n_ + 1; i++)
         {
-            r(i, j) = ri[j-1];
-        }        
+            r(i, j) = derivatives[i];
+        }
     }
 
-    int idx_ = 0;
-    for(int j = 0; j < m_; j++)
+    for (int i = 0; i < n_ + 1; i++)
     {
-        for(int i = 0; i < n_; i++)
+        scalarField values(m_);
+        for (int j = 0; j < m_; j++)
+        {
+            values[j] = p(i, j);
+        }
+
+        const scalarField derivatives
+        (
+            solveSplineDerivatives(values, dy_, r(i, 0), r(i, m_))
+        );
+
+        for (int j = 0; j < m_ + 1; j++)
+        {
+            r(i, j) = derivatives[j];
+        }
+    }
+
+    for (label j = 0; j < m_; j++)
+    {
+        for (label i = 0; i < n_; i++)
         {
             Mat3x3 VxInv({0 , 1.0, 0,
                           dx_[i+1]/(dx_[i] + dx_[i+1]), 0, dx_[i]/(dx_[i] + dx_[i+1]),
@@ -242,10 +499,80 @@ void Foam::biQuadraticInterpolation::calcCoeffs(std::function<scalar(scalar, sca
                       q(i, j), u(i, j), q(i, j+1),
                       r(i+1, j), p(i+1, j), r(i+1, j+1)});
 
-            coefficients_[idx_] = (VyInv*C*(VyInv.transpose())).data(); //TODO pristup 
-            idx_++;
+            coefficients_[j*n_ + i] = (VxInv*C*(VyInv.transpose())).data();
         }
     }
+}
+
+
+Foam::scalarField Foam::biQuadraticInterpolation::solveSplineDerivatives
+(
+    const scalarField& values,
+    const scalarField& intervals,
+    const scalar leftDerivative,
+    const scalar rightDerivative
+) const
+{
+    const label nValues = values.size();
+    scalarField derivatives(nValues + 1, Zero);
+    derivatives[0] = leftDerivative;
+    derivatives[nValues] = rightDerivative;
+
+    if (nValues <= 1)
+    {
+        return derivatives;
+    }
+
+    scalarField lower(nValues - 2, Zero);
+    scalarField diagonal(nValues - 1, Zero);
+    scalarField upper(nValues - 2, Zero);
+    scalarField rhs(nValues - 1, Zero);
+
+    for (label row = 0; row < nValues - 1; row++)
+    {
+        const scalar hLeft = intervals[row];
+        const scalar h = intervals[row + 1];
+        const scalar hRight = intervals[row + 2];
+
+        diagonal[row] = (1.0/h)
+           *(
+                2.0
+              + hLeft/(hLeft + h)
+              + hRight/(h + hRight)
+            );
+
+        rhs[row] = (4.0/h)*(values[row + 1] - values[row])/h;
+
+        if (row == 0)
+        {
+            rhs[row] -= leftDerivative/(hLeft + h);
+        }
+        else
+        {
+            lower[row - 1] = 1.0/(hLeft + h);
+        }
+
+        if (row == nValues - 2)
+        {
+            rhs[row] -= rightDerivative/(h + hRight);
+        }
+        else
+        {
+            upper[row] = 1.0/(h + hRight);
+        }
+    }
+
+    const scalarField interior
+    (
+        solveTridiagonal(lower, diagonal, upper, rhs)
+    );
+
+    for (label i = 0; i < interior.size(); i++)
+    {
+        derivatives[i + 1] = interior[i];
+    }
+
+    return derivatives;
 }
 
 
@@ -257,8 +584,14 @@ Foam::scalarField Foam::biQuadraticInterpolation::solveTridiagonal
     const Foam::scalarField& b
 ) const
 {
-    int n = b.size();
+    const label n = b.size();
     scalarField out(n);
+
+    if (n == 1)
+    {
+        out[0] = b[0]/D[0];
+        return out;
+    }
                                                                                                                                                                        
     scalarField UStar(n-1, 0.0);
     scalarField bStar(n, 0.0);
@@ -285,6 +618,49 @@ Foam::scalarField Foam::biQuadraticInterpolation::solveTridiagonal
 }
 
 
+Foam::scalar Foam::biQuadraticInterpolation::calcDerivativeX
+(
+    const std::function<scalar(scalar, scalar)>& f,
+    const scalar x,
+    const scalar y,
+    const scalar step
+) const
+{
+    return (f(x + step, y) - f(x - step, y))/(2.0*step);
+}
+
+
+Foam::scalar Foam::biQuadraticInterpolation::calcDerivativeY
+(
+    const std::function<scalar(scalar, scalar)>& f,
+    const scalar x,
+    const scalar y,
+    const scalar step
+) const
+{
+    return (f(x, y + step) - f(x, y - step))/(2.0*step);
+}
+
+
+Foam::scalar Foam::biQuadraticInterpolation::calcDerivativeXY
+(
+    const std::function<scalar(scalar, scalar)>& f,
+    const scalar x,
+    const scalar y,
+    const scalar stepX,
+    const scalar stepY
+) const
+{
+    return
+    (
+        f(x + stepX, y + stepY)
+      - f(x + stepX, y - stepY)
+      - f(x - stepX, y + stepY)
+      + f(x - stepX, y - stepY)
+    )/(4.0*stepX*stepY);
+}
+
+
 Foam::scalar Foam::biQuadraticInterpolation::transform(Foam::scalar x, Transformation transformation) const
 {
     switch(transformation) 
@@ -294,7 +670,7 @@ Foam::scalar Foam::biQuadraticInterpolation::transform(Foam::scalar x, Transform
         case LOG10:
             return log10(x);
         case LOGINV:
-            return log(1/x);
+            return -log(x);
         case NONE:
             return x;
     }
@@ -309,9 +685,9 @@ Foam::scalar Foam::biQuadraticInterpolation::backTransform(Foam::scalar x, Trans
         case LOG:
             return exp(x);
         case LOG10:
-            return pow(x, 10.0);
+            return pow(10.0, x);
         case LOGINV:
-            return 1.0/exp(x);
+            return exp(-x);
         case NONE:
             return x;
     }
@@ -319,9 +695,14 @@ Foam::scalar Foam::biQuadraticInterpolation::backTransform(Foam::scalar x, Trans
     return x;
 }
 
-Foam::scalar Foam::biQuadraticInterpolation::calc(Foam::scalar xx, Foam::scalar yy)
+
+Foam::scalar Foam::biQuadraticInterpolation::calc
+(
+    Foam::scalar xx,
+    Foam::scalar yy
+) const
 {
-    std::pair<int, int> position = findPosition(xx, yy);
+    const std::pair<int, int> position = fastFindPosition(xx, yy);
 
     scalar v = xx - x_[position.first];
     scalar w = yy - y_[position.second];
@@ -332,122 +713,124 @@ Foam::scalar Foam::biQuadraticInterpolation::calc(Foam::scalar xx, Foam::scalar 
 }
 
 
-// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
-
-/*Foam::biQuadraticInterpolation::biQuadraticInterpolation()
-:
-    List<value_type>(),
-    bounding_(bounds::normalBounding::WARN),
-    fileName_("fileNameIsUndefined"),
-    reader_(nullptr)
-{}*/
-
-
-/*Foam::biQuadraticInterpolation::biQuadraticInterpolation(const fileName& fName)
-:
-    fileName_(fName)
+std::pair<int, int> Foam::biQuadraticInterpolation::findPosition(Foam::scalar xx, Foam::scalar yy) const
 {
-    readTable();
-}*/
+    label cellX = n_ - 1;
+    for (label i = 0; i < n_; i++)
+    {
+        if (xx < z_[i + 1] || i == n_ - 1)
+        {
+            cellX = i;
+            break;
+        }
+    }
+
+    label cellY = m_ - 1;
+    for (label j = 0; j < m_; j++)
+    {
+        if (yy < t_[j + 1] || j == m_ - 1)
+        {
+            cellY = j;
+            break;
+        }
+    }
+
+    return std::pair<int, int>(cellX, cellY);
+}
 
 
-/*Foam::biQuadraticInterpolation::biQuadraticInterpolation(const dictionary& dict)
-:
-    fileName_(dict.get<fileName>("file"))
-{
-    readTable();
-}*/
-
-
-/*Foam::biQuadraticInterpolation::biQuadraticInterpolation
+std::pair<int, int> Foam::biQuadraticInterpolation::fastFindPosition
 (
-     const biQuadraticInterpolation& tbl
-)
-:
-    fileName_(tbl.fileName_)
-{}*/
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
-
-/*scalar Foam::biQuadraticInterpolation::interpolateValue
-(
-    const List<Tuple2<scalar, Type>>& list,
-    scalar lookupValue
+    const scalar xx,
+    const scalar yy
 ) const
 {
-    return interpolationTable<Type>::interpolateValue
+    label sectionX = 0;
+    label sectionY = 0;
+    label shiftIdxX = 0;
+    label shiftIdxY = 0;
+
+    for (; sectionX < gridSizeX_.size() - 1; sectionX++)
+    {
+        if (xx < boundaryX_[sectionX + 1])
+        {
+            break;
+        }
+        shiftIdxX += gridSizeX_[sectionX];
+    }
+
+    for (; sectionY < gridSizeY_.size() - 1; sectionY++)
+    {
+        if (yy < boundaryY_[sectionY + 1])
+        {
+            break;
+        }
+        shiftIdxY += gridSizeY_[sectionY];
+    }
+
+    label localCellX = 0;
+    if (xx >= boundaryX_.last())
+    {
+        localCellX = gridSizeX_.last() - 1;
+    }
+    else if (xx > boundaryX_[0])
+    {
+        const scalar distance
+        (
+            mag
+            (
+                transform(xx, transformationX_)
+              - transform(boundaryX_[sectionX], transformationX_)
+            )
+        );
+
+        localCellX = min
+        (
+            label(floor(distance/dz_[sectionX])),
+            gridSizeX_[sectionX] - 1
+        );
+    }
+
+    label localCellY = 0;
+    if (yy >= boundaryY_.last())
+    {
+        localCellY = gridSizeY_.last() - 1;
+    }
+    else if (yy > boundaryY_[0])
+    {
+        const scalar distance
+        (
+            mag
+            (
+                transform(yy, transformationY_)
+              - transform(boundaryY_[sectionY], transformationY_)
+            )
+        );
+
+        localCellY = min
+        (
+            label(floor(distance/dt_[sectionY])),
+            gridSizeY_[sectionY] - 1
+        );
+    }
+
+    return std::pair<int, int>
     (
-        list,
-        lookupValue,
-        bounds::repeatableBounding(bounding_)
+        min(shiftIdxX + localCellX, n_ - 1),
+        min(shiftIdxY + localCellY, m_ - 1)
     );
-}*/
+}
 
 
 // * * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * //
 
-/*void Foam::biQuadraticInterpolation::operator=
-(
-    const biQuadraticInterpolation& rhs
-)
-{
-    if (this == &rhs)
-    {
-        return;
-    }
-
-    static_cast<List<value_type>&>(*this) = rhs;
-    fileName_ = rhs.fileName_;
-}*/
-
-
-/*scalar Foam::biQuadraticInterpolation::operator()
+Foam::scalar Foam::biQuadraticInterpolation::operator()
 (
     const scalar valueX,
     const scalar valueY
 ) const
 {
-
-    //return (y0 + (y1 - y0)*(valueX - x0)/(x1 - x0));
-}*/
-
-
-/*void Foam::biQuadraticInterpolation::check() const
-{
-
-}*/
-
-
-/*void Foam::biQuadraticInterpolation::write(Ostream& os) const
-{
-    os.writeEntry("file", fileName_);
-    os.writeEntry("outOfBounds", bounds::normalBoundingNames[bounding_]);
-
-    os  << *this;
-}*/
-
-
-std::pair<int, int> Foam::biQuadraticInterpolation::findPosition(Foam::scalar xx, Foam::scalar yy) const
-{
-    int shiftIdx_X = 0;
-    int shiftIdx_Y = 0;
-
-    int ii;
-    for (ii = 0; ii < gridSizeX_.size(); ii++)
-    {
-        if (xx < boundaryX_[ii+1]) { break; }
-        shiftIdx_X += gridSizeX_[ii];
-    }
-    int jj; 
-    for (jj = 0; jj < gridSizeY_.size(); jj++)
-    {
-        if (yy < boundaryY_[jj+1]) { break; }
-        shiftIdx_Y += gridSizeY_[jj];
-    }
-    
-    return std::pair<int, int>(std::floor((abs(transform(xx, transformationX_) - transform(boundaryX_[ii], transformationX_)))/dz_[ii]) + shiftIdx_X,
-                               std::floor((abs(transform(yy, transformationY_) - transform(boundaryY_[jj], transformationY_)))/dt_[jj]) + shiftIdx_Y);
+    return calc(valueX, valueY);
 }
 
 

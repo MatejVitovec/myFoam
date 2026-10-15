@@ -38,13 +38,14 @@ SourceFiles
 #ifndef biQuadraticInterpolation_H
 #define biQuadraticInterpolation_H
 
-//#include "interpolationTable.H"
 #include "IOobject.H"
+#include "dictionary.H"
 #include "scalar.H"
 #include "label.H"
 #include "scalarField.H"
 #include "FixedList.H"
-#include <eigen3/Eigen/Dense>
+#include "word.H"
+#include <functional>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -189,11 +190,6 @@ class biQuadraticInterpolation
 
 
 
-
-    /////////////
-
-
-
     // Private Data
 
         //- File name
@@ -227,43 +223,77 @@ class biQuadraticInterpolation
         //- Read the table of data from file
         void readTable();
 
-        void calcCoeffs(std::function<scalar(scalar, scalar)> f);
+        static Transformation readTransformation(const word& name);
+        static word transformationName(Transformation transformation);
 
-        scalarField solveTridiagonal(const scalarField& L, const scalarField& D, const scalarField& U, const scalarField& b) const;
-        scalar calcDerivativeX (std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar step) const;
-        scalar calcDerivativeY (std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar step) const;
-        scalar calcDerivativeXY(std::function<scalar(scalar, scalar)> f, scalar x, scalar y, scalar stepX, scalar stepY) const;
-        
+        void readSettings(const dictionary& dict);
+
+        void createGrid();
+
+        void calcCoeffs(const std::function<scalar(scalar, scalar)>& f);
+
+        scalarField solveSplineDerivatives
+        (
+            const scalarField& values,
+            const scalarField& intervals,
+            scalar leftDerivative,
+            scalar rightDerivative
+        ) const;
+
+        scalarField solveTridiagonal
+        (
+            const scalarField& L,
+            const scalarField& D,
+            const scalarField& U,
+            const scalarField& b
+        ) const;
+
+        scalar calcDerivativeX
+        (
+            const std::function<scalar(scalar, scalar)>& f,
+            scalar x,
+            scalar y,
+            scalar step
+        ) const;
+
+        scalar calcDerivativeY
+        (
+            const std::function<scalar(scalar, scalar)>& f,
+            scalar x,
+            scalar y,
+            scalar step
+        ) const;
+
+        scalar calcDerivativeXY
+        (
+            const std::function<scalar(scalar, scalar)>& f,
+            scalar x,
+            scalar y,
+            scalar stepX,
+            scalar stepY
+        ) const;
+
         scalar transform(scalar x, Transformation transformation) const;
-        
         scalar backTransform(scalar x, Transformation transformation) const;
 
-        scalar calc(scalar xx, scalar yy);
+        std::pair<int, int> fastFindPosition(scalar xx, scalar yy) const;
+
+        scalar calc(scalar xx, scalar yy) const;
 
 
 public:
 
     // Constructors
 
-        //- Default construct
-        biQuadraticInterpolation();
-
-        //- Construct from components
-        /*biQuadraticInterpolation
-        (
-            const List<Tuple2<scalar, List<Tuple2<scalar, scalar>>>>& values,
-            const bounds::normalBounding bounding,
-            const fileName& fName
-        );*/
-
-        //- Construct given the name of the file containing the table of data
+        //- Construct by reading grid settings and coefficients from a file
         explicit biQuadraticInterpolation(const fileName& fName);
 
-        //- Construct by reading file name and outOfBounds from dictionary
-        explicit biQuadraticInterpolation(const dictionary& dict);
-
-        //- Copy construct
-        biQuadraticInterpolation(const biQuadraticInterpolation& tbl);
+        //- Construct grid and coefficients from settings and a function
+        biQuadraticInterpolation
+        (
+            const dictionary& dict,
+            const std::function<scalar(scalar, scalar)>& f
+        );
 
 
     // Member Functions
@@ -272,18 +302,16 @@ public:
         //  Exit with a FatalError if there is a problem
         void check() const;
 
-        void loadCoeffs();
-
         //- Write
         void write(Ostream& os) const;
 
+        void write(const fileName& fName) const;
+
+        //- Find a cell by scanning the knot intervals
         std::pair<int, int> findPosition(scalar xx, scalar yy) const;
 
 
     // Member Operators
-
-        //- Copy assignment
-        void operator=(const biQuadraticInterpolation& rhs);
 
         //- Return an interpolated value
         scalar operator()(const scalar valueX, const scalar valueY) const;

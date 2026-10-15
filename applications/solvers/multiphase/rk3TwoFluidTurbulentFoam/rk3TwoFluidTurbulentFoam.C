@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
-                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())m
                                           - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                                           + dragK*(fluid.U2() - fluid.U1()));
 
@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
         rho1.ref() = thermo1.rho();
         rho2.ref() = thermo2.rho();
 
-        #include "../tools/boundaryFlux.H"
+        //#include "../tools/boundaryFlux.H"
 
         //#include "../tools/film/solveFilm.H"
 
@@ -186,9 +186,9 @@ int main(int argc, char *argv[])
 
         //std::cin.ignore();
 
-        if(runTime.timeIndex() > 1100000)
+        if(runTime.timeIndex() > 1500000)
         {
-            Info<< "End after 1 100 000 iter\n" << endl;
+            Info<< "End after 1 500 000 iter\n" << endl;
             return 0;
         }
     }
