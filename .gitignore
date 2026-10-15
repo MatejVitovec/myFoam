@@ -106,6 +106,9 @@
 # Decomposed domain
 **/*/processor*
 
+# Generated OpenFOAM dynamic code
+/tutorials/**/dynamicCode/
+
 # logfiles
 log.*
 *log
