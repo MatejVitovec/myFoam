@@ -1,0 +1,414 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     |
+    \\  /    A nd           | www.openfoam.com
+     \\/     M anipulation  |
+-------------------------------------------------------------------------------
+    Copyright (C) 2011-2015 OpenFOAM Foundation
+    Copyright (C) 2019-2021 OpenCFD Ltd.
+-------------------------------------------------------------------------------
+License
+    This file is part of OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
+
+\*---------------------------------------------------------------------------*/
+
+#include "dragModel.H"
+#include "compressibleTwoFluid.H"
+#include "surfaceInterpolate.H"
+
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
+
+namespace Foam
+{
+namespace CompressibleTwoFluidFoam
+{
+    defineTypeNameAndDebug(dragModel, 0);
+    defineRunTimeSelectionTable(dragModel, dictionary);
+}
+}
+
+const Foam::dimensionSet Foam::CompressibleTwoFluidFoam::dragModel::dimK(1, -3, -1, 0, 0);
+
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+Foam::CompressibleTwoFluidFoam::dragModel::dragModel
+(
+    const dictionary& dict,
+    const compressibleTwoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter,
+    const bool registerObject
+)
+:
+    regIOobject
+    (
+        IOobject
+        (
+            //IOobject::groupName(typeName, fluid.name()),
+            typeName,
+            fluid.mesh().time().timeName(),
+            fluid.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE,
+            registerObject
+        )
+    ),
+    fluid_(fluid),
+    d_(dropletDiameter),
+    Ki_
+    (
+        IOobject
+        (
+            "Ki",
+            fluid.mesh().time().timeName(),
+            fluid.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        fluid.mesh(),
+        dimensionedScalar("zero", dimMass/dimTime/dimVolume, 0.0)
+    )
+{
+}
+
+
+// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
+Foam::autoPtr<Foam::CompressibleTwoFluidFoam::dragModel>
+Foam::CompressibleTwoFluidFoam::dragModel::New
+(
+    const compressibleTwoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter
+)
+{
+    const dictionary& dict = fluid.subDict("drag");
+
+    const word modelType(dict.get<word>("type"));
+
+    Info<< "Selecting dragModel "
+        << modelType << endl;
+
+    auto* ctorPtr = dictionaryConstructorTable(modelType);
+
+    if (!ctorPtr)
+    {
+        FatalIOErrorInLookup
+        (
+            dict,
+            "dragModel",
+            modelType,
+            *dictionaryConstructorTablePtr_
+        ) << exit(FatalIOError);
+    }
+
+    return ctorPtr(dict, fluid, dropletDiameter, true);
+}
+
+
+Foam::autoPtr<Foam::CompressibleTwoFluidFoam::dragModel>
+Foam::CompressibleTwoFluidFoam::dragModel::New
+(
+    const dictionary& dict,
+    const compressibleTwoFluid& fluid,
+    const Foam::volScalarField& dropletDiameter
+)
+{
+    const word modelType(dict.get<word>("type"));
+
+    Info<< "Selecting dragModel for "
+        << fluid << ": " << modelType << endl;
+
+    auto* ctorPtr = dictionaryConstructorTable(modelType);
+
+    if (!ctorPtr)
+    {
+        FatalIOErrorInLookup
+        (
+            dict,
+            "dragModel",
+            modelType,
+            *dictionaryConstructorTablePtr_
+        ) << exit(FatalIOError);
+    }
+
+    return ctorPtr(dict, fluid, dropletDiameter, true);
+}
+
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+Foam::CompressibleTwoFluidFoam::dragModel::~dragModel()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+/*const Foam::volScalarField& Foam::CompressibleTwoFluidFoam::dragModel::CdRe() const
+{
+    //return Cd_;
+}*/
+
+
+const Foam::volScalarField& Foam::CompressibleTwoFluidFoam::dragModel::Ki() const
+{
+    return Ki_;
+    //(0.75*Cd_*fluid_.thermo1().rho()*mag(fluid_.U1() - fluid_.U2()))/d_;
+}
+
+
+Foam::tmp<Foam::volScalarField> Foam::CompressibleTwoFluidFoam::dragModel::K() const
+{
+    return Ki_*fluid_.alpha();
+}
+
+
+
+Foam::scalar Foam::CompressibleTwoFluidFoam::dragModel::dKidp(const label celli) const
+{
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
+
+    const vector U1 = fluid_.U1()[celli];
+    const vector U2 = fluid_.U2()[celli];
+
+    const scalar drho1dp = rho1[celli]*fluid_.gasProps1().beta_T(fluid_.p()[celli], fluid_.T1()[celli]);
+
+    return 0.75*(Cd_[celli]/d_[celli])*drho1dp*mag(U1 - U2);*/
+
+    return 0.0;
+}
+
+Foam::scalar Foam::CompressibleTwoFluidFoam::dragModel::dKidalpha(const label celli) const
+{
+    return 0.0;
+}
+
+Foam::vector Foam::CompressibleTwoFluidFoam::dragModel::dKidU1(const label celli) const
+{
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
+
+    const vector U1 = fluid_.U1()[celli];
+    const vector U2 = fluid_.U2()[celli];
+
+    return 0.75*(Cd_[celli]/d_[celli])*rho1[celli]*(U1 - U2)/(mag(U1 - U2) + VSMALL);*/
+
+    return vector::zero;
+}
+
+Foam::vector Foam::CompressibleTwoFluidFoam::dragModel::dKidU2(const label celli) const
+{
+    return -dKidU1(celli);
+}
+
+Foam::scalar Foam::CompressibleTwoFluidFoam::dragModel::dKidT1(const label celli) const
+{
+    /*const volScalarField rho1 = fluid_.thermo1().rho();
+
+    const vector U1 = fluid_.U1()[celli];
+    const vector U2 = fluid_.U2()[celli];
+
+    const scalar drho1dT = -rho1[celli]*fluid_.gasProps1().beta_p(fluid_.p()[celli], fluid_.T1()[celli]);
+
+    return 0.75*(Cd_[celli]/d_[celli])*drho1dT*mag(U1 - U2);*/
+    return 0.0;
+}
+
+Foam::scalar Foam::CompressibleTwoFluidFoam::dragModel::dKidT2(const label celli) const
+{
+    return 0.0;
+}
+
+
+std::array<Foam::scalar, 100> Foam::CompressibleTwoFluidFoam::dragModel::dSdpUT(const label celli) const
+{
+    constexpr auto idx = [](std::size_t i, std::size_t j) constexpr
+    {
+        return j * 10 + i;      // column-major
+    };
+
+    std::array<Foam::scalar, 100> out{};
+
+    const scalar alpha = fluid_.alpha()[celli];
+    const scalar p = fluid_.p()[celli];
+    const vector U1 = fluid_.U1()[celli];
+    const vector U2 = fluid_.U2()[celli];
+    const scalar T1 = fluid_.T1()[celli];
+    const scalar T2 = fluid_.T2()[celli];
+
+
+    const scalar K = Ki_[celli]*alpha;
+
+    const vector U1mU2 = U1 - U2;
+    const scalar U1mU2dotU1 = U1mU2 & U1;
+    const scalar U2mU1dotU2 = (-U1mU2) & U2;
+
+    const scalar dKdp_      = alpha*dKidp(celli);
+    const scalar dKdalpha_  = alpha*dKidalpha(celli) + Ki_[celli];
+    const vector dKdU1_     = alpha*dKidU1(celli);
+    const vector dKdU2_     = alpha*dKidU2(celli);
+    const scalar dKdT1_     = alpha*dKidT1(celli);
+    const scalar dKdT2_     = alpha*dKidT2(celli);
+
+    //const scalar dKdp_ = 0.0;
+    //const scalar dKdalpha_ = 0.0;
+    //const vector dKdU1_ = vector::zero;
+    //const vector dKdU2_ = vector::zero;
+    //const scalar dKdT1_ = 0.0;
+    //const scalar dKdT2_ = 0.0;
+
+    out[idx(1, 0)] =  dKdp_*U1mU2.x();
+    out[idx(2, 0)] =  dKdp_*U1mU2.y();
+    out[idx(3, 0)] =  dKdp_*U1mU2.z();
+    out[idx(4, 0)] =  dKdp_*U1mU2dotU1;
+    out[idx(6, 0)] = -dKdp_*U1mU2.x();
+    out[idx(7, 0)] = -dKdp_*U1mU2.y();
+    out[idx(8, 0)] = -dKdp_*U1mU2.z();
+    out[idx(9, 0)] =  dKdp_*U2mU1dotU2;
+
+
+    out[idx(1, 1)] =  dKdalpha_*U1mU2.x();
+    out[idx(2, 1)] =  dKdalpha_*U1mU2.y();
+    out[idx(3, 1)] =  dKdalpha_*U1mU2.z();
+    out[idx(4, 1)] =  dKdalpha_*U1mU2dotU1;
+    out[idx(6, 1)] = -dKdalpha_*U1mU2.x();
+    out[idx(7, 1)] = -dKdalpha_*U1mU2.y();
+    out[idx(8, 1)] = -dKdalpha_*U1mU2.z();
+    out[idx(9, 1)] =  dKdalpha_*U2mU1dotU2;
+
+
+    out[idx(1, 2)] =  dKdU1_.x()*U1mU2.x()  + K;
+    out[idx(2, 2)] =  dKdU1_.x()*U1mU2.y(); //
+    out[idx(3, 2)] =  dKdU1_.x()*U1mU2.z(); //
+    out[idx(4, 2)] =  dKdU1_.x()*U1mU2dotU1 + K*(2*U1.x() - U2.x());
+    out[idx(6, 2)] = -dKdU1_.x()*U1mU2.x()  - K;
+    out[idx(7, 2)] = -dKdU1_.x()*U1mU2.y(); //
+    out[idx(8, 2)] = -dKdU1_.x()*U1mU2.z(); //
+    out[idx(9, 2)] =  dKdU1_.x()*U2mU1dotU2 - K*U2.x();
+
+    out[idx(1, 3)] =  dKdU1_.y()*U1mU2.x(); //
+    out[idx(2, 3)] =  dKdU1_.y()*U1mU2.y()  + K;
+    out[idx(3, 3)] =  dKdU1_.y()*U1mU2.z(); //
+    out[idx(4, 3)] =  dKdU1_.y()*U1mU2dotU1 + K*(2*U1.y() - U2.y());
+    out[idx(6, 3)] = -dKdU1_.y()*U1mU2.x(); //
+    out[idx(7, 3)] = -dKdU1_.y()*U1mU2.y()  - K;
+    out[idx(8, 3)] = -dKdU1_.y()*U1mU2.z(); //
+    out[idx(9, 3)] =  dKdU1_.y()*U2mU1dotU2 - K*U2.y();
+
+    out[idx(1, 4)] =  dKdU1_.z()*U1mU2.x(); //
+    out[idx(2, 4)] =  dKdU1_.z()*U1mU2.y(); //
+    out[idx(3, 4)] =  dKdU1_.z()*U1mU2.z()  + K;
+    out[idx(4, 4)] =  dKdU1_.z()*U1mU2dotU1 + K*(2*U1.z() - U2.z());
+    out[idx(6, 4)] = -dKdU1_.z()*U1mU2.x(); //
+    out[idx(7, 4)] = -dKdU1_.z()*U1mU2.y(); //
+    out[idx(8, 4)] = -dKdU1_.z()*U1mU2.z()  - K;
+    out[idx(9, 4)] =  dKdU1_.z()*U2mU1dotU2 - K*U2.z();
+
+
+    out[idx(1, 5)] =  dKdU2_.x()*U1mU2.x()  - K;
+    out[idx(2, 5)] =  dKdU2_.x()*U1mU2.y(); //
+    out[idx(3, 5)] =  dKdU2_.x()*U1mU2.z(); //
+    out[idx(4, 5)] =  dKdU2_.x()*U1mU2dotU1 - K*U1.x(); 
+    out[idx(6, 5)] = -dKdU2_.x()*U1mU2.x()  + K;
+    out[idx(7, 5)] = -dKdU2_.x()*U1mU2.y(); //
+    out[idx(8, 5)] = -dKdU2_.x()*U1mU2.z(); //
+    out[idx(9, 5)] =  dKdU2_.x()*U2mU1dotU2  + K*(2*U2.x() - U1.x());
+
+    out[idx(1, 6)] =  dKdU2_.y()*U1mU2.x(); //
+    out[idx(2, 6)] =  dKdU2_.y()*U1mU2.y()  - K;
+    out[idx(3, 6)] =  dKdU2_.y()*U1mU2.z(); //
+    out[idx(4, 6)] =  dKdU2_.y()*U1mU2dotU1 - K*U1.y(); 
+    out[idx(6, 6)] = -dKdU2_.y()*U1mU2.x(); //
+    out[idx(7, 6)] = -dKdU2_.y()*U1mU2.y()  + K;
+    out[idx(8, 6)] = -dKdU2_.y()*U1mU2.z(); //
+    out[idx(9, 6)] =  dKdU2_.y()*U2mU1dotU2 + K*(2*U2.y() - U1.y());
+
+    out[idx(1, 7)] =  dKdU2_.z()*U1mU2.x(); //
+    out[idx(2, 7)] =  dKdU2_.z()*U1mU2.y(); //
+    out[idx(3, 7)] =  dKdU2_.z()*U1mU2.z()  - K;
+    out[idx(4, 7)] =  dKdU2_.z()*U1mU2dotU1 - K*U1.z(); 
+    out[idx(6, 7)] = -dKdU2_.z()*U1mU2.x(); //
+    out[idx(7, 7)] = -dKdU2_.z()*U1mU2.y(); //
+    out[idx(8, 7)] = -dKdU2_.z()*U1mU2.z()  + K;
+    out[idx(9, 7)] =  dKdU2_.z()*U2mU1dotU2 + K*(2*U2.z() - U1.z());
+
+
+    out[idx(1, 8)] =  dKdT1_*U1mU2.x();
+    out[idx(2, 8)] =  dKdT1_*U1mU2.y();
+    out[idx(3, 8)] =  dKdT1_*U1mU2.z();
+    out[idx(4, 8)] =  dKdT1_*U1mU2dotU1;
+    out[idx(6, 8)] = -dKdT1_*U1mU2.x();
+    out[idx(7, 8)] = -dKdT1_*U1mU2.y();
+    out[idx(8, 8)] = -dKdT1_*U1mU2.z();
+    out[idx(9, 8)] =  dKdT1_*U2mU1dotU2;
+
+    out[idx(1, 9)] =  dKdT2_*U1mU2.x();
+    out[idx(2, 9)] =  dKdT2_*U1mU2.y();
+    out[idx(3, 9)] =  dKdT2_*U1mU2.z();
+    out[idx(4, 9)] =  dKdT2_*U1mU2dotU1;
+    out[idx(6, 9)] = -dKdT2_*U1mU2.x();
+    out[idx(7, 9)] = -dKdT2_*U1mU2.y();
+    out[idx(8, 9)] = -dKdT2_*U1mU2.z();
+    out[idx(9, 9)] =  dKdT2_*U2mU1dotU2;
+
+    return out;
+}
+
+
+bool Foam::CompressibleTwoFluidFoam::dragModel::writeData(Ostream& os) const
+{
+    return os.good();
+}
+
+
+// ************************************************************************* //
+
+
+
+        //from calculateDinv.H (backup)
+
+        //START DRAG
+        /*Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();
+        
+        dragJ(1, 2) = K;
+        dragJ(4, 2) = K*(2*U1[celli].x() - U2[celli].x());
+        dragJ(6, 2) = -K;
+        dragJ(9, 2) = -K*U2[celli].x();
+
+        dragJ(2, 3) = K;
+        dragJ(4, 3) = K*(2*U1[celli].y() - U2[celli].y());
+        dragJ(7, 3) = -K;
+        dragJ(9, 3) = -K*U2[celli].y();
+
+        dragJ(3, 4) = K;
+        dragJ(4, 4) = K*(2*U1[celli].z() - U2[celli].z());
+        dragJ(8, 4) = -K;
+        dragJ(9, 4) = -K*U2[celli].z();
+
+
+        dragJ(1, 5) = -K;
+        dragJ(4, 5) = -K*U1[celli].x(); 
+        dragJ(6, 5) = K;
+        dragJ(9, 5) = K*(2*U2[celli].x() - U1[celli].x());
+
+        dragJ(2, 6) = -K;
+        dragJ(4, 6) = -K*U1[celli].y(); 
+        dragJ(7, 6) = K;
+        dragJ(9, 6) = K*(2*U2[celli].y() - U1[celli].y());
+
+        dragJ(3, 7) = -K;
+        dragJ(4, 7) = -K*U1[celli].z(); 
+        dragJ(8, 7) = K;
+        dragJ(9, 7) = K*(2*U2[celli].z() - U1[celli].z());*/
+        //END DRAG

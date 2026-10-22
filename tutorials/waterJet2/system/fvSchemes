@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-riemannSolver       mslau2;
+riemannSolver       slau2;
 
 epsilonMSlau2       1.0e-4;
 
@@ -29,7 +29,7 @@ gradSchemes
     default         Gauss linear;
     limitedGauss    cellLimited Gauss linear 1;
     //venkatakrishnan cellLimited<cubic> 1.5 leastSquares 1;
-    venkatakrishnan cellLimited<cubic> 2 edgeCellsLeastSquares 1;
+    venkatakrishnan cellLimited<cubic> 1.5 edgeCellsLeastSquares 1;
     grad(U) Gauss linear;
     grad(h) Gauss linear;
 }

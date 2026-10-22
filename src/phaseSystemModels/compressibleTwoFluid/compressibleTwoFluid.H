@@ -1,0 +1,406 @@
+/*---------------------------------------------------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: Open Source CFD
+   \\    /   O peration     | 
+    \\  /    A nd           | For copyright notice see file Copyright
+     \\/     M anipulation  | 
+-------------------------------------------------------------------------------
+License
+    This file isn't part of foam-extend nor OpenFOAM.
+
+    OpenFOAM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation, either version 3 of the License, or (at your
+    option) any later version.
+
+    OpenFOAM is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with foam-extend.  If not, see <http://www.gnu.org/licenses/>.
+
+Application
+    dbFoam
+
+Description
+    Density-based compressible steady-state & transient flow solver.
+
+Author
+    Matej Vitovec
+
+\*---------------------------------------------------------------------------*/
+
+#ifndef compressibleTwoFluid_H
+#define compressibleTwoFluid_H
+
+#include "fvCFD.H"
+#include "volFieldsFwd.H"
+#include "surfaceFieldsFwd.H"
+#include "rhoThermo.H"
+#include "gasProperties.H"
+
+#include "compressibleTwoFluidConservative.H"
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
+{
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace CompressibleTwoFluidFoam
+{
+
+/*---------------------------------------------------------------------------*\
+                        Class compressibleTwoFluid Declaration
+\*---------------------------------------------------------------------------*/
+
+class compressibleTwoFluid
+:
+    public IOdictionary
+{
+    const fvMesh& mesh_;
+
+    const scalar epsilon_;
+    const scalar epsilonMin_;
+    const scalar epsilonMax_;
+
+    word fluid1Name_;
+    word fluid2Name_;
+
+    autoPtr<rhoThermo> pthermo1_;
+    autoPtr<rhoThermo> pthermo2_;
+    rhoThermo& thermo1_;
+    rhoThermo& thermo2_;
+
+    autoPtr<gasProperties> pGasProps1_;
+    autoPtr<gasProperties> pGasProps2_;
+    gasProperties& gasProps1_;
+    gasProperties& gasProps2_;
+
+    volScalarField& p_;
+    volScalarField  alpha2_; //main alpha (alpha2 = alpha)
+    volScalarField  alpha1_;
+    volVectorField  U1_;
+    volVectorField  U2_;
+    volScalarField& T1_;
+    volScalarField& T2_;
+
+    volScalarField a1_;
+    volScalarField a2_;
+
+    volScalarField pInt_;
+    
+    compressibleTwoFluidConservative conservative_;
+            
+    
+    // Private Member Functions
+    
+    //- Disallow default bitwise copy construct
+    compressibleTwoFluid(const compressibleTwoFluid&);
+        
+    //- Disallow default bitwise assignment
+    void operator=(const compressibleTwoFluid&);
+
+    const gasProperties& gas1() const
+    {
+        return gasProps1_;
+    }
+
+    const gasProperties& gas2() const
+    {
+        return gasProps2_;
+    }
+
+    /*void primitiveFromConservative
+    (
+        scalar& p,
+        scalar& alpha,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld
+    );*/
+
+    void correctSoundSpeeds();
+    
+public:
+
+    // Constructors
+
+    //- Construct from components
+    /*compressibleTwoFluid
+    (
+        const volScalarField& p,
+        const volScalarField& alpha,
+        const volVectorField& U1,
+        const volVectorField& U2,
+        const volScalarField& T1,
+        const volScalarField& T2,
+        rhoThermo& thermo1,
+        rhoThermo& thermo2
+    );*/
+
+    compressibleTwoFluid(const fvMesh& mesh);
+
+
+    //- Destructor
+    virtual ~compressibleTwoFluid()
+    {}
+
+    void primitiveFromConservative
+    (
+        scalar& p,
+        scalar& alpha,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld
+    ) const;
+
+    void blendVanishingFluid
+    (
+        scalar& alpha2,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2
+    ) const;
+
+    void blendVanishingFluid
+    (
+        scalar& alpha2,
+        vector& U1,
+        vector& U2,
+        scalar& T1,
+        scalar& T2,
+        const scalar& T2vanished
+    ) const;
+
+    void boundAlpha(scalar& alpha) const;
+
+    void fluxFromConservative
+    (
+        scalar& fluxAlphaRho1,
+        scalar& fluxAlphaRho2,
+        vector& fluxAlphaRhoU1,
+        vector& fluxAlphaRhoU2,
+        scalar& fluxAlphaRhoE1,
+        scalar& fluxAlphaRhoE2,
+        const scalar alphaRho1,
+        const scalar alphaRho2,
+        const vector alphaRhoU1,
+        const vector alphaRhoU2,
+        const scalar epsilon1,
+        const scalar epsilon2,
+        const scalar pIntOld,
+        const vector Sf,
+        const scalar p0,
+        const scalar T10,
+        const scalar T20
+    ) const;
+
+
+    // Memeber functions
+
+    scalar epsilon() const
+    {
+        return epsilon_;
+    } 
+
+    const fvMesh& mesh() const
+    {
+        return mesh_;
+    }
+
+    const volScalarField& p() const
+    {
+        return p_;
+    }
+
+    volScalarField& p()
+    {
+        return p_;
+    }
+
+    const volScalarField& alpha() const
+    {
+        return alpha2_;
+    }
+
+    volScalarField& alpha()
+    {
+        return alpha2_;
+    }
+
+    const volScalarField& alpha1() const
+    {
+        return alpha1_;
+    }
+
+    const volScalarField& alpha2() const
+    {
+        return alpha2_;
+    }
+
+    volScalarField& alpha2() 
+    {
+        return alpha2_;
+    }
+
+    const volVectorField& U1() const
+    {
+        return U1_;
+    }
+
+    volVectorField& U1()
+    {
+        return U1_;
+    }
+
+    const volVectorField& U2() const
+    {
+        return U2_;
+    }
+
+    volVectorField& U2()
+    {
+        return U2_;
+    }
+
+    const volScalarField& T1() const
+    {
+        return T1_;
+    }
+
+    volScalarField& T1()
+    {
+        return T1_;
+    }
+
+    const volScalarField& T2() const
+    {
+        return T2_;
+    }
+
+    volScalarField& T2()
+    {
+        return T2_;
+    }
+
+    const volScalarField& a1() const
+    {
+        return a1_;
+    }
+
+    const volScalarField& a2() const
+    {
+        return a2_;
+    }
+
+    const volScalarField& pInt() const
+    {
+        return pInt_;
+    }
+
+    volScalarField& pInt()
+    {
+        return pInt_;
+    }
+
+    const rhoThermo& thermo1() const
+    {
+        return thermo1_;
+    }
+
+    rhoThermo& thermo1()
+    {
+        return thermo1_;
+    }
+
+    const rhoThermo& thermo2() const
+    {
+        return thermo2_;
+    }
+
+    rhoThermo& thermo2()
+    {
+        return thermo2_;
+    }
+
+    tmp<volScalarField> rho() const
+    {
+        return alpha1_*thermo1_.rho() + alpha2_*thermo2_.rho();
+    }
+
+    const gasProperties& gasProps1() const
+    {
+        return gasProps1_;
+    }
+
+    const gasProperties& gasProps2() const
+    {
+        return gasProps2_;
+    }
+
+    const compressibleTwoFluidConservative& conservative() const
+    {
+        return conservative_;
+    }
+
+    compressibleTwoFluidConservative& conservative()
+    {
+        return conservative_;
+    }
+
+    void correct();
+
+    void blendVanishingFluid();
+
+    void blendVanishingFluid(const volScalarField& T2blend);
+
+    void bound();
+
+    void boundAlpha();
+
+    void correctBoundaryCondition();
+
+    void correctThermo();
+
+    void correctInterfacialPressure();
+
+    void correctConservative();
+
+    tmp<surfaceScalarField> amaxSf() const;
+    
+};
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace CompressibleTwoFluidFoam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+#endif
+
+// ************************************************************************* //

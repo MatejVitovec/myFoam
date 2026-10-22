@@ -1,0 +1,11 @@
+./compressibleTwoFluid.C
+./compressibleTwoFluidConservative/compressibleTwoFluidConservative.C
+./compressibleTwoFluidConvectiveFlux/compressibleTwoFluidConvectiveFlux.C
+./interfacialModels/dragModels/dragModel/dragModel.C
+./interfacialModels/dragModels/constantDrag/constantDrag.C
+./interfacialModels/dragModels/viscousDrag/viscousDrag.C
+./interfacialModels/dragModels/SchillerNaumann/SchillerNaumann.C
+./interfacialModels/virtualMassModels/virtualMassModel/virtualMassModel.C
+./interfacialModels/virtualMassModels/constantVirtualMass/constantVirtualMass.C
+
+LIB = $(FOAM_USER_LIBBIN)/libmyCompressibleTwoFluid

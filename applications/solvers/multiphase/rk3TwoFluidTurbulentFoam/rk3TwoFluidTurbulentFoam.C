@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
-                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())m
+                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                                           + dragK*(fluid.U2() - fluid.U1()));
 
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
                                     + ((dragK*(fluid.U2() - fluid.U1())) & U2));
 
             fluid.correct();
-            fluid.blendVanishingFluid();
+            //fluid.blendVanishingFluid();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             if(i == 2) fluid.correctInterfacialPressure();
@@ -181,6 +181,9 @@ int main(int argc, char *argv[])
         //#include "../tools/film/solveFilm.H"
 
         runTime.write();
+
+        Info << "alpha2_pos min = " << gMin(twoFluidFlux.alpha_pos()) << ", alpha2_neg min = " << gMin(twoFluidFlux.alpha_neg()) << endl;
+        Info << "alpha2_pos max = " << gMax(twoFluidFlux.alpha_pos()) << ", alpha2_neg max = " << gMax(twoFluidFlux.alpha_neg()) << endl;
 
         //runTime.printExecutionTime(Info);
 

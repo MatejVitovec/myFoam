@@ -602,6 +602,16 @@ void Foam::TwoFluidFoam::twoFluid::blendVanishingFluid()
             U2_[celli] = gFunc*U2_[celli] + (1.0 - gFunc)*U1_[celli];
             T2_[celli] = gFunc*T2_[celli] + (1.0 - gFunc)*T1_[celli];
         }
+
+        /*if ((1.0 - alpha2) <= epsilonMin_)
+        {
+            alpha2_[celli] = 1.0 - epsilonMin_;
+        }
+        
+        if (alpha2 <= epsilonMin_)
+        {
+            alpha2_[celli] = epsilonMin_;
+        }*/
     }
     
     alpha1_ = 1.0 - alpha2_;
