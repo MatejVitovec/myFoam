@@ -30,7 +30,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::compressibleTwoFluidConservative::compressibleTwoFluidConservative
+Foam::CompressibleTwoFluidFoam::compressibleTwoFluidConservative::compressibleTwoFluidConservative
 (
     const volScalarField& p,
     const volScalarField& alpha,

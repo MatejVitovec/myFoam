@@ -43,6 +43,11 @@ Author
 namespace Foam
 {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace CompressibleTwoFluidFoam
+{
+
 /*---------------------------------------------------------------------------*\
                         Class compressibleTwoFluidConservative Declaration
 \*---------------------------------------------------------------------------*/
@@ -155,12 +160,13 @@ public:
     void update();
 };
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace CompressibleTwoFluidFoam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
 

@@ -43,9 +43,9 @@ Description
 
 #include "processorPolyPatch.H"
 
-#include "twoFluid.H"
-#include "twoFluidConvectiveFlux.H"
-#include "twoFluidFvc.H"
+#include "compressibleTwoFluid.H"
+#include "compressibleTwoFluidConvectiveFlux.H"
+#include "compressibleTwoFluidFvc.H"
 #include "dragModel.H"
 
 #include "faCFD.H"
@@ -102,32 +102,39 @@ int main(int argc, char *argv[])
         {
             twoFluidFlux.computeFlux();
 
+            /*volSymmTensorField devRhoReff2
+            (
+                "devRhoReff2",
+                -thermo2.mu()*dev(twoSymm(fvc::grad(U2)))
+            );*/
+
             volScalarField dragK = drag.K();
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
-                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
+                                     - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg()));
             
             conservative.alphaRho2() = coeff[i][0]*conservative.alphaRho2().oldTime()
                                      + coeff[i][1]*conservative.alphaRho2()
-                                     - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
+                                     - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg()));
 
             conservative.alphaRhoU1() = coeff[i][0]*conservative.alphaRhoU1().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU1()
-                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+                                      - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           + alpha1*fvc::div(turbulence1->devRhoReff())
-                                          - fluid.pInt()*TwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
+                                          - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
                                           + dragK*(fluid.U1() - fluid.U2()));
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
-                                      - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                                          - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
+                                      - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                                          - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
+                                          //+ alpha2*fvc::div(devRhoReff2)
                                           + dragK*(fluid.U2() - fluid.U1()));
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                                    - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                                     + alpha1*fvc::div(turbulence1->devRhoReff() & U1)
                                     - alpha1*fvc::laplacian(turbulence1->alphaEff(), h1)
                                     //- fvc::laplacian(turbulence1->kappaEff(), T1)
@@ -135,11 +142,12 @@ int main(int argc, char *argv[])
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
-                                    - coeff[i][2]*dt*(TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                                    - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                                    //+ alpha2*fvc::div(devRhoReff2 & U2)
                                     + ((dragK*(fluid.U2() - fluid.U1())) & U2));
 
             fluid.correct();
-            //fluid.blendVanishingFluid();
+            fluid.blendVanishingFluid();
             fluid.correctBoundaryCondition();
             fluid.correctThermo();
             if(i == 2) fluid.correctInterfacialPressure();

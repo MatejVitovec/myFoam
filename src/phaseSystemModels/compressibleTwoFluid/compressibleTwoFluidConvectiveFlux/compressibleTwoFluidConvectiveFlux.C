@@ -32,7 +32,7 @@ License
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-Foam::compressibleTwoFluidConvectiveFlux::compressibleTwoFluidConvectiveFlux
+Foam::CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux::compressibleTwoFluidConvectiveFlux
 (
     const volScalarField& p,
     const volScalarField& alpha,
@@ -244,7 +244,7 @@ Foam::compressibleTwoFluidConvectiveFlux::compressibleTwoFluidConvectiveFlux
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::compressibleTwoFluidConvectiveFlux::computeFlux()
+void Foam::CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux::computeFlux()
 {
     const auto& owner = mesh_.owner();
 

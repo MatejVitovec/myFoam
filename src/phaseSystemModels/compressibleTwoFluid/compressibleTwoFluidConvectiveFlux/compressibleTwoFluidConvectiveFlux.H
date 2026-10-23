@@ -47,6 +47,11 @@ Author
 namespace Foam
 {
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace CompressibleTwoFluidFoam
+{
+
 /*---------------------------------------------------------------------------*\
                         Class compressibleTwoFluidConvectiveFlux Declaration
 \*---------------------------------------------------------------------------*/
@@ -234,9 +239,11 @@ public:
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-} // End namespace Foam
+} // End namespace CompressibleTwoFluidFoam
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
 
 #endif
 

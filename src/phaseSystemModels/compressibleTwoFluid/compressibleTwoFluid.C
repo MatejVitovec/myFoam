@@ -38,7 +38,7 @@ IOdictionary
 (
     IOobject
     (
-        "compressibleTwoFluidProperties",
+        "twoFluidProperties",
         mesh.time().constant(),
         mesh,
         IOobject::MUST_READ_IF_MODIFIED,
