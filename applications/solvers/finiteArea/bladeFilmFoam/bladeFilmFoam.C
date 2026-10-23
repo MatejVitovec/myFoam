@@ -41,9 +41,9 @@ Description
 #include "ThermalDiffusivity.H"
 #include "fvcSmooth.H"
 
-#include "twoFluid.H"
-#include "twoFluidConvectiveFlux.H"
-#include "twoFluidFvc.H"
+#include "compressibleTwoFluid.H"
+#include "compressibleTwoFluidConvectiveFlux.H"
+#include "compressibleTwoFluidFvc.H"
 #include "dragModel.H"
 
 #include <eigen3/Eigen/Dense>

@@ -39,9 +39,9 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
-#include "twoFluid.H"
-#include "twoFluidConvectiveFlux.H"
-#include "twoFluidFvc.H"
+#include "compressibleTwoFluid.H"
+#include "compressibleTwoFluidConvectiveFlux.H"
+#include "compressibleTwoFluidFvc.H"
 #include "dragModel.H"
 
 #include <eigen3/Eigen/Dense>
@@ -105,17 +105,17 @@ int main(int argc, char *argv[])
             //virtualMassTerm = 0.5*rho1*(1.0 - alpha2)*alpha2*(DU2 - DU1);
 
             volScalarField rezAlphaRho1(-dt*(
-                fvc::ddt(conservative.alphaRho1()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
+                fvc::ddt(conservative.alphaRho1()) + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
             ));
 
             volScalarField rezAlphaRho2(-dt*(
-                fvc::ddt(conservative.alphaRho2()) + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+                fvc::ddt(conservative.alphaRho2()) + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
             ));
 
             volVectorField rezAlphaRhoU1(-dt*(
                 fvc::ddt(conservative.alphaRhoU1())
-                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
+                + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+                - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                 + drag.K()*(fluid.U1() - fluid.U2())
                 + virtualMassCoeffsMinus1
                 //+ virtualMassTerm
@@ -123,8 +123,8 @@ int main(int argc, char *argv[])
 
             volVectorField rezAlphaRhoU2(-dt*(
                 fvc::ddt(conservative.alphaRhoU2())
-                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
+                + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 + drag.K()*(fluid.U2() - fluid.U1())
                 + virtualMassCoeffsMinus2
                 //- virtualMassTerm
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 
             volScalarField rezEpsilon1(-dt*(
                 fvc::ddt(conservative.epsilon1())
-                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 + ((drag.K()*(fluid.U1() - fluid.U2())) & U1)
                 + (virtualMassCoeffsMinus1 & U1)
                 //+ (virtualMassTerm & U1)
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 
             volScalarField rezEpsilon2(-dt*(
                 fvc::ddt(conservative.epsilon2())
-                + TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                + CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 + ((drag.K()*(fluid.U2() - fluid.U1())) & U2)
                 + (virtualMassCoeffsMinus2 & U2)
                 //- (virtualMassTerm & U2)

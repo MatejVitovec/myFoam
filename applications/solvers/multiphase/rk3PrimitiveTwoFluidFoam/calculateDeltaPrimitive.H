@@ -36,7 +36,7 @@
         //DRAG
         const double K = dragK[celli];
 
-        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli, K, d[celli]);
+        std::array<scalar, 100> dragJ_ = drag.dSdpUT(celli);
         Eigen::Map<Eigen::Matrix<double, 10, 10>> dragJ(dragJ_.data());
 
         /*Eigen::Matrix<double, 10, 10> dragJ = Eigen::Matrix<double, 10, 10>::Zero();

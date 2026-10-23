@@ -2,11 +2,11 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluid(mesh);
+CompressibleTwoFluidFoam::compressibleTwoFluid fluid(mesh);
 
-twoFluidConservative& conservative = fluid.conservative();
+CompressibleTwoFluidFoam::compressibleTwoFluidConservative& conservative = fluid.conservative();
 
-twoFluidConvectiveFlux twoFluidFlux
+CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux twoFluidFlux
 (
     fluid.p(),
     fluid.alpha(),
@@ -59,8 +59,9 @@ volScalarField d
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, d);
-TwoFluidFoam::dragModel& drag = pDrag();
+autoPtr<CompressibleTwoFluidFoam::dragModel> pDrag =
+    CompressibleTwoFluidFoam::dragModel::New(fluid, d);
+CompressibleTwoFluidFoam::dragModel& drag = pDrag();
 drag.correct();
 
 //Pro ukladani

@@ -2,11 +2,11 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluid(mesh);
+CompressibleTwoFluidFoam::compressibleTwoFluid fluid(mesh);
 
-twoFluidConservative& conservative = fluid.conservative();
+CompressibleTwoFluidFoam::compressibleTwoFluidConservative& conservative = fluid.conservative();
 
-twoFluidConvectiveFlux twoFluidFlux
+CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux twoFluidFlux
 (
     fluid.p(),
     fluid.alpha(),
@@ -17,6 +17,11 @@ twoFluidConvectiveFlux twoFluidFlux
     fluid.thermo1(),
     fluid.thermo2()
 );
+
+fluid.correctBoundaryCondition();
+fluid.correctThermo();
+fluid.correctInterfacialPressure();
+fluid.correctConservative();
 
 
 volScalarField& p = fluid.p();
@@ -48,9 +53,6 @@ surfaceScalarField rhoMPhi2
     linearInterpolate(rho*U2) & mesh.Sf()
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
-TwoFluidFoam::dragModel& drag = pDrag();
-
 saturation satur = saturation(fluid.subDict("condensation"), thermo1);
 
 autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::condensationModel::New
@@ -66,6 +68,24 @@ autoPtr<Foam::WetSteam::condensationModel> pCondensation = Foam::WetSteam::conde
     fluid
 );
 Foam::WetSteam::condensationModel& condensation = pCondensation();
+
+volScalarField dropletDiameter
+(
+    IOobject
+    (
+        "dropletDiameter",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    condensation.dropletDiameter()
+);
+
+autoPtr<CompressibleTwoFluidFoam::dragModel> pDrag =
+    CompressibleTwoFluidFoam::dragModel::New(fluid, dropletDiameter);
+CompressibleTwoFluidFoam::dragModel& drag = pDrag();
+drag.correct();
 
 volScalarField condensationMassSource
 (

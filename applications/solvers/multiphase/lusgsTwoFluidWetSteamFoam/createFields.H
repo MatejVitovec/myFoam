@@ -2,9 +2,9 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluid(mesh);
+CompressibleTwoFluidFoam::compressibleTwoFluid fluid(mesh);
 
-twoFluidConvectiveFlux twoFluidFlux
+CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux twoFluidFlux
 (
     fluid.p(),
     fluid.alpha(),
@@ -15,6 +15,11 @@ twoFluidConvectiveFlux twoFluidFlux
     fluid.thermo1(),
     fluid.thermo2()
 );
+
+fluid.correctBoundaryCondition();
+fluid.correctThermo();
+fluid.correctInterfacialPressure();
+fluid.correctConservative();
 
 
 volScalarField& p = fluid.p();
@@ -92,8 +97,10 @@ Foam::WetSteam::condensationModel& condensation = pCondensation();
 
 volScalarField dropletDiameter = condensation.dropletDiameter();
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid, dropletDiameter);
-TwoFluidFoam::dragModel& drag = pDrag();
+autoPtr<CompressibleTwoFluidFoam::dragModel> pDrag =
+    CompressibleTwoFluidFoam::dragModel::New(fluid, dropletDiameter);
+CompressibleTwoFluidFoam::dragModel& drag = pDrag();
+drag.correct();
 
 volScalarField condensationMassSource
 (

@@ -39,9 +39,9 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
-#include "twoFluid.H"
-#include "twoFluidConvectiveFlux.H"
-#include "twoFluidFvc.H"
+#include "compressibleTwoFluid.H"
+#include "compressibleTwoFluidConvectiveFlux.H"
+#include "compressibleTwoFluidFvc.H"
 #include "dragModel.H"
 #include "condensationModel.H"
 #include "saturation.H"
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
             volScalarField Hlint = satur.hsl() + (Uint & U2) - 0.5*magSqr(U2);
 
             dropletDiameter = condensation.dropletDiameter();
-            volScalarField dragKi = drag.Ki();
-            volVectorField dragSource = dragKi*alpha*(U1 - U2);
+            drag.correct();
+            volVectorField dragSource = drag.K()*(U1 - U2);
 
             condensationMassSource = condensation.condensationRateMassSource();
             nucleationMassSource = condensation.nucleationRateMassSource(); //DOCASNE
@@ -113,35 +113,35 @@ int main(int argc, char *argv[])
 
             volScalarField rezAlphaRho1(-dt*(
                 /*fvc::ddt(conservative.alphaRho1())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux1_pos(), twoFluidFlux.alphaRhoFlux1_neg())
                 + condensationMassSource
             ));
 
             volScalarField rezAlphaRho2(-dt*(
                 /*fvc::ddt(conservative.alphaRho2())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoFlux2_pos(), twoFluidFlux.alphaRhoFlux2_neg())
                 - condensationMassSource
             ));
 
             volVectorField rezAlphaRhoU1(-dt*(
                 /*fvc::ddt(conservative.alphaRhoU1())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
+                - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha1_pos()*mesh.Sf(), twoFluidFlux.alpha1_neg()*mesh.Sf())
                 + dragSource
                 + Uint*condensationMassSource
             ));
 
             volVectorField rezAlphaRhoU2(-dt*(
                 /*fvc::ddt(conservative.alphaRhoU2())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
-                - fluid.pInt()*TwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
+                - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
                 - dragSource
                 - Uint*condensationMassSource
             ));
 
             volScalarField rezEpsilon1(-dt*(
                 /*fvc::ddt(conservative.epsilon1())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
                 //+ (dragSource & Uint)
                 + (dragSource & U1)
                 + condensationMassSource*(Hvint - satur.L())                
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
             volScalarField rezEpsilon2(-dt*(
                 /*fvc::ddt(conservative.epsilon2())
-                +*/ TwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
+                +*/ CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
                 //- (dragSource & Uint)
                 - (dragSource & U2)
                 - condensationMassSource*Hlint

@@ -2,11 +2,11 @@
 
 Info<< "Reading thermophysical properties\n" << endl;
 
-TwoFluidFoam::twoFluid fluid(mesh);
+CompressibleTwoFluidFoam::compressibleTwoFluid fluid(mesh);
 
-twoFluidConservative& conservative = fluid.conservative();
+CompressibleTwoFluidFoam::compressibleTwoFluidConservative& conservative = fluid.conservative();
 
-twoFluidConvectiveFlux twoFluidFlux
+CompressibleTwoFluidFoam::compressibleTwoFluidConvectiveFlux twoFluidFlux
 (
     fluid.p(),
     fluid.alpha(),
@@ -18,6 +18,10 @@ twoFluidConvectiveFlux twoFluidFlux
     fluid.thermo2()
 );
 
+fluid.correctBoundaryCondition();
+fluid.correctThermo();
+fluid.correctInterfacialPressure();
+fluid.correctConservative();
 
 volScalarField& p = fluid.p();
 const volScalarField& alpha1 = fluid.alpha1();
@@ -36,9 +40,6 @@ surfaceScalarField amaxSf
     fluid.amaxSf()
 );
 
-autoPtr<TwoFluidFoam::dragModel> pDrag = TwoFluidFoam::dragModel::New(fluid);
-TwoFluidFoam::dragModel& drag = pDrag();
-
 volScalarField d
 (
     IOobject
@@ -52,6 +53,10 @@ volScalarField d
     mesh,
     dimensionedScalar("dropletDiameter", dimLength, 1e-5)
 );
+
+autoPtr<CompressibleTwoFluidFoam::dragModel> pDrag =
+    CompressibleTwoFluidFoam::dragModel::New(fluid, d);
+CompressibleTwoFluidFoam::dragModel& drag = pDrag();
 
 
 //Pro ukladani
