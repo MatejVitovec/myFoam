@@ -47,6 +47,7 @@ scalar Foam::ausmPlusUp::massFlux
     const vector& normalVector
 ) const
 {
+
     const scalar aTilde   = 0.5*(aLeft   + aRight);
     const scalar rhoTilde = 0.5*(rhoLeft + rhoRight);
 
@@ -58,17 +59,17 @@ scalar Foam::ausmPlusUp::massFlux
     const scalar magMaRelLeft  = mag(MaRelLeft);
     const scalar magMaRelRight = mag(MaRelRight);
 
-    //const scalar M4Plus  = (magMaRelLeft >= 1.0)  ? 0.5*(MaRelLeft  + magMaRelLeft)  : 0.25*sqr(MaRelLeft  + 1.0)*(1.0 - 16.0*beta_*0.25*sqr(MaRelLeft  - 1.0));
-    //const scalar M4Minus = (magMaRelRight >= 1.0) ? 0.5*(MaRelRight - magMaRelRight) : 0.25*sqr(MaRelRight - 1.0)*(1.0 + 16.0*beta_*0.25*sqr(MaRelRight + 1.0));
-    const scalar M4Plus  = (magMaRelLeft >= 1.0)  ? 0.5*(MaRelLeft  + magMaRelLeft)  :  0.25*sqr(MaRelLeft  + 1.0) - beta_*sqr(sqr(MaRelLeft) - 1.0);
+    const scalar M4Plus  = (magMaRelLeft >= 1.0)  ? 0.5*(MaRelLeft  + magMaRelLeft)  :  0.25*sqr(MaRelLeft  + 1.0) + beta_*sqr(sqr(MaRelLeft) - 1.0);
     const scalar M4Minus = (magMaRelRight >= 1.0) ? 0.5*(MaRelRight - magMaRelRight) : -0.25*sqr(MaRelRight - 1.0) - beta_*sqr(sqr(MaRelRight) - 1.0);
 
-    //const scalar MaBarSqr = (magSqr(ULeft) + magSqr(URight))/(2.0*sqr(aTilde));
     //const scalar MaBarSqr = (sqr(qLeft) + sqr(qRight))/(2.0*sqr(aTilde));
     const scalar MaBarSqr = 0.5*(sqr(MaRelLeft) + sqr(MaRelRight));
-    //const scalar MaZero = sqrt(min(1.0, max(MaBarSqr, MaInf_)));
-    //const scalar fa = MaZero*(2.0 - MaZero);
-    const scalar MaP = kp_*(M4Plus - M4Minus + 0.5*(MaRelRight - MaRelLeft - magMaRelLeft - magMaRelRight))*max(1.0 - MaBarSqr, 0.0)*((pLeft - pRight)/(rhoTilde*sqr(aTilde)));
+    
+    /*const scalar MaZero = sqrt(min(1.0, max(MaBarSqr, sqr(MaInf_))));
+    const scalar fa = MaZero*(2.0 - MaZero);*/
+    const scalar fa = 1.0;
+
+    const scalar MaP = (kp_/fa)*max(1.0 - sigma_*MaBarSqr, 0.0)*((pLeft - pRight)/(rhoTilde*sqr(aTilde)));
 
     const scalar Ma = M4Plus + M4Minus + MaP;
 
@@ -94,20 +95,19 @@ scalar Foam::ausmPlusUp::pressureFlux
     const scalar qLeft  = (ULeft  & normalVector);
     const scalar qRight = (URight & normalVector);
     const scalar MaRelLeft  = qLeft /aTilde;
-    const scalar MaRelRight = qRight/aTilde;  
+    const scalar MaRelRight = qRight/aTilde;
 
-    /*const scalar MaBarSqr = (sqr(qLeft) + sqr(qRight))/(2.0*sqr(aTilde));
-    const scalar MaZero = sqrt(min(1.0, max(MaBarSqr, MaInf_)));
-    const scalar fa = MaZero*(2.0 - MaZero);
-    const scalar theta = (3.0/16.0)*(-4.0 + 5.0*sqr(fa));
-    const scalar M2Plus  = 0.25*sqr(MaRelLeft  + 1.0);
-    const scalar M2Minus = 0.25*sqr(MaRelRight - 1.0);
-    const scalar PPlusLeft   = (mag(MaRelLeft)  >= 1.0) ? 0.5*(1.0 + sign(MaRelLeft))  : (1.0/MaRelLeft)*M2Plus  *(( 2.0 - MaRelLeft)  - 16.0*theta*MaRelLeft*M2Plus);
-    const scalar PMinusRight = (mag(MaRelRight) >= 1.0) ? 0.5*(1.0 - sign(MaRelRight)) : (1.0/MaRelRight)*M2Minus*((-2.0 - MaRelRight) + 16.0*theta*MaRelRight*M2Minus);*/
-    const scalar PPlusLeft   = (mag(MaRelLeft)  >= 1.0) ? 0.5*(1.0 + sign(MaRelLeft))  : 0.25*sqr(MaRelLeft + 1.0)*(2.0 - MaRelLeft) + (3/16)*MaRelLeft*sqr(sqr(MaRelLeft - 1.0));
-    const scalar PMinusRight = (mag(MaRelRight) >= 1.0) ? 0.5*(1.0 - sign(MaRelRight)) : 0.25*sqr(MaRelRight - 1.0)*(2.0 + MaRelRight) - (3/16)*MaRelRight*sqr(sqr(MaRelRight - 1.0));
+    /*const scalar MaBarSqr = 0.5*(sqr(MaRelLeft) + sqr(MaRelRight));
+    const scalar MaZero = sqrt(min(1.0, max(MaBarSqr, sqr(MaInf_))));
+    const scalar fa = MaZero*(2.0 - MaZero);*/
+    const scalar fa = 1.0;
 
-    const scalar Pu = ku_*PPlusLeft*PMinusRight*(rhoTilde*aTilde)*(qLeft - qRight);
+    const scalar alpha = (3.0/16.0)*(-4.0 + 5.0*sqr(fa));
+
+    const scalar PPlusLeft   = (mag(MaRelLeft)  >= 1.0) ? 0.5*(1.0 + sign(MaRelLeft))  : 0.25*sqr(MaRelLeft  + 1.0)*(2.0 - MaRelLeft)  + alpha*MaRelLeft *sqr(sqr(MaRelLeft  - 1.0));
+    const scalar PMinusRight = (mag(MaRelRight) >= 1.0) ? 0.5*(1.0 - sign(MaRelRight)) : 0.25*sqr(MaRelRight - 1.0)*(2.0 + MaRelRight) - alpha*MaRelRight*sqr(sqr(MaRelRight - 1.0));
+
+    const scalar Pu = ku_*PPlusLeft*PMinusRight*rhoTilde*fa*aTilde*(qLeft - qRight);
 
     return PPlusLeft*pLeft + PMinusRight*pRight + Pu;
 }

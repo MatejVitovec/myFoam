@@ -64,6 +64,9 @@ int main(int argc, char *argv[])
     #include "createFields.H"
     #include "createTimeControls.H"
 
+    fluid.correctThermo();
+    fluid.correctConservative();
+
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     // Courant numbers used to adjust the time-step
@@ -95,7 +98,8 @@ int main(int argc, char *argv[])
             /*volScalarField rho = alpha1*rho1 + alpha2*rho2;
             volVectorField virtualVelocity = (alpha1*rho1*U1 + alpha2*rho2*U2)/rho;
             volVectorField dragTerm = drag.K(d)*(fluid.U1() - fluid.U2());*/
-            volScalarField dragK = drag.K();
+
+            //volScalarField dragK = drag.K();
 
             conservative.alphaRho1() = coeff[i][0]*conservative.alphaRho1().oldTime()
                                      + coeff[i][1]*conservative.alphaRho1()
@@ -109,23 +113,23 @@ int main(int argc, char *argv[])
                                       + coeff[i][1]*conservative.alphaRhoU1()
                                       - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux1_pos(), twoFluidFlux.alphaRhoUFlux1_neg())
                                           - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div((1.0 - twoFluidFlux.alpha2_pos())*mesh.Sf(), (1.0 - twoFluidFlux.alpha2_neg())*mesh.Sf())
-                                          + dragK*(fluid.U1() - fluid.U2()));
+                                          /*+ dragK*(fluid.U1() - fluid.U2())*/);
             
             conservative.alphaRhoU2() = coeff[i][0]*conservative.alphaRhoU2().oldTime()
                                       + coeff[i][1]*conservative.alphaRhoU2()
                                       - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoUFlux2_pos(), twoFluidFlux.alphaRhoUFlux2_neg())
                                           - fluid.pInt()*CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alpha2_pos()*mesh.Sf(), twoFluidFlux.alpha2_neg()*mesh.Sf())
-                                          + dragK*(fluid.U2() - fluid.U1()));
+                                          /*+ dragK*(fluid.U2() - fluid.U1())*/);
 
             conservative.epsilon1() = coeff[i][0]*conservative.epsilon1().oldTime()
                                     + coeff[i][1]*conservative.epsilon1()
                                     - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux1_pos(), twoFluidFlux.alphaRhoEFlux1_neg())
-                                    + ((dragK*(fluid.U1() - fluid.U2())) & U1));
+                                    /*+ ((dragK*(fluid.U1() - fluid.U2())) & U1)*/);
             
             conservative.epsilon2() = coeff[i][0]*conservative.epsilon2().oldTime()
                                     + coeff[i][1]*conservative.epsilon2()
                                     - coeff[i][2]*dt*(CompressibleTwoFluidFoam::fvc::div(twoFluidFlux.alphaRhoEFlux2_pos(), twoFluidFlux.alphaRhoEFlux2_neg())
-                                    + ((dragK*(fluid.U2() - fluid.U1())) & U2));
+                                    /*+ ((dragK*(fluid.U2() - fluid.U1())) & U2)*/);
 
             fluid.correct();
             fluid.blendVanishingFluid();
@@ -134,7 +138,7 @@ int main(int argc, char *argv[])
             if(i == 2) fluid.correctInterfacialPressure();
             fluid.correctConservative();
 
-            drag.correct();
+            //drag.correct();
 
             /*const label patchI = U1.mesh().boundaryMesh().findPatchID("wall");
             const fvPatch& patch = U1.boundaryField()[patchI].patch();

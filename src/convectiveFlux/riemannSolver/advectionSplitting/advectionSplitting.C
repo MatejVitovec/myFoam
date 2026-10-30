@@ -92,6 +92,89 @@ void Foam::advectionSplitting::calculateFlux
     rhoEFlux = (leftMassFlux*HLeft + rightMassFlux*HRight)*magSf;
 }
 
+void Foam::advectionSplitting::calculateFlux
+(
+    scalar& alphaRhoFlux,
+    vector& alphaRhoUFluxLeft,
+    vector& alphaRhoUFluxRight,
+    scalar& alphaRhoEFlux,
+    const scalar alphaLeft,
+    const scalar alphaRight,
+    const scalar pLeft,
+    const scalar pRight,
+    const vector ULeft,
+    const vector URight,
+    const scalar rhoLeft,
+    const scalar rhoRight,
+    const scalar eLeft,
+    const scalar eRight,
+    const scalar aLeft,
+    const scalar aRight,
+    const vector Sf,
+    const scalar magSf
+) const
+{
+    if (magSf <= VSMALL)
+    {
+        FatalErrorInFunction
+            << "Face area magnitude must be positive, got " << magSf
+            << exit(FatalError);
+    }
+
+    const vector normalVector = Sf/magSf;
+    const scalar HLeft = eLeft + pLeft/rhoLeft + 0.5*magSqr(ULeft);
+    const scalar HRight = eRight + pRight/rhoRight + 0.5*magSqr(URight);
+
+    const scalar massFlux_ = massFlux
+    (
+        pLeft, pRight,
+        ULeft, URight,
+        rhoLeft, rhoRight,
+        aLeft, aRight,
+        normalVector
+    );
+
+    const scalar leftMassFlux = 0.5*(massFlux_ + mag(massFlux_));
+    const scalar rightMassFlux = 0.5*(massFlux_ - mag(massFlux_));
+
+    const scalar pressureFlux_ = pressureFlux
+    (
+        pLeft, pRight,
+        ULeft, URight,
+        rhoLeft, rhoRight,
+        aLeft, aRight,
+        normalVector
+    );
+
+    alphaRhoFlux =
+        (
+            leftMassFlux*alphaLeft
+          + rightMassFlux*alphaRight
+        )*magSf;
+
+    const vector momentumAdvectionFlux =
+        leftMassFlux*alphaLeft*ULeft
+      + rightMassFlux*alphaRight*URight;
+
+    alphaRhoUFluxLeft =
+        (
+            momentumAdvectionFlux
+          + pressureFlux_*alphaLeft*normalVector
+        )*magSf;
+
+    alphaRhoUFluxRight =
+        (
+            momentumAdvectionFlux
+          + pressureFlux_*alphaRight*normalVector
+        )*magSf;
+
+    alphaRhoEFlux =
+        (
+            leftMassFlux*alphaLeft*HLeft
+          + rightMassFlux*alphaRight*HRight
+        )*magSf;
+}
+
 
 void Foam::advectionSplitting::calculateFlux
 (

@@ -61,6 +61,7 @@ private:
     const scalar ku_;
     const scalar beta_;
     const scalar MaInf_;
+    const scalar sigma_ = 1.0;
 
     scalar massFlux
     (
@@ -98,18 +99,18 @@ public:
         ausmPlusUp()
         :
             advectionSplitting(),
-            kp_(0.5),
-            ku_(0.5),
-            beta_(1/8),    
+            kp_(1.0),
+            ku_(1.0),
+            beta_(1.0/8.0),
             MaInf_(0.05)
         {};
 
         ausmPlusUp(const dictionary& dict)
         :
             advectionSplitting(dict),
-            kp_(0.5),
-            ku_(0.5),
-            beta_(1/8),    
+            kp_(1.0),
+            ku_(1.0),
+            beta_(1.0/8.0),
             MaInf_(0.05)
         {};
 

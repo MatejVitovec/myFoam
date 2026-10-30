@@ -41,7 +41,7 @@ surfaceScalarField amaxSf
     fluid.amaxSf()
 );
 
-volScalarField d
+/*volScalarField d
 (
     IOobject
     (
@@ -57,7 +57,7 @@ volScalarField d
 
 autoPtr<CompressibleTwoFluidFoam::dragModel> pDrag =
     CompressibleTwoFluidFoam::dragModel::New(fluid, d);
-CompressibleTwoFluidFoam::dragModel& drag = pDrag();
+CompressibleTwoFluidFoam::dragModel& drag = pDrag();*/
 
 
 //Pro ukladani
@@ -86,4 +86,3 @@ volScalarField rho2
     ),
     thermo2.rho()
 );
-

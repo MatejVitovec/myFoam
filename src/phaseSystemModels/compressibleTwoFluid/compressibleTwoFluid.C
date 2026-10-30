@@ -289,7 +289,7 @@ void Foam::CompressibleTwoFluidFoam::compressibleTwoFluid::blendVanishingFluid
 {
     if ((1.0 - alpha2) <= epsilonMin_)
     {
-        //alpha2 = 1.0 - epsilonMin_;
+        alpha2 = 1.0 - epsilonMin_;
         U1 = U2;
         T1 = T2;
     }
@@ -304,7 +304,7 @@ void Foam::CompressibleTwoFluidFoam::compressibleTwoFluid::blendVanishingFluid
         
     if (alpha2 <= epsilonMin_)
     {
-        //alpha2 = epsilonMin_;
+        alpha2 = epsilonMin_;
         U2 = U1;
         T2 = T1;
     }
@@ -330,7 +330,7 @@ void Foam::CompressibleTwoFluidFoam::compressibleTwoFluid::blendVanishingFluid
 {
     if ((1.0 - alpha2) <= epsilonMin_)
     {
-        //alpha2 = 1.0 - epsilonMin_;
+        alpha2 = 1.0 - epsilonMin_;
         U1 = U2;
         T1 = T2;
     }
@@ -345,7 +345,7 @@ void Foam::CompressibleTwoFluidFoam::compressibleTwoFluid::blendVanishingFluid
         
     if (alpha2 <= epsilonMin_)
     {
-        //alpha2 = epsilonMin_;
+        alpha2 = epsilonMin_;
         U2 = U1;
         T2 = T2vanished;
     }
@@ -697,8 +697,10 @@ void Foam::CompressibleTwoFluidFoam::compressibleTwoFluid::correctInterfacialPre
     const auto& rho1 = thermo1_.rho();
     const auto& rho2 = thermo2_.rho();
 
-    pInt_ = p_ - min(sigma*((alpha1_*rho1*alpha2_*rho2)/
-        (alpha1_*rho2 + alpha2_*rho1))*magSqr(U2_ - U1_), epsilonP*p_);
+    pInt_ = p_ - min(
+        sigma*((alpha1_*rho1*alpha2_*rho2)/
+        (alpha1_*rho2 + alpha2_*rho1))*magSqr(U2_ - U1_),
+        epsilonP*p_);
 
     //pInt_ = p_ - min(sigma*alpha2_*rho1*magSqr(U2_ - U1_), epsilonP*p_);
 }

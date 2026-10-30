@@ -17,7 +17,12 @@ EXE_INC = \
     -IconvectiveFlux/riemannSolver/advectionSplitting \
     -IconvectiveFlux/riemannSolver/advectionSplitting/slau2 \
     -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp \
-    -IconvectiveFlux/riemannSolver/mslau2
+    -IconvectiveFlux/riemannSolver/advectionSplitting/ausmPlusUp2 \
+    -IconvectiveFlux/riemannSolver/mslau2 \
+    -IconvectiveFlux/riemannSolver/hllcInterphase \
+    -IconvectiveFlux/riemannSolver/hllcGodunovInterphase \
+    -IconvectiveFlux/riemannSolver/godunovInterphase \
+    -IconvectiveFlux/riemannSolver/twoFluidComposite
 
 EXE_LIBS = \
     -lfiniteVolume \

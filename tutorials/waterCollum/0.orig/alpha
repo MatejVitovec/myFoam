@@ -64,6 +64,7 @@ internalField   #codeStream
             }
         }
 
+        os.precision(17);
         alpha.writeEntry("", os);
     #};
 };

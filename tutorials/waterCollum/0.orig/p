@@ -23,8 +23,9 @@ internalField   uniform 1e5;
 boundaryField
 {
     inlet
-    {
-        type            zeroGradient;
+    {	
+	type            fixedValue;
+        value           uniform 235438;
     }
 
     outlet

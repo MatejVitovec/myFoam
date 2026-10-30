@@ -5,6 +5,11 @@ riemannSolver/hllc/hllc.C
 riemannSolver/advectionSplitting/advectionSplitting.C
 riemannSolver/advectionSplitting/slau2/slau2.C
 riemannSolver/advectionSplitting/ausmPlusUp/ausmPlusUp.C
+riemannSolver/advectionSplitting/ausmPlusUp2/ausmPlusUp2.C
 riemannSolver/mslau2/mslau2.C
+riemannSolver/hllcInterphase/hllcInterphase.C
+riemannSolver/hllcGodunovInterphase/hllcGodunovInterphase.C
+riemannSolver/godunovInterphase/godunovInterphase.C
+riemannSolver/twoFluidComposite/twoFluidComposite.C
 
 LIB = $(FOAM_USER_LIBBIN)/libmyConvectiveFlux

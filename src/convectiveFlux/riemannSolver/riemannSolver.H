@@ -145,6 +145,34 @@ public:
             FatalError << "Rieman solver not implemented" << endl;
         }
 
+        //- Update fluxes for a phase with a varying volume fraction
+        virtual void calculateFlux
+        (
+            scalar& alphaRhoFlux,
+            vector& alphaRhoUFluxLeft,
+            vector& alphaRhoUFluxRight,
+            scalar& alphaRhoEFlux,
+            const scalar alphaLeft,
+            const scalar alphaRight,
+            const scalar pLeft,
+            const scalar pRight,
+            const vector ULeft,
+            const vector URight,
+            const scalar rhoLeft,
+            const scalar rhoRight,
+            const scalar eLeft,
+            const scalar eRight,
+            const scalar aLeft,
+            const scalar aRight,
+            const vector Sf,
+            const scalar magSf
+        ) const
+        {
+            FatalErrorInFunction
+                << "Volume-fraction-weighted calculateFlux not implemented"
+                << exit(FatalError);
+        }
+
         //- Update fluxes based on current left and right states, with passive scalar
         virtual void calculateFlux
         (
@@ -193,6 +221,34 @@ public:
         ) const
         {
             FatalError << "Rieman solver not implemented" << endl;
+        }
+
+        //- Update interphase fluxes and return the star pressure
+        virtual void calculateFlux
+        (
+            scalar& starPressure,
+            scalar& alphaRhoFlux1Left,  scalar& alphaRhoFlux1Right,
+            scalar& alphaRhoFlux2Left,  scalar& alphaRhoFlux2Right,
+            vector& alphaRhoUFlux1Left, vector& alphaRhoUFlux1Right,
+            vector& alphaRhoUFlux2Left, vector& alphaRhoUFlux2Right,
+            scalar& alphaRhoEFlux1Left, scalar& alphaRhoEFlux1Right,
+            scalar& alphaRhoEFlux2Left, scalar& alphaRhoEFlux2Right,
+            const scalar& alphaLeft,    const scalar& alphaRight,
+            const scalar& pLeft,        const scalar& pRight,
+            const vector& U1Left,       const vector& U1Right,
+            const vector& U2Left,       const vector& U2Right,
+            const scalar& T1Left,       const scalar& T1Right,
+            const scalar& T2Left,       const scalar& T2Right,
+            const vector& Sf,
+            const scalar& magSf,
+            const gasProperties& gas1,
+            const gasProperties& gas2
+        ) const
+        {
+            FatalErrorInFunction
+                << "Interphase calculateFlux with star-pressure output "
+                << "not implemented"
+                << exit(FatalError);
         }
 };
 
