@@ -197,11 +197,11 @@ int main(int argc, char *argv[])
 
         //std::cin.ignore();
 
-        if(runTime.timeIndex() > 1500000)
+        /*if(runTime.timeIndex() > 1500000)
         {
             Info<< "End after 1 500 000 iter\n" << endl;
             return 0;
-        }
+        }*/
     }
 
     Info<< "End\n" << endl;

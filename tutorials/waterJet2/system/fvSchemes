@@ -15,9 +15,34 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-riemannSolver       slau2;
+//riemannSolver       slau2;
+//epsilonMSlau2       1.0e-4;
 
-epsilonMSlau2       1.0e-4;
+riemannSolver twoFluidComposite;
+
+twoFluidCompositeCoeffs
+{
+    interfaceTolerance 1e-5;
+    interfacePressureCoefficient 2;
+    interfacePressureLimit 0.01;
+
+    phase1Solver
+    {
+        riemannSolver slau2;
+    }
+
+    phase2Solver
+    {
+        riemannSolver slau2;
+    }
+
+    interphaseSolver
+    {
+        riemannSolver hllcGodunovInterphase;
+        minimumStarPressureRatio 1e-6;
+    }
+}
+
 
 ddtSchemes
 {

@@ -55,6 +55,29 @@ public:
         const gasProperties& gas1,
         const gasProperties& gas2
     ) const;
+
+    scalar einfeldtSoundSpeed
+    (
+        const scalar pLeft,    const scalar pRight,
+        const vector ULeft,    const vector URight,
+        const scalar TLeft,    const scalar TRight,
+        const scalar rhoLeft,  const scalar rhoRight,
+        const vector normal,
+        const gasProperties& gas1,
+        const gasProperties& gas2
+    ) const;
+
+    scalar roeSoundSpeed
+    (
+        const scalar pLeft,    const scalar pRight,
+        const vector ULeft,    const vector URight,
+        const scalar TLeft,    const scalar TRight,
+        const scalar rhoLeft,  const scalar rhoRight,
+        const vector normal,
+        const gasProperties& gas1,
+        const gasProperties& gas2
+    ) const;
+
 };
 
 } // End namespace Foam
