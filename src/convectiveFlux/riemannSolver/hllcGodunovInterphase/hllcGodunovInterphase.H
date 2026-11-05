@@ -26,6 +26,28 @@ class hllcGodunovInterphase
     hllcGodunovInterphase(const hllcGodunovInterphase&) = delete;
     void operator=(const hllcGodunovInterphase&) = delete;
 
+    scalar einfeldtSoundSpeed
+    (
+        const scalar pLeft,    const scalar pRight,
+        const vector ULeft,    const vector URight,
+        const scalar TLeft,    const scalar TRight,
+        const scalar rhoLeft,  const scalar rhoRight,
+        const vector normal,
+        const gasProperties& gas1,
+        const gasProperties& gas2
+    ) const;
+
+    scalar roeSoundSpeed
+    (
+        const scalar pLeft,    const scalar pRight,
+        const vector ULeft,    const vector URight,
+        const scalar TLeft,    const scalar TRight,
+        const scalar rhoLeft,  const scalar rhoRight,
+        const vector normal,
+        const gasProperties& gas1,
+        const gasProperties& gas2
+    ) const;
+
 public:
 
     TypeName("hllcGodunovInterphase");
@@ -52,28 +74,6 @@ public:
         const scalar& T2Left,       const scalar& T2Right,
         const vector& Sf,
         const scalar& magSf,
-        const gasProperties& gas1,
-        const gasProperties& gas2
-    ) const;
-
-    scalar einfeldtSoundSpeed
-    (
-        const scalar pLeft,    const scalar pRight,
-        const vector ULeft,    const vector URight,
-        const scalar TLeft,    const scalar TRight,
-        const scalar rhoLeft,  const scalar rhoRight,
-        const vector normal,
-        const gasProperties& gas1,
-        const gasProperties& gas2
-    ) const;
-
-    scalar roeSoundSpeed
-    (
-        const scalar pLeft,    const scalar pRight,
-        const vector ULeft,    const vector URight,
-        const scalar TLeft,    const scalar TRight,
-        const scalar rhoLeft,  const scalar rhoRight,
-        const vector normal,
         const gasProperties& gas1,
         const gasProperties& gas2
     ) const;
