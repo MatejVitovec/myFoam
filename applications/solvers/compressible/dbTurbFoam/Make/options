@@ -9,7 +9,7 @@ EXE_INC = \
     -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
     -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
-    -I../../../../thermophysicalModels/lnInclude \
+    -I../../../../src/thermophysicalModels/lnInclude \
     -IconvectiveFlux \
     -IconvectiveFlux/lnInclude \
     -IconvectiveFlux/riemannSolver \

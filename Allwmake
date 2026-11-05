@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+if ! command -v wmake >/dev/null 2>&1; then
+    printf 'Chyba: wmake není dostupný. Nejdřív načtěte prostředí OpenFOAM (source .../etc/bashrc).\n' >&2
+    exit 1
+fi
+
+if [[ -z "${FOAM_USER_LIBBIN:-}" || -z "${FOAM_USER_APPBIN:-}" ]]; then
+    printf 'Chyba: prostředí OpenFOAM není kompletní (FOAM_USER_LIBBIN nebo FOAM_USER_APPBIN není nastaven).\n' >&2
+    printf 'Nejdřív načtěte prostředí OpenFOAM, například: source /cesta/k/OpenFOAM/etc/bashrc\n' >&2
+    exit 1
+fi
+
+build_target() {
+    local mode=$1
+    local dir=$2
+    local label=${mode:-application}
+
+    if [[ ! -f "$ROOT_DIR/$dir/Make/files" ]]; then
+        printf 'Chyba: v %s chybí Make/files.\n' "$dir" >&2
+        exit 1
+    fi
+
+    printf '\n==> %s (%s)\n' "$dir" "$label"
+    if [[ -n "$mode" ]]; then
+        (cd "$ROOT_DIR/$dir" && wmake "$mode")
+    else
+        (cd "$ROOT_DIR/$dir" && wmake)
+    fi
+}
+
+libraries=(
+    src/OpenFOAM
+    src/finiteVolume
+    src/thermophysicalModels
+    src
+    src/convectiveFlux
+    src/bound
+    src/phaseSystemModels/compressibleTwoFluid
+    src/phaseSystemModels/compressibleTwoFluid/phaseCompressibleTurbulenceModels
+    src/phaseSystemModels/compressibleMixture
+    src/twoFluid
+    src/condensationModels
+    src/functionObjects/field
+)
+
+executables=(
+    src/OpenFOAM/interpolations/biLinearInterpolation/test
+    src/OpenFOAM/interpolations/biQuadraticInterpolation/test
+    src/OpenFOAM/interpolations/biCubicInterpolation/test
+    src/thermophysicalModels/tutorial/gasProps
+    applications/solvers/compressible/blockLusgsFoam
+    applications/solvers/compressible/dbTurbFoam
+    applications/solvers/finiteArea/bladeFilmFoam
+    applications/solvers/multiphase/dbFoam
+    applications/solvers/multiphase/lusgsDbFoam
+    applications/solvers/multiphase/lusgsMixtureFoam
+    applications/solvers/multiphase/lusgsMixtureWetSteamFoam
+    applications/solvers/multiphase/lusgsTwoFluidFoam
+    applications/solvers/multiphase/lusgsTwoFluidBoundedFoam
+    applications/solvers/multiphase/lusgsTwoFluidTurbulentFoam
+    applications/solvers/multiphase/lusgsTwoFluidWetSteamFoam
+    applications/solvers/multiphase/rk3PrimitiveTwoFluidFoam
+    applications/solvers/multiphase/rk3TwoFluidTurbulentFoam
+    applications/solvers/multiphase/wetSteamDbFoam
+)
+
+printf 'Sestavuji knihovny a aplikace v %s\n' "$ROOT_DIR"
+for dir in "${libraries[@]}"; do
+    build_target libso "$dir"
+done
+
+for dir in "${executables[@]}"; do
+    build_target "" "$dir"
+done
+
+printf '\nSestavení všech aktuálních cílů myFoam bylo úspěšně dokončeno.\n'

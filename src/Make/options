@@ -7,6 +7,7 @@ EXE_INC = \
 
 LIB_LIBS = \
     -lfiniteVolume \
-	-lmyFiniteVolumeFoam \
+    -L$(FOAM_USER_LIBBIN) \
+    -lmyFiniteVolumeFoam \
     -lmeshTools
 	
