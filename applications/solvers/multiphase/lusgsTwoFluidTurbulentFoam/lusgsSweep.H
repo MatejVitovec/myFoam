@@ -10,8 +10,8 @@
     const volScalarField nu1Max
     (
         "nuMax.1",
-        //max(4.0/3.0 * turbulence1->nuEff(), thermo1.Cp()/thermo1.Cv() * turbulence1->alphaEff()/rho1)
-        turbulence1->alphaEff()/rho1
+        max(4.0/3.0 * turbulence1->nuEff(), thermo1.Cp()/thermo1.Cv() * turbulence1->alphaEff()/rho1)
+        //turbulence1->alphaEff()/rho1
     );
 
     Field<scalar> drhodp1(mesh.nCells());
@@ -34,8 +34,8 @@
         cp2[celli] = gasProps2.Cp(p[celli], T2[celli]);
     }
 
-    forAll(owner, faceI)
-    {
+//    forAll(owner, faceI)
+//    {
 
         /*scalar cm_own = 1.0 / Foam::sqrt((1.0 - alpha[owner[faceI]])/(rho1[owner[faceI]]*a1[owner[faceI]]*a1[owner[faceI]]) + alpha[owner[faceI]]/(rho2[owner[faceI]]*a2[owner[faceI]]*a2[owner[faceI]]));
         scalar cm_nei = 1.0 / Foam::sqrt((1.0 - alpha[neighbour[faceI]])/(rho1[neighbour[faceI]]*a1[neighbour[faceI]]*a1[neighbour[faceI]]) + alpha[neighbour[faceI]]/(rho2[neighbour[faceI]]*a2[neighbour[faceI]]*a2[neighbour[faceI]]));
@@ -44,14 +44,14 @@
                                        mag(U1[neighbour[faceI]] & Sf[faceI]) + cm_nei*magSf[faceI]),
                                    max(mag(U2[owner[faceI]]     & Sf[faceI]) + cm_own*magSf[faceI],
                                        mag(U2[neighbour[faceI]] & Sf[faceI]) + cm_nei*magSf[faceI]));*/
-    }
+//    }
 
-    forAll(mesh.boundary(), patchi)
-    {
-        const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
+//    forAll(mesh.boundary(), patchi)
+//    {
+//        const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
 
-        forAll(mesh.boundary()[patchi], faceI)
-        {
+//        forAll(mesh.boundary()[patchi], faceI)
+//        {
             /*ac[pFaceCells[faceI]] = lusgsOmega*max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + a1[pFaceCells[faceI]]*magSf[faceI],
                                                    mag(U2[pFaceCells[faceI]] & Sf[faceI]) + a2[pFaceCells[faceI]]*magSf[faceI]);*/
 
@@ -61,8 +61,8 @@
 
             ac[pFaceCells[faceI]] = lusgsOmega*max(mag(U1[pFaceCells[faceI]] & Sf[faceI]) + cm*magSf[faceI],
                                                    mag(U2[pFaceCells[faceI]] & Sf[faceI]) + cm*magSf[faceI]);*/
-        }
-    }
+//        }
+//    }
 
     //std::vector<Eigen::FullPivLU<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());
     std::vector<Eigen::ColPivHouseholderQR<Eigen::Matrix<double,10,10>>> D_inv(mesh.nCells());

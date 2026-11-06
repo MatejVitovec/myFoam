@@ -29,11 +29,15 @@
                 if (own != celli)
                 {
                     const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*nu1Max[own];
+                    //const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*max(nu1Max[own], nu1Max[nei]);
                     const scalar av2 = 0.0;
                     //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
                     //                                   max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
                     //const scalar ac1 = lusgsOmega*(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])));
                     //const scalar ac2 = ac1;
+
+                    //const scalar ac1 = lusgsOmega*max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei], mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
+                    //const scalar ac2 = lusgsOmega*max(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei], mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
                     const scalar ac1 = lusgsOmega*(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei]);
                     const scalar ac2 = lusgsOmega*(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei]);
 
@@ -58,11 +62,15 @@
                 if (nei != celli)
                 {
                     const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*nu1Max[nei];
+                    //const scalar av1 = (2.0*sqr(magSf[facei])/dvol)*max(nu1Max[own], nu1Max[nei]);
                     const scalar av2 = 0.0;
                     //const scalar ac1 = lusgsOmega*(max(max(mag(U1[own] & Sf[facei]) + (a1[own] * magSf[facei]), mag(U2[own] & Sf[facei]) + (a2[own]*magSf[facei])),
                     //                                   max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei]))));
                     //const scalar ac1 = lusgsOmega*(max(mag(U1[nei] & Sf[facei]) + (a1[nei] * magSf[facei]), mag(U2[nei] & Sf[facei]) + (a2[nei]*magSf[facei])));
                     //const scalar ac2 = ac1;
+
+                    //const scalar ac1 = lusgsOmega*max(mag(U1[own] & Sf[facei]) + a1[own]*magSf[facei], mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
+                    //const scalar ac2 = lusgsOmega*max(mag(U2[own] & Sf[facei]) + a2[own]*magSf[facei], mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
                     const scalar ac1 = lusgsOmega*(mag(U1[nei] & Sf[facei]) + a1[nei]*magSf[facei]);
                     const scalar ac2 = lusgsOmega*(mag(U2[nei] & Sf[facei]) + a2[nei]*magSf[facei]);
 
@@ -74,14 +82,14 @@
                     const scalar unMLambda1 = ac1 + av1 - un1;
                     const scalar unMLambda2 = ac2 + av2 - un2;
 
-                    rAlphaRho1  += 0.5*(                                                   alpha1[nei]*unMLambda1*drhodp1[nei]*dpStar[nei]                              - unMLambda1*rho1[nei]*dalphaStar[nei]                                    + ((alpha1[nei]*rho1[nei]*Sf[facei]) & dU1Star[nei])                                + alpha1[nei]*(unMLambda1*drhodT1[nei])*dT1Star[nei]);
-                    rAlphaRho2  += 0.5*(                                                   alpha2[nei]*unMLambda2*drhodp2[nei]*dpStar[nei]                              + unMLambda2*rho2[nei]*dalphaStar[nei]                                    + ((alpha2[nei]*rho2[nei]*Sf[facei]) & dU2Star[nei])                                + alpha2[nei]*(unMLambda2*drhodT2[nei])*dT2Star[nei]);
+                    rAlphaRho1  += 0.5*(                                                   alpha1[nei]*unMLambda1*drhodp1[nei]*dpStar[nei]                              - unMLambda1*rho1[nei]*dalphaStar[nei]                                    - ((alpha1[nei]*rho1[nei]*Sf[facei]) & dU1Star[nei])                                + alpha1[nei]*(unMLambda1*drhodT1[nei])*dT1Star[nei]);
+                    rAlphaRho2  += 0.5*(                                                   alpha2[nei]*unMLambda2*drhodp2[nei]*dpStar[nei]                              + unMLambda2*rho2[nei]*dalphaStar[nei]                                    - ((alpha2[nei]*rho2[nei]*Sf[facei]) & dU2Star[nei])                                + alpha2[nei]*(unMLambda2*drhodT2[nei])*dT2Star[nei]);
 
-                    rAlphaRhoU1 += 0.5*(                             alpha1[nei]*(unMLambda1*drhodp1[nei]*U1[nei] + Sf[facei])*dpStar[nei] - (unMLambda1*rho1[nei]*U1[nei] + p[nei]*Sf[facei])*dalphaStar[nei] + (alpha1[nei]*rho1[nei]*(unMLambda1*tensor::I + (U1[nei] * Sf[facei])) & dU1Star[nei])                        + alpha1[nei]*(unMLambda1*drhodT1[nei]*U1[nei])*dT1Star[nei]);
-                    rAlphaRhoU2 += 0.5*(                             alpha2[nei]*(unMLambda2*drhodp2[nei]*U2[nei] + Sf[facei])*dpStar[nei] + (unMLambda2*rho2[nei]*U2[nei] + p[nei]*Sf[facei])*dalphaStar[nei] + (alpha2[nei]*rho2[nei]*(unMLambda2*tensor::I + (U2[nei] * Sf[facei])) & dU2Star[nei])                        + alpha2[nei]*(unMLambda2*drhodT2[nei]*U2[nei])*dT2Star[nei]);
+                    rAlphaRhoU1 += 0.5*(                             alpha1[nei]*(unMLambda1*drhodp1[nei]*U1[nei] - Sf[facei])*dpStar[nei] - (unMLambda1*rho1[nei]*U1[nei] - p[nei]*Sf[facei])*dalphaStar[nei] + (alpha1[nei]*rho1[nei]*(unMLambda1*tensor::I - (U1[nei] * Sf[facei])) & dU1Star[nei])                        + alpha1[nei]*(unMLambda1*drhodT1[nei]*U1[nei])*dT1Star[nei]);
+                    rAlphaRhoU2 += 0.5*(                             alpha2[nei]*(unMLambda2*drhodp2[nei]*U2[nei] - Sf[facei])*dpStar[nei] + (unMLambda2*rho2[nei]*U2[nei] - p[nei]*Sf[facei])*dalphaStar[nei] + (alpha2[nei]*rho2[nei]*(unMLambda2*tensor::I - (U2[nei] * Sf[facei])) & dU2Star[nei])                        + alpha2[nei]*(unMLambda2*drhodT2[nei]*U2[nei])*dT2Star[nei]);
                 
-                    rEpsilon1   += 0.5*(alpha1[nei]*(unMLambda1*(drhodp1[nei]*H1[nei] + drhodT1[nei]*T1[nei]/rho1[nei]) + un1)*dpStar[nei]            - (unMLambda1*rho1[nei]*E1 + p[nei]*un1)*dalphaStar[nei]     + ((alpha1[nei]*rho1[nei]*(unMLambda1*U1[nei] + H1[nei]*Sf[facei])) & dU1Star[nei]) + alpha1[nei]*(unMLambda1*(drhodT1[nei]*H1[nei] + rho1[nei]*cp1[nei]))*dT1Star[nei]);
-                    rEpsilon2   += 0.5*(alpha2[nei]*(unMLambda2*(drhodp2[nei]*H2[nei] + drhodT2[nei]*T2[nei]/rho2[nei]) + un2)*dpStar[nei]            + (unMLambda2*rho2[nei]*E2 + p[nei]*un2)*dalphaStar[nei]     + ((alpha2[nei]*rho2[nei]*(unMLambda2*U2[nei] + H2[nei]*Sf[facei])) & dU2Star[nei]) + alpha2[nei]*(unMLambda2*(drhodT2[nei]*H2[nei] + rho2[nei]*cp2[nei]))*dT2Star[nei]);
+                    rEpsilon1   += 0.5*(alpha1[nei]*(unMLambda1*(drhodp1[nei]*H1[nei] + drhodT1[nei]*T1[nei]/rho1[nei]) - un1)*dpStar[nei]            - (unMLambda1*rho1[nei]*E1 - p[nei]*un1)*dalphaStar[nei]     + ((alpha1[nei]*rho1[nei]*(unMLambda1*U1[nei] - H1[nei]*Sf[facei])) & dU1Star[nei]) + alpha1[nei]*(unMLambda1*(drhodT1[nei]*H1[nei] + rho1[nei]*cp1[nei]))*dT1Star[nei]);
+                    rEpsilon2   += 0.5*(alpha2[nei]*(unMLambda2*(drhodp2[nei]*H2[nei] + drhodT2[nei]*T2[nei]/rho2[nei]) - un2)*dpStar[nei]            + (unMLambda2*rho2[nei]*E2 - p[nei]*un2)*dalphaStar[nei]     + ((alpha2[nei]*rho2[nei]*(unMLambda2*U2[nei] - H2[nei]*Sf[facei])) & dU2Star[nei]) + alpha2[nei]*(unMLambda2*(drhodT2[nei]*H2[nei] + rho2[nei]*cp2[nei]))*dT2Star[nei]);
                 }
             }
             /*else

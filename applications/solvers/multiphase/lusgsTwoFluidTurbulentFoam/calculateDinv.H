@@ -31,9 +31,19 @@
         //acSum[owner[facei]]     += 0.5*lusgsOmega*max(mag(U1[owner[facei]] & Sf[facei])     + a1[owner[facei]]*magSf[facei],     mag(U2[owner[facei]] & Sf[facei])     + a2[owner[facei]]*magSf[facei]);
         //acSum[neighbour[facei]] += 0.5*lusgsOmega*max(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei], mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
 
-        avSum[owner[facei]]     += (sqr(magSf[facei])/dvol)*nu1Max[owner[facei]];
-        avSum[neighbour[facei]] += (sqr(magSf[facei])/dvol)*nu1Max[neighbour[facei]];
 
+        /*const scalar avFace  = (sqr(magSf[facei])/dvol)*max(nu1Max[owner[facei]], nu1Max[neighbour[facei]]);
+        const scalar acFace1 = 0.5*lusgsOmega*max(mag(U1[owner[facei]] & Sf[facei]) + a1[owner[facei]]*magSf[facei], mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
+        const scalar acFace2 = 0.5*lusgsOmega*max(mag(U2[owner[facei]] & Sf[facei]) + a2[owner[facei]]*magSf[facei], mag(U2[neighbour[facei]] & Sf[facei]) + a2[neighbour[facei]]*magSf[facei]);
+        avSum[owner[facei]]      += avFace;
+        avSum[neighbour[facei]]  += avFace;
+        acSum1[owner[facei]]     += acFace1;
+        acSum2[owner[facei]]     += acFace2;
+        acSum1[neighbour[facei]] += acFace1;
+        acSum2[neighbour[facei]] += acFace2;*/
+
+        avSum[owner[facei]]      += (sqr(magSf[facei])/dvol)*nu1Max[owner[facei]];
+        avSum[neighbour[facei]]  += (sqr(magSf[facei])/dvol)*nu1Max[neighbour[facei]];
         acSum1[owner[facei]]     += 0.5*lusgsOmega*(mag(U1[owner[facei]]     & Sf[facei]) + a1[owner[facei]]    *magSf[facei]);
         acSum2[owner[facei]]     += 0.5*lusgsOmega*(mag(U2[owner[facei]]     & Sf[facei]) + a2[owner[facei]]    *magSf[facei]);
         acSum1[neighbour[facei]] += 0.5*lusgsOmega*(mag(U1[neighbour[facei]] & Sf[facei]) + a1[neighbour[facei]]*magSf[facei]);
@@ -45,10 +55,14 @@
         const labelUList& pFaceCells = mesh.boundary()[patchi].faceCells();
         const vectorField& pSf = mesh.Sf().boundaryField()[patchi];
         const scalarField& pMagSf = mesh.magSf().boundaryField()[patchi];
+        const vectorField& pCf = mesh.Cf().boundaryField()[patchi];
 
         forAll(mesh.boundary()[patchi], facei)
         {
             //acSum[pFaceCells[facei]] += 0.5*lusgsOmega*(max(mag(U1[pFaceCells[facei]] & pSf[facei]) + a1[pFaceCells[facei]]*pMagSf[facei], mag(U2[pFaceCells[facei]] & pSf[facei]) + a2[pFaceCells[facei]]*pMagSf[facei]));
+
+            const scalar dvol = mag((pCf[facei] - mesh.C()[pFaceCells[facei]]) & pSf[facei]);
+            avSum[pFaceCells[facei]]  += (sqr(pMagSf[facei])/dvol)*nu1Max[pFaceCells[facei]];
 
             acSum1[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U1[pFaceCells[facei]] & pSf[facei]) + a1[pFaceCells[facei]]*pMagSf[facei]);
             acSum2[pFaceCells[facei]] += 0.5*lusgsOmega*(mag(U2[pFaceCells[facei]] & pSf[facei]) + a2[pFaceCells[facei]]*pMagSf[facei]);
